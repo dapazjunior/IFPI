@@ -1,5 +1,5 @@
 def main():
-    """Lê três notas, calcula a média, ajusta a média se for o caso e exibe a média final."""
+    """Lê 5 números, calcula a média e exibe quais números estão acima da média."""
 
     #Entrada de dados
     n1 = float(input())
@@ -7,7 +7,6 @@ def main():
     n3 = float(input())
     n4 = float(input())
     n5 = float(input())
-
 
     #Processamento
     media = calcular_media(n1, n2, n3, n4, n5)
@@ -22,13 +21,13 @@ def main():
 
 
 def calcular_media(num1, num2, num3, num4, num5):
-    """Retorna a média aritmética de cinco valores."""
-
+    """Recebe 5 números. Retorna a média aritmética deles."""
     media = (num1 + num2 + num3 + num4 + num5) / 5
     return media
 
 
 def print_se_maior(num, media):
+    """Se o número for maior que a média, exibe ele."""
     if num > media:
         print(f'{num}')
 
