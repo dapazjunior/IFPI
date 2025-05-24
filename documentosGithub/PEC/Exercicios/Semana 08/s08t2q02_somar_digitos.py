@@ -10,7 +10,6 @@ def main():
     #Saída de dados
     print(soma)
 
-
 def separar_e_somar_algarismos(n):
     """Recebe um número de até 6 dígitos e retorna a soma dos seus algarismos."""
 
