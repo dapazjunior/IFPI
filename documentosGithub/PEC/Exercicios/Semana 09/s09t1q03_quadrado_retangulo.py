@@ -1,0 +1,24 @@
+def main():
+    lado1 = int(input())
+    lado2 = int(input())
+
+    print(verificar_poligono(lado1, lado2))
+
+
+def verificar_poligono(v1, v2):
+    if v1 == v2:
+        return "QUADRADO" 
+    else:
+        return f"{calcular_perimetro(v1, v2)}" + " - " + f"{calcular_area(v1,v2)}"
+
+
+def calcular_perimetro(v1, v2):
+    return (v1 + v2) * 2
+
+
+def calcular_area(v1, v2):
+    return v1 * v2
+
+
+if __name__ == "__main__":
+    main()
