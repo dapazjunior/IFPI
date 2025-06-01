@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otimizador de Rotas - OpenStreetMap</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <style>
+        /* Estilos básicos para o corpo da página */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Estilo do contêiner principal da aplicação */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Estilo do título principal */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Estilo do parágrafo de descrição */
+        p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Seção de entrada de endereços e botões */
+        .input-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        /* Grupo de input para cada endereço */
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        /* Campo de texto para o endereço */
+        .location-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            transition: border-color 0.3s ease;
+        }
+
+        .location-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        /* Botão de remover endereço */
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Estilo geral dos botões */
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            margin-top: 10px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Estilos específicos para os botões de ação */
+        #add-location {
+            background: #2ecc71;
+        }
+        #add-location:hover {
+            background: #27ae60;
+        }
+
+        #optimize-route {
+            background: #f39c12;
+        }
+        #optimize-route:hover {
+            background: #d35400;
+        }
+
+        #reset {
+            background: #95a5a6;
+        }
+        #reset:hover {
+            background: #7f8c8d;
+        }
+
+        /* Seção de resultados (mapa e painel de direções) */
+        .results-section {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Estilo do mapa */
+        #map {
+            flex: 2;
+            min-height: 450px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background-color: #e0e0e0;
+        }
+
+        /* Estilo do painel de direções */
+        #directions-panel {
+            flex: 1;
+            min-width: 280px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            max-height: 450px;
+        }
+
+        #directions-panel h3 {
+            margin-top: 0;
+            color: #34495e;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Estilo para cada instrução de rota */
+        .instruction {
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .instruction:last-child {
+            border-bottom: none;
+        }
+
+        /* Estilo para o número ao lado do input */
+        .input-number {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #34495e;
+            width: 25px; /* Largura fixa para alinhar */
+            text-align: right;
+        }
+
+        /* Estilo para o checkbox de fixar */
+        .fix-checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            color: #555;
+            margin-left: 10px;
+        }
+        .fix-checkbox-group input[type="checkbox"] {
+            transform: scale(1.2); /* Aumenta um pouco o tamanho do checkbox */
+        }
+
+
+        /* Media queries para responsividade */
+        @media (max-width: 768px) {
+            .results-section {
+                flex-direction: column;
+            }
+            #map, #directions-panel {
+                width: 100%;
+                min-width: unset;
+            }
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            button {
+                width: calc(50% - 5px);
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            button:nth-child(even) {
+                margin-left: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Otimizador de Rotas</h1>
+        <p>Adicione múltiplos endereços para encontrar a rota mais eficiente e obter instruções detalhadas.</p>
+        
+        <div class="input-section">
+            <div id="location-inputs">
+                </div>
+            <button id="add-location">+ Adicionar Parada</button>
+            <button id="optimize-route">Otimizar Rota</button>
+            <button id="reset">Resetar</button>
+        </div>
+        
+        <div class="results-section">
+            <div id="map"></div>
+            <div id="directions-panel">
+                <h3>Instruções da Rota</h3>
+                <div id="instructions"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script>
+        // Variáveis globais para o mapa e camadas
+        let map;
+        let routeLayer;
+        let markers = []; // Array para armazenar os marcadores no mapa
+        let geocoder; // Objeto geocoder do Leaflet
+        let inputCounter = 0; // Contador para gerar IDs e números únicos para os inputs
+
+        // Icones personalizados para os marcadores numerados
+        const numberedIcon = (number) => {
+            return L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="background-color:#3498db; color:white; border-radius:50%; width:30px; height:30px; line-height:30px; text-align:center; font-weight:bold; font-size:16px;">${number}</div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 30] // Ajuste para centralizar o ícone na coordenada
+            });
+        };
+
+        // Icone para o ponto de início (opcional, pode ser diferente)
+        const startIcon = L.divIcon({
+            className: 'custom-div-icon start-icon',
+            html: `<div style="background-color:#2ecc71; color:white; border-radius:50%; width:35px; height:35px; line-height:35px; text-align:center; font-weight:bold; font-size:18px;">A</div>`,
+            iconSize: [35, 35],
+            iconAnchor: [17, 35]
+        });
+
+        // Icone para o ponto final (opcional, pode ser diferente)
+        const endIcon = L.divIcon({
+            className: 'custom-div-icon end-icon',
+            html: `<div style="background-color:#e74c3c; color:white; border-radius:50%; width:35px; height:35px; line-height:35px; text-align:center; font-weight:bold; font-size:18px;">Z</div>`,
+            iconSize: [35, 35],
+            iconAnchor: [17, 35]
+        });
+
+
+        // Executa quando o DOM estiver completamente carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap(); // Inicializa o mapa
+            setupEventListeners(); // Configura os listeners de eventos dos botões
+            addLocationInput(); // Adiciona o primeiro campo de input de endereço
+            addLocationInput(); // Adiciona um segundo campo de input para ter pelo menos dois pontos
+        });
+
+        /**
+         * Inicializa o mapa Leaflet e suas configurações básicas.
+         */
+        function initMap() {
+            // Cria o mapa centrado no Brasil com um zoom inicial
+            map = L.map('map').setView([-14.2350, -51.9253], 5);
+            
+            // Adiciona a camada de tiles do OpenStreetMap ao mapa
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Inicializa a camada de grupo para as rotas
+            routeLayer = L.layerGroup().addTo(map);
+
+            // Inicializa o geocoder do Leaflet para busca de endereços
+            geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false, // Não marca automaticamente o geocode no mapa
+                collapsed: true, // O controle de busca começa colapsado
+                position: 'topleft' // Posição do controle no mapa
+            }).addTo(map);
+            
+            // Evento disparado quando um endereço é geocodificado pelo controle do geocoder
+            geocoder.on('markgeocode', function(e) {
+                // Encontra o input de endereço que está atualmente focado
+                const inputFocused = document.querySelector('.location-input:focus');
+                if (inputFocused) {
+                    // Preenche o input com o nome completo do endereço geocodificado
+                    inputFocused.value = e.geocode.name;
+                }
+            });
+        }
+
+        /**
+         * Configura os listeners de eventos para os botões principais.
+         */
+        function setupEventListeners() {
+            // Listener para o botão "Adicionar Parada"
+            document.getElementById('add-location').addEventListener('click', addLocationInput);
+            
+            // Listener para o botão "Otimizar Rota"
+            document.getElementById('optimize-route').addEventListener('click', optimizeRoute);
+            
+            // Listener para o botão "Resetar"
+            document.getElementById('reset').addEventListener('click', resetMap);
+        }
+
+        /**
+         * Adiciona um novo campo de input para endereço dinamicamente.
+         */
+        function addLocationInput() {
+            inputCounter++; // Incrementa o contador para o próximo input
+            const inputsContainer = document.getElementById('location-inputs');
+            const newInputGroup = document.createElement('div');
+            newInputGroup.className = 'input-group';
+            newInputGroup.id = `input-group-${inputCounter}`; // ID único para o grupo
+
+            const inputNumberSpan = document.createElement('span');
+            inputNumberSpan.className = 'input-number';
+            inputNumberSpan.textContent = `${inputCounter}.`; // Número da parada
+            
+            const newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.className = 'location-input';
+            newInput.placeholder = 'Digite um endereço';
+            newInput.id = `location-input-${inputCounter}`; // ID único para o input
+
+            const removeButton = document.createElement('button');
+            removeButton.className = 'remove-btn';
+            removeButton.textContent = '×';
+            removeButton.addEventListener('click', function() {
+                if (inputsContainer.children.length > 2) { // Permitir remover até ter 2 inputs
+                    inputsContainer.removeChild(newInputGroup);
+                    updateInputNumbers(); // Atualiza os números após remover
+                } else {
+                    alert('Você precisa ter pelo menos duas paradas.');
+                }
+            });
+
+            const fixCheckboxGroup = document.createElement('div');
+            fixCheckboxGroup.className = 'fix-checkbox-group';
+
+            const fixCheckbox = document.createElement('input');
+            fixCheckbox.type = 'checkbox';
+            fixCheckbox.className = 'fix-checkbox';
+            fixCheckbox.id = `fix-checkbox-${inputCounter}`;
+
+            const fixLabel = document.createElement('label');
+            fixLabel.htmlFor = `fix-checkbox-${inputCounter}`;
+            fixLabel.textContent = 'Fixar';
+
+            fixCheckboxGroup.appendChild(fixCheckbox);
+            fixCheckboxGroup.appendChild(fixLabel);
+            
+            newInputGroup.appendChild(inputNumberSpan);
+            newInputGroup.appendChild(newInput);
+            newInputGroup.appendChild(fixCheckboxGroup);
+            newInputGroup.appendChild(removeButton);
+            inputsContainer.appendChild(newInputGroup);
+            
+            newInput.focus();
+            updateInputNumbers(); // Atualiza os números após adicionar
+        }
+
+        /**
+         * Atualiza a numeração dos inputs após adicionar ou remover.
+         */
+        function updateInputNumbers() {
+            const inputGroups = document.querySelectorAll('.input-group');
+            inputGroups.forEach((group, index) => {
+                const numberSpan = group.querySelector('.input-number');
+                if (numberSpan) {
+                    numberSpan.textContent = `${index + 1}.`;
+                }
+                const input = group.querySelector('.location-input');
+                if (input) {
+                    input.id = `location-input-${index + 1}`;
+                }
+                const checkbox = group.querySelector('.fix-checkbox');
+                if (checkbox) {
+                    checkbox.id = `fix-checkbox-${index + 1}`;
+                }
+                const label = group.querySelector('.fix-checkbox-group label');
+                if (label) {
+                    label.htmlFor = `fix-checkbox-${index + 1}`;
+                }
+            });
+            inputCounter = inputGroups.length; // Reseta o contador para o número atual de inputs
+        }
+
+
+        /**
+         * Otimiza a rota com base nos endereços fornecidos.
+         */
+        async function optimizeRoute() {
+            const locationInputs = document.querySelectorAll('.location-input');
+            let locations = [];
+            let fixedStartLocation = null;
+            let fixedEndLocation = null;
+            let unfixedLocations = [];
+
+            // Coleta os valores dos inputs e identifica pontos fixos
+            for (let i = 0; i < locationInputs.length; i++) {
+                const input = locationInputs[i];
+                const address = input.value.trim();
+                if (!address) {
+                    alert('Por favor, preencha todos os campos de endereço.');
+                    return;
+                }
+
+                const checkbox = document.getElementById(`fix-checkbox-${i + 1}`);
+                if (checkbox && checkbox.checked) {
+                    if (i === 0) { // Se o primeiro estiver fixo
+                        fixedStartLocation = { address: address, index: i };
+                    } else if (i === locationInputs.length - 1) { // Se o último estiver fixo
+                        fixedEndLocation = { address: address, index: i };
+                    } else { // Se for um ponto intermediário fixo
+                        unfixedLocations.push({ address: address, index: i, fixed: true });
+                    }
+                } else {
+                    unfixedLocations.push({ address: address, index: i, fixed: false });
+                }
+            }
+
+            // Monta a ordem final dos locais
+            // Começa com o fixo inicial se houver
+            if (fixedStartLocation) {
+                locations.push(fixedStartLocation);
+            }
+
+            // Adiciona os não fixos (e intermediários fixos)
+            unfixedLocations.forEach(loc => {
+                if (!(fixedStartLocation && loc.index === fixedStartLocation.index) &&
+                    !(fixedEndLocation && loc.index === fixedEndLocation.index)) {
+                    locations.push(loc);
+                }
+            });
+            
+            // Adiciona o fixo final se houver
+            if (fixedEndLocation) {
+                locations.push(fixedEndLocation);
+            }
+
+            // Remove duplicatas se um ponto estiver fixado no início e no fim e for o mesmo ponto
+            if (fixedStartLocation && fixedEndLocation && fixedStartLocation.index === fixedEndLocation.index) {
+                locations = [fixedStartLocation]; // Apenas o ponto fixo
+            }
+
+            if (locations.length < 2) {
+                alert('Você precisa ter pelo menos duas paradas para calcular a rota.');
+                return;
+            }
+
+            clearRoute(); // Limpa a rota e marcadores anteriores do mapa
+
+            // Geocodifica todos os endereços na ordem final
+            const coordinates = await Promise.all(locations.map(loc => geocodeAddress(loc.address)));
+            const validCoordinates = coordinates.filter(coord => coord);
+
+            if (validCoordinates.length < 2) {
+                alert('Não foi possível geocodificar endereços suficientes. Por favor, verifique-os.');
+                return;
+            }
+
+            try {
+                // Obtém a rota usando o serviço OSRM na ordem definida
+                const routeData = await getRoute(validCoordinates); 
+                
+                if (routeData && routeData.geometry && routeData.geometry.coordinates) {
+                    // Desenha a rota e os marcadores
+                    drawRoute(routeData, validCoordinates); 
+                    displayInstructions(routeData.legs);
+                    
+                    // Ajusta o zoom do mapa para mostrar toda a rota
+                    const bounds = L.latLngBounds(routeData.geometry.coordinates.map(coord => [coord[1], coord[0]]));
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                } else {
+                    alert('Não foi possível calcular a rota. Verifique os endereços ou tente novamente.');
+                }
+            } catch (error) {
+                console.error('Erro ao calcular a rota:', error);
+                alert('Ocorreu um erro ao calcular a rota. Por favor, tente novamente.');
+            }
+        }
+
+        /**
+         * Geocodifica um endereço usando a API Nominatim (OpenStreetMap).
+         * @param {string} address - O endereço a ser geocodificado.
+         * @returns {Promise<Object|null>} - Uma promessa que resolve para um objeto com lat, lon e display_name, ou null em caso de falha.
+         */
+        async function geocodeAddress(address) {
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), display_name: data[0].display_name };
+                }
+                console.warn(`Não foi possível geocodificar o endereço: "${address}"`);
+                return null;
+            } catch (error) {
+                console.error(`Erro ao geocodificar "${address}":`, error);
+                return null;
+            }
+        }
+
+        /**
+         * Obtém a rota entre múltiplos pontos usando o serviço OSRM (Open Source Routing Machine).
+         * @param {Array<Object>} coordinates - Array de objetos de coordenadas ({lat, lon}).
+         * @returns {Promise<Object|null>} - Uma promessa que resolve para o objeto de rota do OSRM, ou null em caso de falha.
+         */
+        async function getRoute(coordinates) {
+            const waypoints = coordinates.map(coord => `${coord.lon},${coord.lat}`).join(';');
+            const url = `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson&steps=true`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data && data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                    return data.routes[0];
+                }
+                console.error('Erro na resposta do OSRM:', data);
+                return null;
+            } catch (error) {
+                console.error('Erro na requisição da rota para OSRM:', error);
+                return null;
+            }
+        }
+
+        /**
+         * Desenha a rota e os marcadores no mapa.
+         * @param {Object} routeData - O objeto de dados da rota retornado pelo OSRM.
+         * @param {Array<Object>} originalCoordinates - As coordenadas originais dos pontos de parada para colocar os marcadores.
+         */
+        function drawRoute(routeData, originalCoordinates) {
+            clearRoute(); // Garante que o mapa esteja limpo antes de desenhar
+
+            if (routeData && routeData.geometry && routeData.geometry.coordinates) {
+                const routeCoordinates = routeData.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                
+                routeLayer.addLayer(L.polyline(routeCoordinates, { color: '#3498db', weight: 6, opacity: 0.8 }));
+
+                originalCoordinates.forEach((coord, index) => {
+                    let iconToUse;
+                    if (index === 0 && originalCoordinates.length > 1) { // Primeiro ponto da rota
+                         iconToUse = startIcon;
+                    } else if (index === originalCoordinates.length - 1 && originalCoordinates.length > 1) { // Último ponto da rota
+                         iconToUse = endIcon;
+                    } else { // Pontos intermediários
+                         iconToUse = numberedIcon(index + 1);
+                    }
+                    const marker = L.marker([coord.lat, coord.lon], { icon: iconToUse })
+                                    .bindPopup(`<b>Parada ${index + 1}</b><br>${coord.display_name || 'Endereço'}`)
+                                    .addTo(map);
+                    markers.push(marker);
+                });
+            }
+        }
+
+        /**
+         * Exibe as instruções detalhadas da rota no painel de direções.
+         * @param {Array<Object>} legs - Array de "pernas" da rota (trechos entre waypoints).
+         */
+        function displayInstructions(legs) {
+            const instructionsDiv = document.getElementById('instructions');
+            instructionsDiv.innerHTML = '';
+
+            if (!legs || legs.length === 0) {
+                instructionsDiv.innerHTML = '<p>Nenhuma instrução de rota disponível.</p>';
+                return;
+            }
+
+            let totalDistance = 0;
+            let totalDuration = 0;
+
+            legs.forEach((leg, legIndex) => {
+                totalDistance += leg.distance;
+                totalDuration += leg.duration;
+
+                const legHeader = document.createElement('h4');
+                legHeader.textContent = `Trecho ${legIndex + 1}: ${(leg.distance / 1000).toFixed(2)} km, ${formatDuration(leg.duration)}`;
+                instructionsDiv.appendChild(legHeader);
+
+                if (leg.steps && leg.steps.length > 0) {
+                    leg.steps.forEach((step, stepIndex) => {
+                        const instruction = document.createElement('div');
+                        instruction.className = 'instruction';
+                        instruction.innerHTML = `<strong>${stepIndex + 1}.</strong> ${step.maneuver.instruction} (${(step.distance / 1000).toFixed(2)} km)`;
+                        instructionsDiv.appendChild(instruction);
+                    });
+                } else {
+                    const noSteps = document.createElement('p');
+                    noSteps.textContent = 'Nenhuma instrução detalhada para este trecho.';
+                    instructionsDiv.appendChild(noSteps);
+                }
+            });
+
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'instruction';
+            summaryDiv.innerHTML = `<hr><strong>Distância Total:</strong> ${(totalDistance / 1000).toFixed(2)} km<br><strong>Tempo Total Estimado:</strong> ${formatDuration(totalDuration)}`;
+            instructionsDiv.prepend(summaryDiv);
+        }
+
+        /**
+         * Formata a duração em segundos para um formato legível (horas, minutos).
+         * @param {number} seconds - Duração em segundos.
+         * @returns {string} - Duração formatada.
+         */
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            let result = '';
+            if (hours > 0) {
+                result += `${hours}h `;
+            }
+            result += `${minutes}min`;
+            return result.trim();
+        }
+
+        /**
+         * Limpa a rota e todos os marcadores do mapa.
+         */
+        function clearRoute() {
+            routeLayer.clearLayers();
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            document.getElementById('instructions').innerHTML = '';
+        }
+
+        /**
+         * Reseta o mapa, os inputs de endereço e as instruções.
+         */
+        function resetMap() {
+            clearRoute();
+            
+            const inputsContainer = document.getElementById('location-inputs');
+            // Remove todos os inputs, exceto o primeiro
+            while (inputsContainer.children.length > 0) {
+                inputsContainer.removeChild(inputsContainer.lastChild);
+            }
+            inputCounter = 0; // Reseta o contador
+            addLocationInput(); // Adiciona o primeiro input novamente
+            addLocationInput(); // Adiciona o segundo input novamente
+
+            // Centraliza o mapa de volta ao Brasil
+            map.setView([-14.2350, -51.9253], 5);
+        }
+    </script>
+</body>
+</html>

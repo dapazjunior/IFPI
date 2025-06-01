@@ -9,10 +9,9 @@ def main():
 def verificar_valores(v1, v2, v3):
     if v1 == v2 == v3:
         return "Todos os valores são iguais"
-    elif v1 == v2 or v2 == v3 or v1 == v3:
+    if v1 == v2 or v2 == v3 or v1 == v3:
         return "Existem dois valores iguais e um diferente"
-    else:
-        return "Todos os valores são diferentes"
+    return "Todos os valores são diferentes"
 
 
 if __name__ == "__main__":

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otimizador de Rotas - OpenStreetMap</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Otimizador de Rotas</h1>
+        <p>Adicione vários endereços e encontre a rota mais eficiente usando OpenStreetMap</p>
+        
+        <div class="input-section">
+            <div id="location-inputs">
+                <div class="input-group">
+                    <input type="text" class="location-input" placeholder="Digite um endereço">
+                    <button class="remove-btn">×</button>
+                </div>
+            </div>
+            <button id="add-location">+ Adicionar Parada</button>
+            <button id="optimize-route">Otimizar Rota</button>
+            <button id="reset">Resetar</button>
+        </div>
+        
+        <div class="results-section">
+            <div id="map"></div>
+            <div id="directions-panel">
+                <h3>Instruções de Rota</h3>
+                <div id="instructions"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
