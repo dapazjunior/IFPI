@@ -62,8 +62,7 @@ def horoscopo(signo_desejado):
     )
 
     resposta = urllib.request.urlopen(requisicao)
-    pagina = resposta.read().decode("utf-8")  # Corrigido para "utf-8"
-
+    pagina = resposta.read().decode("utf-8")
     marcador_inicio = '<p class="text-pred">'
     marcador_final = '</p>'
 
