@@ -1,10 +1,14 @@
 def main():
+    """Lê um código numérico e retorna o dia da semana correspondente."""
+    # Entrada de dados
     codigo = int(input())
 
+    # Processamento e saída de dados
     print(verifcar_dia(codigo))
 
 
 def verifcar_dia(num):
+    """Retorna o nome do dia da semana de acordo com o código de 1 a 7."""
     if num == 1:
         return "domingo"
     elif num == 2:
@@ -23,6 +27,5 @@ def verifcar_dia(num):
         return "valor inválido"
 
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

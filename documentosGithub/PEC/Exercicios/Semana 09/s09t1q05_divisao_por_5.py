@@ -1,10 +1,14 @@
 def main():
+    """Lê um valor e retorna um resultado de acordo com seu módulo 5."""
+    # Entrada de dados
     valor = int(input())
 
+    # Processamento e saída de dados
     print(verificar_valores(valor))
 
 
 def verificar_valores(num):
+    """Executa operações com base no resto de num dividido por 5."""
     valor = num % 5
 
     if valor == 0:
@@ -20,7 +24,9 @@ def verificar_valores(num):
     
 
 def eh_par(num):
+    """Retorna True se o número for par, False se for ímpar."""
     return num % 2 == 0
+
 
 if __name__ == "__main__":
     main()

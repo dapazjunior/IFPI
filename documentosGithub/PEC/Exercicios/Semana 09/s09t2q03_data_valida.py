@@ -1,12 +1,16 @@
 def main():
+    """Lê uma data no formato DDMMAAAA e verifica se ela é válida."""
+    # Entrada de dados
     data = input().strip()
    
+    # Processamento e saída de dados
     d, m, a = separar_data(data)
 
     print(eh_valida(d, m, a))
 
 
 def eh_valida(dia, mes, ano):
+    """Verifica se a data fornecida é válida."""
     if mes < 1 or mes > 12:
         return False
     
@@ -24,6 +28,7 @@ def eh_valida(dia, mes, ano):
 
 
 def eh_bissexto(ano):
+    """Retorna True se o ano for bissexto, caso contrário False."""
     if ano % 400 == 0:
         return True
     
@@ -32,9 +37,10 @@ def eh_bissexto(ano):
     
     if ano % 4 == 0:
         return True
-    
+
 
 def separar_data(data):
+    """Separa uma string DDMMAAAA em dia, mês e ano (inteiros)."""
     dia = int(data[0:2])
     mes = int(data[2:4])
     ano = int(data[4:8])
