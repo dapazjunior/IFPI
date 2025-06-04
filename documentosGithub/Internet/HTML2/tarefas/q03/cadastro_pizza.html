@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8"/>
+    <title>Cadastro Pizza On Line</title>
+</head>
+<body background="imagens/fundo_listras.jpg">
+
+    <table border="1" align="center" cellpadding="10" cellspacing="5" bgcolor="#FFFFFF" width="500">
+        <tr>
+            <td align="center" colspan="2">
+                <img src="imagens/topo1.jpg" alt="Pizza Online Cadastro" width="100%" height="60"/>
+                <h2><font color="red">Cadastre-se e receba nossas atualizações</font></h2>
+            </td>
+        </tr>
+        <form action="#" method="post">
+            <tr>
+                <td align="right"><b><font color="red">Nome:</font></b></td>
+                <td><input type="text" name="nome" size="30" placeholder="Digite seu nome completo"/></td>
+            </tr>
+            <tr>
+                <td align="right"><b><font color="red">Senha:</font></b></td>
+                <td><input type="password" name="senha" size="20" placeholder="Crie uma senha"/></td>
+            </tr>
+            <tr>
+                <td align="right"><b><font color="red">Confirmação de senha:</font></b></td>
+                <td><input type="password" name="confirma_senha" size="20" placeholder="Confirme sua senha"/></td>
+            </tr>
+            <tr>
+                <td align="right"><b><font color="red">Seu tipo de Pizza preferido:</font></b></td>
+                <td>
+                    <select name="tipo_pizza">
+                        <option value="margherita" selected>Margherita</option>
+                        <option value="mussarela">Mussarela</option>
+                        <option value="portuguesa">Portuguesa</option> {/* Adicionado */}
+                        <option value="calabresa">Calabresa</option>
+                        <option value="california">Califórnia</option> {/* Adicionado */}
+                        <option value="pepperoni">Pepperoni</option>
+                        <option value="quatro_queijos">Quatro queijos</option>
+                        <option value="bacon">Bacon</option> {/* Adicionado */}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td align="right" valign="top"><b><font color="red">Quantas vezes come Pizza por semestre?</font></b></td>
+                <td>
+                    <input type="radio" name="frequencia_pizza" value="1a5"/> Entre 1 a 5<br/>
+                    <input type="radio" name="frequencia_pizza" value="5a10"/> 5 a 10<br/>
+                    <input type="radio" name="frequencia_pizza" value="mais10"/> Mais de 10
+                </td>
+            </tr>
+            <tr>
+                <td align="right" valign="top"><b><font color="red">Comentário:</font></b></td>
+                <td>
+                    <textarea name="comentario" rows="4" cols="35" placeholder="Deixe seu comentário aqui..."></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="checkbox" name="receber_emails_parceiros" value="sim" checked/> Deseja receber e-mails dos nossos parceiros
+                </td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2">
+                    <input type="submit" value="Enviar"/>
+                    <input type="reset" value="Limpar"/>
+                </td>
+            </tr>
+        </form>
+        <tr>
+            <td align="center" colspan="2">
+                <hr/>
+                <a href="http://www.pizzaonline.com.br" target="_blank"><font color="red">w w w . p i z z a o n l i n e . c o m . b r</font></a>
+                <br/>
+                <a href="pizza_pratica17.html">Voltar para a página de Pizza</a>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
