@@ -1,13 +1,14 @@
 def main():
-    populacao_dodo = int(input())
+    populacao_dodo = int(input())  # valor inicial da população
 
-    atualizar_populacao(populacao_dodo)
+    simular_populacao(populacao_dodo)
 
 
-def atualizar_populacao(populacao_inicial):
+def simular_populacao(populacao_inicial):
     ano = 1600
     populacao = populacao_inicial
 
+    # continua enquanto a população for maior que 10% da original
     while populacao > 0.1 * populacao_inicial:
         nascimentos = calcular_nascimentos(populacao)
         mortes = calcular_mortes(populacao)
@@ -17,11 +18,11 @@ def atualizar_populacao(populacao_inicial):
 
 
 def calcular_nascimentos(populacao):
-    return 0.01 * populacao
+    return 0.01 * populacao  # 1% de nascimentos
 
 
 def calcular_mortes(populacao):
-    return 0.06 * populacao
+    return 0.06 * populacao  # 6% de mortes
 
 
 if __name__ == "__main__":
