@@ -2,6 +2,7 @@ def main():
     total = 0
 
     while True:
+        # mostra o cardápio e lê o pedido
         opcao = input("CÓDIGO  PRODUTO         PREÇO (R$)\n" \
         "H       Hamburger       5,50\n" \
         "C       Cheeseburger    6,80\n" \
@@ -9,15 +10,17 @@ def main():
         "A       Americano       7,00\n" \
         "Q       Queijo Prato    4,00\n" \
         "X       PARA TOTAL DA CONTA\n").strip().lower()
-        if opcao == 'x':
+        
+        if opcao == 'x':  # se for x, termina
             break
 
-        total += valor(opcao)
+        total += valor(opcao)  # soma o valor do item ao total
     
-    print(f'{total:.2f}')
+    print(f'{total:.2f}')  # mostra o total da conta
 
 
 def valor(opcao):
+    # retorna o preço de acordo com o item
     if opcao == 'h':
         return 5.5
     elif opcao == 'c':
