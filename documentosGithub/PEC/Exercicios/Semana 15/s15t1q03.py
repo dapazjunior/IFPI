@@ -1,30 +1,34 @@
 def main():
-    cidades = carrega_cidades()
+    cidades = carrega_cidades()  # carrega os dados do arquivo .csv
 
-    dia, mes = solicitar_data()
+    dia, mes = solicitar_data()  # solicita o dia e o mês do aniversário
     
-    cidades_aniv = verificar_aniversariantes(dia, mes, cidades)
+    cidades_aniv = verificar_aniversariantes(dia, mes, cidades)  # filtra as cidades que fazem aniversário nesse dia
 
+    # exibe a lista com a data formatada
     print(f"CIDADES QUE FAZEM ANIVERSÁRIO EM {dia} DE {mes_escrito(mes)}:")
     for cidade in cidades_aniv:
-        print(f'{cidade[0]}({cidade[1]})')
+        print(f'{cidade[0]}({cidade[1]})')  # cidade[0] = nome, cidade[1] = UF
+
 
 def solicitar_data():
+    # lê o dia e o mês digitados pelo usuário
     dia = int(input())
     mes = int(input())
 
-    return dia, mes
+    return dia, mes  # retorna os dois valores
 
 
 def verificar_aniversariantes(dia, mes, cidades):
-    aniversariantes = []
+    aniversariantes = []  # lista que vai guardar as cidades que batem com a data
     for cidade in cidades:
-        if dia == cidade[3] and mes == cidade[4]:
-            aniversariantes.append((cidade[2], cidade[0], cidade[3], cidade[4]))
+        if dia == cidade[3] and mes == cidade[4]:  # cidade[3] = dia, cidade[4] = mês
+            aniversariantes.append((cidade[2], cidade[0], cidade[3], cidade[4]))  # nome, UF, dia, mês
     return aniversariantes
 
 
 def mes_escrito(mes):
+    # converte número do mês para nome
     if mes == 1:
         return "JANEIRO"
     elif mes == 2:
@@ -57,10 +61,10 @@ def carrega_cidades():
     resultado = []
     with open("cidades.csv", 'r', encoding='utf-8') as arquivo:
         for linha in arquivo:
+            # separa os dados da linha
             uf, ibge, nome, dia, mes, pop = linha.split(';')
-            resultado.append(
-                (uf, int(ibge), nome, int(dia), int(mes), int(pop))
-            )
+            # transforma os dados para o formato correto e adiciona na lista
+            resultado.append((uf, int(ibge), nome, int(dia), int(mes), int(pop)))
     arquivo.close()
     return resultado
 

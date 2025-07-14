@@ -1,21 +1,24 @@
 def main():
-    cidades = carrega_cidades()
+    cidades = carrega_cidades()  # carrega a lista de cidades do arquivo
 
-    qtd = int(input())
+    qtd = int(input())  # lê a população mínima desejada
 
-    cidades_maiores = verificar_maiores(qtd, cidades)
+    cidades_maiores = verificar_maiores(qtd, cidades)  # filtra as cidades com população maior
 
+    # imprime as cidades encontradas
     print(f"CIDADES COM MAIS DE {qtd} HABITANTES:")
     for cidade in cidades_maiores:
+        # cidade[1] = IBGE, cidade[2] = nome, cidade[0] = UF, cidade[5] = população
         print(f'IBGE: {cidade[1]} - {cidade[2]}({cidade[0]}) - POPULAÇÃO: {cidade[5]}')
+
 
 def solicitar_data():
     dia = int(input())
     mes = int(input())
-
     return dia, mes
 
 
+# verifica quais cidades têm população maior que o valor informado
 def verificar_maiores(pop, cidades):
     maiores = []
     for cidade in cidades:
@@ -24,6 +27,7 @@ def verificar_maiores(pop, cidades):
     return maiores
 
 
+# lê o arquivo cidades.csv e carrega os dados das cidades
 def carrega_cidades():
     resultado = []
     with open("cidades.csv", 'r', encoding='utf-8') as arquivo:
