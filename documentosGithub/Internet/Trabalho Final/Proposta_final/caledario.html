@@ -15,15 +15,15 @@
           <a class="navbar-brand" href="index.html">
             <img src="logo_ifpi.png" alt="Logo do IFPI" width="auto" height="150">
           </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-principal" aria-controls="menu-principal" aria-expanded="false" aria-label="Alternar navegação">
             <span class="navbar-toggler-icon"></span>
           </button>
-          <div class="collapse navbar-collapse" id="navbarContent">
+          <div class="collapse navbar-collapse" id="menu-principal">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
               <li class="nav-item"><a class="nav-link" href="index.html">Início</a></li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Institucional</a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" aria-labelledby="menu-institucional">
                   <li><a class="dropdown-item" href="sobre.html">Sobre o IFPI</a></li>
                   <li><a class="dropdown-item" href="campi.html">Nossos Campi</a></li>
                   <li><hr class="dropdown-divider"></li>
@@ -31,12 +31,12 @@
                 </ul>
               </li>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Informações
                 </a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" aria-labelledby="menu-informacoes">
                   <li><a class="dropdown-item" href="editais.html">Processos Seletivos</a></li>
-                  <li><a class="dropdown-item" href="caledario.html">Calendário Acadêmico</a></li>
+                  <li><a class="dropdown-item active" href="caledario.html">Calendário Acadêmico</a></li>
                 </ul>
               </li>
             </ul>
@@ -54,7 +54,7 @@
             
             <div class="mb-5">
                 <h2 class="text-success mb-3">Download dos Calendários Completos</h2>
-                <div class="list-group">
+                <div class="list-group" id="lista-downloads">
                     <a href="calendariointegrado2025.pdf" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" download>
                         Calendário Acadêmico 2025 - Técnico Integrado
                         <i class="bi bi-download"></i>
@@ -66,63 +66,63 @@
                 </div>
             </div>
 
-            <ul class="nav nav-tabs nav-fill mb-4" id="calendarTabs" role="tablist">
+            <ul class="nav nav-tabs nav-fill mb-4" id="abas-calendario" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="integrado-tab" data-bs-toggle="tab" data-bs-target="#integrado-pane" type="button" role="tab" aria-controls="integrado-pane" aria-selected="true">Técnico Integrado</button>
+                    <button class="nav-link active" id="aba-tecnico" data-bs-toggle="tab" data-bs-target="#painel-tecnico" type="button" role="tab" aria-controls="painel-tecnico" aria-selected="true">Técnico Integrado</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="superior-tab" data-bs-toggle="tab" data-bs-target="#superior-pane" type="button" role="tab" aria-controls="superior-pane" aria-selected="false">Superior</button>
+                    <button class="nav-link" id="aba-superior" data-bs-toggle="tab" data-bs-target="#painel-superior" type="button" role="tab" aria-controls="painel-superior" aria-selected="false">Superior</button>
                 </li>
             </ul>
 
-            <div class="tab-content" id="calendarTabsContent">
-                <div class="tab-pane fade show active" id="integrado-pane" role="tabpanel" aria-labelledby="integrado-tab" tabindex="0">
+            <div class="tab-content" id="conteudo-abas">
+                <div class="tab-pane fade show active" id="painel-tecnico" role="tabpanel" aria-labelledby="aba-tecnico" tabindex="0">
                     <h3 class="text-center mb-4">Resumo - Técnico Integrado</h3>
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <h4 class="text-success">1º Semestre</h4>
                             <ul class="list-group">
-                                <li class="list-group-item"><strong>Março:</strong> Início das Aulas (19) , Ambientação (19 a 22) , Semana de Combate à Violência Contra a Mulher (24 a 28).</li>
-                                <li class="list-group-item"><strong>Abril:</strong> Feriados - Paixão de Cristo (18) , Tiradentes (21).</li>
-                                <li class="list-group-item"><strong>Maio:</strong> Dia do Trabalho (01) , Avaliações do 1º Bimestre (05 a 09) , Fim do 1º Bimestre (15) , Início do 2º Bimestre (16).</li>
+                                <li class="list-group-item"><strong>Março:</strong> Início das Aulas (19), Ambientação (19 a 22), Semana de Combate à Violência Contra a Mulher (24 a 28).</li>
+                                <li class="list-group-item"><strong>Abril:</strong> Feriados - Paixão de Cristo (18), Tiradentes (21).</li>
+                                <li class="list-group-item"><strong>Maio:</strong> Dia do Trabalho (01), Avaliações do 1º Bimestre (05 a 09), Fim do 1º Bimestre (15), Início do 2º Bimestre (16).</li>
                                 <li class="list-group-item"><strong>Junho:</strong> Corpus Christi (ponto facultativo) (19 e 20).</li>
-                                <li class="list-group-item"><strong>Julho:</strong> Avaliações do 2º Bimestre (14 a 18) , Provas Finais (24 e 25) , Fim do Período Letivo (31).</li>
+                                <li class="list-group-item"><strong>Julho:</strong> Avaliações do 2º Bimestre (14 a 18), Provas Finais (24 e 25), Fim do Período Letivo (31).</li>
                             </ul>
                         </div>
                         <div class="col-md-6 mb-4">
                             <h4 class="text-success">2º Semestre</h4>
                             <ul class="list-group">
-                                <li class="list-group-item"><strong>Agosto:</strong> Férias Docentes (01 a 15) , Início das Aulas (19).</li>
-                                <li class="list-group-item"><strong>Setembro:</strong> Independência do Brasil (07) , Aniversário do IFPI (23).</li>
-                                <li class="list-group-item"><strong>Outubro:</strong> Avaliações do 3º Bimestre (06 a 10) , Dia dos Professores (15) , Início do 4º Bimestre (16) , Dia do Piauí (19).</li>
-                                <li class="list-group-item"><strong>Novembro:</strong> Finados (02) , Proclamação da República (15) , Consciência Negra (20).</li>
-                                <li class="list-group-item"><strong>Dezembro:</strong> Avaliações do 4º Bimestre (09 a 13) , Provas Finais (19 e 20) , Fim do Período Letivo (23) , Natal (25).</li>
+                                <li class="list-group-item"><strong>Agosto:</strong> Férias Docentes (01 a 15), Início das Aulas (19).</li>
+                                <li class="list-group-item"><strong>Setembro:</strong> Independência do Brasil (07), Aniversário do IFPI (23).</li>
+                                <li class="list-group-item"><strong>Outubro:</strong> Avaliações do 3º Bimestre (06 a 10), Dia dos Professores (15), Início do 4º Bimestre (16), Dia do Piauí (19).</li>
+                                <li class="list-group-item"><strong>Novembro:</strong> Finados (02), Proclamação da República (15), Consciência Negra (20).</li>
+                                <li class="list-group-item"><strong>Dezembro:</strong> Avaliações do 4º Bimestre (09 a 13), Provas Finais (19 e 20), Fim do Período Letivo (23), Natal (25).</li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="superior-pane" role="tabpanel" aria-labelledby="superior-tab" tabindex="0">
+                <div class="tab-pane fade" id="painel-superior" role="tabpanel" aria-labelledby="aba-superior" tabindex="0">
                     <h3 class="text-center mb-4">Resumo - Superior</h3>
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <h4 class="text-success">1º Semestre</h4>
                             <ul class="list-group">
                                 <li class="list-group-item"><strong>Janeiro:</strong> Matrículas de Veteranos (20 a 28).</li>
-                                <li class="list-group-item"><strong>Março:</strong> Início das Aulas (19) , Reajuste de Matrícula (24 a 28).</li>
-                                <li class="list-group-item"><strong>Abril:</strong> Trancamento de Curso/Disciplina (01 a 05) , Feriados - Paixão de Cristo (18) , Tiradentes (21).</li>
-                                <li class="list-group-item"><strong>Maio:</strong> Dia do Trabalho (01) , Avaliações do 1º Bimestre (05 a 09) , Fim do 1º Bimestre (15) , Início do 2º Bimestre (16).</li>
-                                <li class="list-group-item"><strong>Julho:</strong> Solicitação de Colação de Grau (07 a 11) , Avaliações do 2º Bimestre (14 a 18) , Fim do Período Letivo (31).</li>
+                                <li class="list-group-item"><strong>Março:</strong> Início das Aulas (19), Reajuste de Matrícula (24 a 28).</li>
+                                <li class="list-group-item"><strong>Abril:</strong> Trancamento de Curso/Disciplina (01 a 05), Feriados - Paixão de Cristo (18), Tiradentes (21).</li>
+                                <li class="list-group-item"><strong>Maio:</strong> Dia do Trabalho (01), Avaliações do 1º Bimestre (05 a 09), Fim do 1º Bimestre (15), Início do 2º Bimestre (16).</li>
+                                <li class="list-group-item"><strong>Julho:</strong> Solicitação de Colação de Grau (07 a 11), Avaliações do 2º Bimestre (14 a 18), Fim do Período Letivo (31).</li>
                             </ul>
                         </div>
                         <div class="col-md-6 mb-4">
                              <h4 class="text-success">2º Semestre</h4>
                              <ul class="list-group">
-                                <li class="list-group-item"><strong>Agosto:</strong> Férias Docentes (01 a 15) , Matrículas de Veteranos (01 a 09) , Início das Aulas (19).</li>
-                                <li class="list-group-item"><strong>Setembro:</strong> Reajuste de Matrícula (01 a 05) , Trancamento de Curso (08 a 12) , Aniversário do IFPI (23).</li>
-                                <li class="list-group-item"><strong>Outubro:</strong> Avaliações do 3º Bimestre (06 a 10) , Dia dos Professores (15) , Dia do Piauí (19).</li>
-                                <li class="list-group-item"><strong>Novembro:</strong> Finados (02) , Proclamação da República (15) , Consciência Negra (20).</li>
-                                <li class="list-group-item"><strong>Dezembro:</strong> Solicitação de Colação de Grau (01 a 05) , Avaliações do 4º Bimestre (09 a 13) , Fim do Período Letivo (23) , Natal (25).</li>
+                                <li class="list-group-item"><strong>Agosto:</strong> Férias Docentes (01 a 15), Matrículas de Veteranos (01 a 09), Início das Aulas (19).</li>
+                                <li class="list-group-item"><strong>Setembro:</strong> Reajuste de Matrícula (01 a 05), Trancamento de Curso (08 a 12), Aniversário do IFPI (23).</li>
+                                <li class="list-group-item"><strong>Outubro:</strong> Avaliações do 3º Bimestre (06 a 10), Dia dos Professores (15), Dia do Piauí (19).</li>
+                                <li class="list-group-item"><strong>Novembro:</strong> Finados (02), Proclamação da República (15), Consciência Negra (20).</li>
+                                <li class="list-group-item"><strong>Dezembro:</strong> Solicitação de Colação de Grau (01 a 05), Avaliações do 4º Bimestre (09 a 13), Fim do Período Letivo (23), Natal (25).</li>
                             </ul>
                         </div>
                     </div>
