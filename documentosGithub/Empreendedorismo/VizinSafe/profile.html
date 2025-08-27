@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - VizinSafe</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="sticky-top bg-primary text-white p-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="logo-icon bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                        VS
+                    </div>
+                    <span class="fw-bold">Meu Perfil</span>
+                </div>
+                <div>
+                    <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Editar perfil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-shield-alt me-2"></i>Privacidade</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-question-circle me-2"></i>Ajuda</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="index.html"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mb-5">
+        <div class="profile-header text-center my-4">
+            <div class="profile-avatar">V</div>
+            <h2 class="profile-name">Vinícius Oliveira</h2>
+            <div class="profile-location text-muted mb-2">Jardim das Flores</div>
+            <span class="user-badge trust-level-2">Confiança Média</span>
+        </div>
+        
+        <div class="profile-stats row g-3 mb-4">
+            <div class="col-4">
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Alertas</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-card">
+                    <div class="stat-value">47</div>
+                    <div class="stat-label">Contribuições</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-card">
+                    <div class="stat-value">89%</div>
+                    <div class="stat-label">Precisão</div>
+                </div>
+            </div>
+        </div>
+        
+        <h3 class="h5 fw-bold mb-3">Configurações</h3>
+        
+        <div class="list-group mb-4">
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Notificações</span>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+            </div>
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Localização em tempo real</span>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked>
+                </div>
+            </div>
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Modo escuro</span>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox">
+                </div>
+            </div>
+            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span>Privacidade</span>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span>Ajuda e Suporte</span>
+                <i class="fas fa-chevron-right text-muted"></i>
+            </a>
+            <a href="index.html" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span>Sair</span>
+                <i class="fas fa-sign-out-alt text-muted"></i>
+            </a>
+        </div>
+        
+        <h3 class="h5 fw-bold mb-3">Minhas Últimas Contribuições</h3>
+        
+        <div class="occurrence-card card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <div class="occurrence-type">Animal Perdido</div>
+                    <div class="occurrence-time">ontem</div>
+                </div>
+                <p class="card-text">Encontrei um cachorro da raça poodle na Rua das Flores. Usava coleira azul.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">5 confirmações</div>
+                    <span class="user-badge trust-level-3">Resolvido</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="occurrence-card card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <div class="occurrence-type">Obra na Via</div>
+                    <div class="occurrence-time">2 dias atrás</div>
+                </div>
+                <p class="card-text">Serviço de reparo na rede de esgoto na Av. Principal. Trânsito lento.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">12 confirmações</div>
+                    <span class="user-badge trust-level-3">Ativo</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav d-flex justify-content-around">
+        <a href="feed.html" class="nav-item">
+            <i class="fas fa-list"></i>
+            <span>Feed</span>
+        </a>
+        <a href="map.html" class="nav-item">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Mapa</span>
+        </a>
+        <a href="chat.html" class="nav-item">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <i class="fas fa-user"></i>
+            <span>Perfil</span>
+        </a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

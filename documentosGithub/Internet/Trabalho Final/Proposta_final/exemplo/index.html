@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFPI - Instituto Federal do Piauí</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Ícones do Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://ifpi.edu.br/images/2022/07/13/ifpi_parnaiba.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            margin-bottom: 30px;
+        }
+        
+        .footer {
+            background-color: #1a3e72;
+            color: white;
+            padding: 30px 0;
+        }
+        
+        .ifpi-blue {
+            background-color: #1a3e72;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark ifpi-blue sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="https://ifpi.edu.br/images/logo-ifpi.png" alt="IFPI" height="50">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="institucional.html">Institucional</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="cursosDropdown" role="button" data-bs-toggle="dropdown">
+                            Cursos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Técnicos</a></li>
+                            <li><a class="dropdown-item" href="#">Superiores</a></li>
+                            <li><a class="dropdown-item" href="#">Pós-graduação</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Editais</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contato</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Seção Hero -->
+    <header class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Instituto Federal do Piauí</h1>
+            <p class="lead">Educação profissional e tecnológica de excelência</p>
+            <a href="#" class="btn btn-primary btn-lg mt-3">Conheça nossos cursos</a>
+        </div>
+    </header>
+
+    <!-- Seção Sobre -->
+    <section class="container mb-5">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="fw-bold mb-4">Sobre o IFPI</h2>
+                <p>O Instituto Federal de Educação, Ciência e Tecnologia do Piauí (IFPI) é uma instituição que oferece educação profissional, científica e tecnológica em diferentes níveis e modalidades de ensino.</p>
+                <p>Com campi em diversas cidades do estado, o IFPI tem como missão promover a educação profissional e tecnológica, pública, gratuita e de qualidade, contribuindo para o desenvolvimento sustentável do Piauí e do Brasil.</p>
+                <a href="#" class="btn btn-outline-primary">Saiba mais</a>
+            </div>
+            <div class="col-md-6">
+                <img src="https://ifpi.edu.br/images/2022/07/13/ifpi_parnaiba.jpg" alt="Campus do IFPI" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Cursos -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Nossos Cursos</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 card-hover shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-laptop text-primary" style="font-size: 2.5rem;"></i>
+                            <h4 class="card-title mt-3">Informática</h4>
+                            <p class="card-text">Cursos técnicos e superiores na área de tecnologia da informação.</p>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Ver cursos</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 card-hover shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-building text-primary" style="font-size: 2.5rem;"></i>
+                            <h4 class="card-title mt-3">Administração</h4>
+                            <p class="card-text">Formação para gestão de empresas e organizações.</p>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Ver cursos</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 card-hover shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-activity text-primary" style="font-size: 2.5rem;"></i>
+                            <h4 class="card-title mt-3">Enfermagem</h4>
+                            <p class="card-text">Cursos na área da saúde com foco em enfermagem.</p>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Ver cursos</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Notícias -->
+    <section class="container py-5">
+        <h2 class="text-center fw-bold mb-5">Notícias e Eventos</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://ifpi.edu.br/images/2023/06/15/vestibular_2023_2.jpg" class="card-img-top" alt="Notícia 1">
+                    <div class="card-body">
+                        <h5 class="card-title">Vestibular 2023.2</h5>
+                        <p class="card-text">Inscrições abertas para o processo seletivo do segundo semestre de 2023.</p>
+                        <a href="#" class="btn btn-sm btn-primary">Leia mais</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://ifpi.edu.br/images/2023/05/10/semana_tecnologica.jpg" class="card-img-top" alt="Notícia 2">
+                    <div class="card-body">
+                        <h5 class="card-title">Semana Tecnológica</h5>
+                        <p class="card-text">Evento reúne estudantes e profissionais para discutir inovações tecnológicas.</p>
+                        <a href="#" class="btn btn-sm btn-primary">Leia mais</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="https://ifpi.edu.br/images/2023/04/20/formatura.jpg" class="card-img-top" alt="Notícia 3">
+                    <div class="card-body">
+                        <h5 class="card-title">Cerimônia de Formatura</h5>
+                        <p class="card-text">IFPI realiza colação de grau para mais de 200 estudantes.</p>
+                        <a href="#" class="btn btn-sm btn-primary">Leia mais</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="#" class="btn btn-outline-primary">Veja todas as notícias</a>
+        </div>
+    </section>
+
+    <!-- Seção Contato -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="fw-bold mb-4">Entre em Contato</h2>
+                    <form>
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="nome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-mail</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensagem" class="form-label">Mensagem</label>
+                            <textarea class="form-control" id="mensagem" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="fw-bold mb-4">Nossos Campi</h2>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">Teresina - Central</a>
+                        <a href="#" class="list-group-item list-group-item-action">Parnaíba</a>
+                        <a href="#" class="list-group-item list-group-item-action">Picos</a>
+                        <a href="#" class="list-group-item list-group-item-action">Floriano</a>
+                        <a href="#" class="list-group-item list-group-item-action">Corrente</a>
+                        <a href="#" class="list-group-item list-group-item-action">Paulistana</a>
+                    </div>
+                    <div class="mt-4">
+                        <h5>Redes Sociais</h5>
+                        <a href="#" class="btn btn-outline-dark me-2"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="btn btn-outline-dark me-2"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-dark me-2"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="btn btn-outline-dark"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>IFPI</h5>
+                    <p>Instituto Federal de Educação, Ciência e Tecnologia do Piauí</p>
+                    <p>CNPJ: 10.724.903/0001-94</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Links Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Portal do Aluno</a></li>
+                        <li><a href="#" class="text-white">Portal do Servidor</a></li>
+                        <li><a href="#" class="text-white">Editais</a></li>
+                        <li><a href="#" class="text-white">Transparência</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contato</h5>
+                    <p><i class="bi bi-geo-alt-fill me-2"></i> Rua São Pedro, 1000 - Teresina/PI</p>
+                    <p><i class="bi bi-telephone-fill me-2"></i> (86) 3215-5000</p>
+                    <p><i class="bi bi-envelope-fill me-2"></i> contato@ifpi.edu.br</p>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="text-center">
+                <p class="mb-0">© 2023 IFPI - Todos os direitos reservados</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

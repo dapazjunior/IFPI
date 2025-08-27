@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - VizinSafe</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="sticky-top bg-primary text-white p-3">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="logo-icon bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                        VS
+                    </div>
+                    <span class="fw-bold">Chat da Comunidade</span>
+                </div>
+                <div>
+                    <button class="btn btn-link text-white p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-users"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Membros online</h6></li>
+                        <li><a class="dropdown-item" href="#">Maria Silva</a></li>
+                        <li><a class="dropdown-item" href="#">João Santos</a></li>
+                        <li><a class="dropdown-item" href="#">Ana Costa</a></li>
+                        <li><a class="dropdown-item" href="#">Carlos Oliveira</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Ver todos os membros</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mb-5 pb-3">
+        <div class="chat-container">
+            <div class="chat-message d-flex mb-3">
+                <div class="message-avatar me-2">M</div>
+                <div class="message-content">
+                    <div class="message-sender">Maria Silva</div>
+                    <div>Alguém mais viu a viatura na rua principal?</div>
+                </div>
+            </div>
+            
+            <div class="chat-message d-flex mb-3 justify-content-end">
+                <div class="message-content">
+                    <div class="message-sender">Você</div>
+                    <div>Vi sim, estava parada perto da padaria.</div>
+                </div>
+                <div class="message-avatar ms-2">V</div>
+            </div>
+            
+            <div class="chat-message d-flex mb-3">
+                <div class="message-avatar me-2">J</div>
+                <div class="message-content">
+                    <div class="message-sender">João Santos</div>
+                    <div>Alguém conhece um encanador de confiança?</div>
+                </div>
+            </div>
+            
+            <div class="chat-message d-flex mb-3">
+                <div class="message-avatar me-2">C</div>
+                <div class="message-content">
+                    <div class="message-sender">Carlos Oliveira</div>
+                    <div>Recomendo o Marcos, telefone 98765-4321</div>
+                </div>
+            </div>
+            
+            <div class="chat-message d-flex mb-3">
+                <div class="message-avatar me-2">A</div>
+                <div class="message-content">
+                    <div class="message-sender">Ana Costa</div>
+                    <div>Alguém perdeu um gato laranja?</div>
+                </div>
+            </div>
+            
+            <div class="chat-message d-flex mb-3">
+                <div class="message-avatar me-2">P</div>
+                <div class="message-content">
+                    <div class="message-sender">Paulo Mendes</div>
+                    <div>Amanhã terá interrupção no fornecimento de água das 9h às 15h.</div>
+                </div>
+            </div>
+            
+            <div class="chat-message d-flex mb-3 justify-content-end">
+                <div class="message-content">
+                    <div class="message-sender">Você</div>
+                    <div>Obrigado pela informação, Paulo!</div>
+                </div>
+                <div class="message-avatar ms-2">V</div>
+            </div>
+        </div>
+    </main>
+
+    <div class="chat-input px-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Digite uma mensagem...">
+            <button class="btn btn-primary" type="button">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav d-flex justify-content-around">
+        <a href="feed.html" class="nav-item">
+            <i class="fas fa-list"></i>
+            <span>Feed</span>
+        </a>
+        <a href="map.html" class="nav-item">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Mapa</span>
+        </a>
+        <a href="chat.html" class="nav-item active">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Perfil</span>
+        </a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
