@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domus Smart - Sistema Completo de Automação</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --primary:#00d4ff;--primary-dark:#0099cc;--secondary:#ff6b35;--accent:#8b5cf6;
+      --dark-bg:#0f172a;--darker-bg:#0a0f1c;--card-bg:#1e293b;--card-hover:#2d3748;
+      --text-primary:#f8fafc;--text-secondary:#94a3b8;--success:#10b981;--warning:#f59e0b;
+      --error:#ef4444;--border:#334155;--illumination:#fbbf24;--climate:#60a5fa;
+      --security:#ef4444;--entertainment:#8b5cf6;--appliances:#34d399
+    }
+    body{font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
+      background:linear-gradient(135deg,var(--darker-bg),var(--dark-bg));
+      min-height:100vh;color:var(--text-primary);overflow-x:hidden}
+    .container{max-width:1400px;margin:0 auto;padding:20px}
+    /* header */
+    .header{text-align:center;margin-bottom:40px;padding:20px 0;position:relative}
+    .header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+      width:200px;height:3px;background:linear-gradient(90deg,transparent,var(--primary),transparent)}
+    .logo{display:flex;align-items:center;justify-content:center;gap:15px;margin-bottom:15px}
+    .logo-icon{font-size:2.5rem;color:var(--primary)}
+    .logo-text{font-size:2.8rem;font-weight:700;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .tagline{font-size:1.2rem;color:var(--text-secondary)}
+    /* nav */
+    .nav-tabs{display:flex;justify-content:center;gap:10px;margin-bottom:30px;flex-wrap:wrap}
+    .nav-tab{padding:12px 24px;background:var(--card-bg);border:1px solid var(--border);
+      border-radius:50px;color:var(--text-secondary);cursor:pointer;transition:.3s;
+      font-weight:500;display:flex;align-items:center;gap:8px}
+    .nav-tab.active{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border-color:var(--primary)}
+    /* status conexão */
+    .connection-status{display:flex;align-items:center;justify-content:center;gap:10px;
+      padding:15px;border-radius:12px;margin-bottom:30px;font-weight:600;max-width:400px;margin:auto;
+      border:1px solid var(--border)}
+    .connected{background:rgba(16,185,129,0.1);color:var(--success)}
+    .disconnected{background:rgba(239,68,68,0.1);color:var(--error)}
+    /* cards */
+    .dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:25px}
+    .card{background:linear-gradient(145deg,var(--card-bg),var(--darker-bg));border-radius:20px;padding:25px;
+      border:1px solid var(--border);transition:.3s}
+    .card-header{display:flex;align-items:center;gap:15px;margin-bottom:20px}
+    .card-title{font-size:1.4rem;font-weight:600}
+    .card-subtitle{font-size:.9rem;color:var(--text-secondary)}
+    .device{display:flex;justify-content:space-between;align-items:center;padding:15px 0;
+      border-top:1px solid var(--border)}
+    .device-info{flex:1}
+    .device-name{font-weight:600}
+    .device-status{display:flex;align-items:center;gap:8px;font-size:.9rem}
+    .status-indicator{width:8px;height:8px;border-radius:50%}
+    .status-on{background:var(--success)}
+    .status-off{background:var(--error)}
+    .scene-buttons{display:flex;gap:10px}
+    .scene-btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;cursor:pointer}
+    .scene-btn.active{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <div class="header">
+      <div class="logo"><i class="fas fa-home logo-icon"></i><div class="logo-text">Domus Smart</div></div>
+      <div class="tagline">Sistema Completo de Automação Residencial</div>
+    </div>
+
+    <!-- NAV -->
+    <div class="nav-tabs">
+      <div class="nav-tab active" onclick="switchTab('overview',this)"><i class="fas fa-th-large"></i>Visão Geral</div>
+      <div class="nav-tab" onclick="switchTab('illumination',this)"><i class="fas fa-lightbulb"></i>Iluminação</div>
+      <div class="nav-tab" onclick="switchTab('climate',this)"><i class="fas fa-thermometer-half"></i>Climatização</div>
+      <div class="nav-tab" onclick="switchTab('security',this)"><i class="fas fa-shield-alt"></i>Segurança</div>
+      <div class="nav-tab" onclick="switchTab('entertainment',this)"><i class="fas fa-tv"></i>Entretenimento</div>
+      <div class="nav-tab" onclick="switchTab('appliances',this)"><i class="fas fa-plug"></i>Eletrodomésticos</div>
+    </div>
+
+    <!-- STATUS -->
+    <div id="connectionStatus" class="connection-status disconnected">
+      <div class="status-pulse"></div><span id="connectionText">Conectando...</span>
+    </div>
+
+    <!-- VISÃO GERAL -->
+    <div id="overview" class="tab-content active">
+      <div class="dashboard">
+        <!-- Iluminação -->
+        <div class="card illumination">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
+            <div><div class="card-title">Iluminação</div><div class="card-subtitle">5 de 12 luzes ligadas</div></div>
+          </div>
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Status Geral</div>
+              <div class="device-status">
+                <span id="overviewLightStatus" class="status-indicator status-on"></span>
+                <span id="overviewLightText">Sistema Ativo</span>
+              </div>
+            </div>
+            <div class="scene-buttons">
+              <button class="scene-btn active" onclick="activateScene('day',this)">Dia</button>
+              <button class="scene-btn" onclick="activateScene('night',this)">Noite</button>
+            </div>
+          </div>
+        </div>
+        <!-- Climatização -->
+        <div class="card climate">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-thermometer-half"></i></div>
+            <div><div class="card-title">Climatização</div><div class="card-subtitle">Temperatura controlada</div></div>
+          </div>
+          <div class="device-status" style="justify-content:center;margin-top:10px">
+            <span id="overviewClimateStatus" class="status-indicator status-on"></span>
+            <span id="overviewClimateText">Ar-condicionado: 23°C • Umidade: 45%</span>
+          </div>
+        </div>
+        <!-- Segurança -->
+        <div class="card security">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+            <div><div class="card-title">Segurança</div><div class="card-subtitle">Sistema armado</div></div>
+          </div>
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Status de Segurança</div>
+              <div class="device-status">
+                <span id="overviewSecurityStatus" class="status-indicator status-on"></span>
+                <span id="overviewSecurityText">Tudo seguro</span>
+              </div>
+            </div>
+            <button class="scene-btn" onclick="toggleSecurity()">Desarmar</button>
+          </div>
+        </div>
+        <!-- Entretenimento -->
+        <div class="card entertainment">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-tv"></i></div>
+            <div><div class="card-title">Entretenimento</div><div class="card-subtitle">Sala de estar ativa</div></div>
+          </div>
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Home Theater</div>
+              <div class="device-status">
+                <span id="overviewEntertainmentStatus" class="status-indicator status-off"></span>
+                <span id="overviewEntertainmentText">Desligado</span>
+              </div>
+            </div>
+            <button class="scene-btn" onclick="toggleEntertainment()">Ativar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ILUMINAÇÃO -->
+    <div id="illumination" class="tab-content">
+      <div class="dashboard">
+        <!-- Sala de Estar -->
+        <div class="card illumination">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-couch"></i></div>
+            <div>
+              <div class="card-title">Sala de Estar</div>
+              <div class="card-subtitle">Iluminação principal</div>
+            </div>
+          </div>
+          <!-- Luz Principal -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Luz Principal</div>
+              <div class="device-status">
+                <span id="salaPrincipalStatus" class="status-indicator status-off"></span>
+                <span id="salaPrincipalText">Desligada</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="salaPrincipalSwitch" onchange="toggleDevice('salaPrincipal',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <!-- Luz de Acento -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Luz de Acento</div>
+              <div class="device-status">
+                <span id="salaAcentoStatus" class="status-indicator status-off"></span>
+                <span id="salaAcentoText">Desligada</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="salaAcentoSwitch" onchange="toggleDevice('salaAcento',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Quarto -->
+        <div class="card illumination">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-bed"></i></div>
+            <div>
+              <div class="card-title">Quarto</div>
+              <div class="card-subtitle">Iluminação ambiente</div>
+            </div>
+          </div>
+          <!-- Luz Principal do Quarto -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Luz Principal</div>
+              <div class="device-status">
+                <span id="quartoPrincipalStatus" class="status-indicator status-off"></span>
+                <span id="quartoPrincipalText">Desligada</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="quartoPrincipalSwitch" onchange="toggleDevice('quartoPrincipal',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <!-- Abajur -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Abajur</div>
+              <div class="device-status">
+                <span id="quartoAbajurStatus" class="status-indicator status-off"></span>
+                <span id="quartoAbajurText">Desligado</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="quartoAbajurSwitch" onchange="toggleDevice('quartoAbajur',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Cozinha -->
+        <div class="card illumination">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-utensils"></i></div>
+            <div>
+              <div class="card-title">Cozinha</div>
+              <div class="card-subtitle">Luzes e bancada</div>
+            </div>
+          </div>
+          <!-- Luz Principal da Cozinha -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Luz Principal</div>
+              <div class="device-status">
+                <span id="cozinhaPrincipalStatus" class="status-indicator status-off"></span>
+                <span id="cozinhaPrincipalText">Desligada</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="cozinhaPrincipalSwitch" onchange="toggleDevice('cozinhaPrincipal',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <!-- Luz da Bancada -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Luz da Bancada</div>
+              <div class="device-status">
+                <span id="cozinhaBancadaStatus" class="status-indicator status-off"></span>
+                <span id="cozinhaBancadaText">Desligada</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="cozinhaBancadaSwitch" onchange="toggleDevice('cozinhaBancada',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Garagem -->
+        <div class="card illumination">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-warehouse"></i></div>
+            <div>
+              <div class="card-title">Garagem</div>
+              <div class="card-subtitle">Luz externa</div>
+            </div>
+          </div>
+          <!-- Luz da Garagem -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Luz da Garagem</div>
+              <div class="device-status">
+                <span id="garagemLuzStatus" class="status-indicator status-off"></span>
+                <span id="garagemLuzText">Desligada</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="garagemLuzSwitch" onchange="toggleDevice('garagemLuz',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- CLIMATIZAÇÃO -->
+    <div id="climate" class="tab-content">
+      <div class="dashboard">
+
+        <!-- Sala de Estar - Ar Condicionado -->
+        <div class="card climate">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-wind"></i></div>
+            <div>
+              <div class="card-title">Sala de Estar</div>
+              <div class="card-subtitle">Controle de ar-condicionado</div>
+            </div>
+          </div>
+
+          <!-- AC Sala -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Ar Condicionado</div>
+              <div class="device-status">
+                <span id="acSalaStatus" class="status-indicator status-off"></span>
+                <span id="acSalaText">Desligado</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="acSalaSwitch" onchange="toggleDevice('acSala',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Controle de Temperatura -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Temperatura</div>
+              <div class="device-status">
+                <span id="acSalaTempText">23°C</span>
+              </div>
+            </div>
+            <input type="range" min="16" max="30" value="23" class="slider"
+                   oninput="updateTemperature('acSala',this.value)">
+          </div>
+        </div>
+
+        <!-- Quarto - Ar Condicionado -->
+        <div class="card climate">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-snowflake"></i></div>
+            <div>
+              <div class="card-title">Quarto</div>
+              <div class="card-subtitle">Climatização do quarto</div>
+            </div>
+          </div>
+
+          <!-- AC Quarto -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Ar Condicionado</div>
+              <div class="device-status">
+                <span id="acQuartoStatus" class="status-indicator status-off"></span>
+                <span id="acQuartoText">Desligado</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="acQuartoSwitch" onchange="toggleDevice('acQuarto',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Controle de Temperatura -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Temperatura</div>
+              <div class="device-status">
+                <span id="acQuartoTempText">22°C</span>
+              </div>
+            </div>
+            <input type="range" min="16" max="30" value="22" class="slider"
+                   oninput="updateTemperature('acQuarto',this.value)">
+          </div>
+        </div>
+
+        <!-- Ventilador -->
+        <div class="card climate">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-fan"></i></div>
+            <div>
+              <div class="card-title">Ventilador</div>
+              <div class="card-subtitle">Velocidade ajustável</div>
+            </div>
+          </div>
+
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Ventilador da Sala</div>
+              <div class="device-status">
+                <span id="ventiladorSalaStatus" class="status-indicator status-off"></span>
+                <span id="ventiladorSalaText">Desligado</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="ventiladorSalaSwitch" onchange="toggleDevice('ventiladorSala',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Controle de Velocidade -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Velocidade</div>
+              <div class="device-status">
+                <span id="ventiladorSalaVelocidadeText">0%</span>
+              </div>
+            </div>
+            <input type="range" min="0" max="100" value="0" class="slider"
+                   oninput="updateSpeed('ventiladorSala',this.value)">
+          </div>
+        </div>
+
+        <!-- Aquecedor -->
+        <div class="card climate">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-fire"></i></div>
+            <div>
+              <div class="card-title">Aquecedor</div>
+              <div class="card-subtitle">Controle de temperatura</div>
+            </div>
+          </div>
+
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Aquecedor Central</div>
+              <div class="device-status">
+                <span id="aquecedorCentralStatus" class="status-indicator status-off"></span>
+                <span id="aquecedorCentralText">Desligado</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="aquecedorCentralSwitch" onchange="toggleDevice('aquecedorCentral',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Controle de Temperatura -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Temperatura</div>
+              <div class="device-status">
+                <span id="aquecedorCentralTempText">20°C</span>
+              </div>
+            </div>
+            <input type="range" min="15" max="28" value="20" class="slider"
+                   oninput="updateTemperature('aquecedorCentral',this.value)">
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- SEGURANÇA -->
+    <div id="security" class="tab-content">
+      <div class="dashboard">
+
+        <!-- Sistema de Alarme -->
+        <div class="card security">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-bell"></i></div>
+            <div>
+              <div class="card-title">Sistema de Alarme</div>
+              <div class="card-subtitle">Monitoramento de intrusão</div>
+            </div>
+          </div>
+
+          <!-- Alarme Principal -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Alarme Principal</div>
+              <div class="device-status">
+                <span id="alarmePrincipalStatus" class="status-indicator status-off"></span>
+                <span id="alarmePrincipalText">Desarmado</span>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="alarmePrincipalSwitch" onchange="toggleDevice('alarmePrincipal',this.checked)">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Câmeras de Segurança -->
+        <div class="card security">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-video"></i></div>
+            <div>
+              <div class="card-title">Câmeras</div>
+              <div class="card-subtitle">Monitoramento em tempo real</div>
+            </div>
+          </div>
+
+          <!-- Câmera Frontal -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Câmera Frontal</div>
+              <div class="device-status">
+                <span id="cameraFrontalStatus" class="status-indicator status-on"></span>
+                <span id="cameraFrontalText">Ativa</span>
+              </div>
+            </div>
+            <button class="scene-btn" onclick="abrirCamera('frontal')">Visualizar</button>
+          </div>
+
+          <!-- Câmera Garagem -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Câmera Garagem</div>
+              <div class="device-status">
+                <span id="cameraGaragemStatus" class="status-indicator status-on"></span>
+                <span id="cameraGaragemText">Ativa</span>
+              </div>
+            </div>
+            <button class="scene-btn" onclick="abrirCamera('garagem')">Visualizar</button>
+          </div>
+        </div>
+
+        <!-- Portão Automático -->
+        <div class="card security">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-door-open"></i></div>
+            <div>
+              <div class="card-title">Portão Automático</div>
+              <div class="card-subtitle">Controle de acesso</div>
+            </div>
+          </div>
+
+          <!-- Portão da Garagem -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Portão da Garagem</div>
+              <div class="device-status">
+                <span id="portaoGaragemStatus" class="status-indicator status-off"></span>
+                <span id="portaoGaragemText">Fechado</span>
+              </div>
+            </div>
+            <button class="scene-btn" onclick="togglePortao('portaoGaragem')">Abrir</button>
+          </div>
+        </div>
+
+        <!-- Sensores -->
+        <div class="card security">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-rss"></i></div>
+            <div>
+              <div class="card-title">Sensores</div>
+              <div class="card-subtitle">Portas e janelas</div>
+            </div>
+          </div>
+
+          <!-- Sensor da Porta Principal -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Porta Principal</div>
+              <div class="device-status">
+                <span id="sensorPortaPrincipalStatus" class="status-indicator status-on"></span>
+                <span id="sensorPortaPrincipalText">Fechada</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sensor da Janela da Sala -->
+          <div class="device">
+            <div class="device-info">
+              <div class="device-name">Janela da Sala</div>
+              <div class="device-status">
+                <span id="sensorJanelaSalaStatus" class="status-indicator status-on"></span>
+                <span id="sensorJanelaSalaText">Fechada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
