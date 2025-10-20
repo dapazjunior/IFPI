@@ -89,3 +89,13 @@ INSERT INTO colecaocd_musica VALUES
 (5, 7, 'A Estrada é Longa', 230),
 (5, 8, 'Hoje Acordei Feliz pra Cacete', 210);
 
+
+
+SELECT nome, datacompra FROM colecaocd_cd ORDER BY datacompra DESC;
+SELECT * FROM colecaocd_musica WHERE cd_codigo = 1;
+SELECT numero, nome, duracao FROM colecaocd_musica WHERE cd_codigo = 5;
+SELECT nome FROM colecaocd_cd WHERE localcompra = Submarino;
+SELECT * FROM colecaocd_musica ORDER BY nome;
+SELECT * FROM colecaocd_cd WHERE album = S;
+SELECT * FROM colecaocd_cd WHERE datacompra = 2025-07;
+SELECT * FROM colecaocd_cd WHERE 30 <= valorpago <= 50;
