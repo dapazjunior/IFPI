@@ -90,11 +90,155 @@ INSERT INTO colecaocd_musica VALUES
 (5, 8, 'Hoje Acordei Feliz pra Cacete', 210);
 
 
+/*a) Mostrar todos os CDs*/
+SELECT * 
+FROM colecaocd_cd
 
-SELECT nome, datacompra FROM colecaocd_cd ORDER BY datacompra DESC;
-SELECT * FROM colecaocd_musica WHERE cd_codigo = 1;
-SELECT numero, nome, duracao FROM colecaocd_musica WHERE cd_codigo = 5;
-SELECT nome FROM colecaocd_cd WHERE localcompra = Submarino;
+
+/*b) Mostrar os campos nome e data da compra dos CDs ordenados por nome*/
+SELECT nome, datacompra
+FROM colecaocd_cd
+ORDER BY nome;
+
+/*c) Mostrar os campos nome e data da compra dos CDs classificados por data de compra em ordem decrescente*/
+SELECT nome, datacompra 
+FROM colecaocd_cd
+ORDER BY datacompra DESC;
+
+/*d) Mostrar o total gasto com a compra dos CDs*/
+SELECT SUM(valorpago) AS totalgasto
+FROM colecaocd_cd
+
+/*e) Mostrar todas as músicas (todos os campos) do CD com o código 1*/
+SELECT *
+FROM colecaocd_musica
+WHERE cd_codigo = 1;
+
+/*f) Mostrar o nome do CD e o nome das músicas de todos CDs*/
+SELECT c.nome AS nome_cd, m.nome AS nome_musica
+FROM colecaocd_cd AS c INNER JOIN colecaocd_musica AS m
+ON c.codigo = m.cd_codigo;
+
+/*g) Mostrar o nome e o artista de todas as músicas cadastradas*/
+SELECT m.nome AS nome_musica, c.artista
+FROM colecaocd_musica as m INNER JOIN colecaocd_cd as c
+ON m.cd_codigo = c.codigo
+
+/*h) Mostrar o tempo total de músicas cadastradas*/
+SELECT SUM(duracao) AS tempototal
+FROM colecaocd_musica
+
+/*i) Mostrar o número, nome e tempo das músicas do CD com o código 5 por ordem de número*/
+SELECT numero, nome, duracao
+FROM colecaocd_musica
+WHERE cd_codigo = 5
+ORDER BY numero;
+
+/*j) Mostrar o número, nome e tempo das músicas do CD com o nome “Reginaldo Rossi – Perfil” por ordem de nome*/
+SELECT m.numero, m.nome, m.duracao
+FROM colecaocd_cd AS c INNER JOIN colecaocd_musica AS m
+ON m.cd_codigo = c.codigo
+WHERE c.nome = "Reginaldo Rossi – Perfil"
+ORDER BY m.nome;
+
+/*k) Mostrar o tempo total de músicas por CD*/
+SELECT cd_codigo, SUM(duracao) AS tempototal
+FROM colecaocd_musica
+GROUP BY cd_codigo;
+
+/*l) Mostrar a quantidade de músicas cadastradas*/
+SELECT COUNT(*) AS qtdmusicas
+FROM colecaocd_musica;
+
+/*m) Mostrar a média de duração das músicas cadastradas*/
+SELECT SUM(duracao) / COUNT(*) as mediatempo
+FROM colecaocd_musica
+
+/*n) Mostrar a quantidade de CDs*/
+SELECT COUNT(*) AS qtdcds
+FROM colecaocd_cd;
+
+/*o) Mostrar o nome das músicas do artista Reginaldo Rossi*/
+SELECT m.nome
+FROM colecaocd_cd AS c INNER JOIN colecaocd_musica AS m
+ON m.cd_codigo = c.codigo
+WHERE c.artista = "Reginaldo Rossi"
+
+/*p) Mostrar a quantidade de músicas por CDs*/
+SELECT cd_codigo, COUNT(*) AS musicasporcd
+FROM colecaocd_musica
+GROUP BY cd_codigo;
+
+/*q) Mostrar o nome de todos os CDs comprados no “Submarino.com”*/
+SELECT nome
+FROM colecaocd_cd
+WHERE localcompra = "Submarino.com"
+
+/*r) Mostrar o nome do CD e o nome da primeira música de todos os CDs*/
+SELECT c.nome, m.nome
+FROM colecaocd_cd AS c INNER JOIN colecaocd_musica AS m
+ON m.cd_codigo = c.codigo
+WHERE m.numero = 1
+
+/*s) Mostrar uma listagem de músicas em ordem alfabética*/
+SELECT *
+FROM colecaocd_musica
+ORDER BY nome;
+
+/*t) Mostrar todos os CDs que são álbuns*/
+SELECT *
+FROM colecaocd_cd
+WHERE album = "S"
+
+/*u) Mostrar o CD que custou mais caro*/
+SELECT *
+FROM colecaocd_cd
+WHERE valorpago = (SELECT MAX(valorpago) FROM colecaocd_cd);
+
+/*v) Mostrar os CDs comprados em julho de 2014*/
+SELECT *
+FROM colecaocd_cd
+WHERE datacompra BETWEEN '2014-07-01' AND '2014-07-31';
+
+/*w) Mostrar os CDs cujo valor pago esteja entre R$ 30,00 e R$ 50,00*/
+SELECT *
+FROM colecaocd_cd
+WHERE valorpago BETWEEN 30 AND 50;
+
+/*x) Mostrar as musicas dos CDs com código 1, 3 e 6*/
+SELECT *
+FROM colecaocd_musica
+WHERE cd_codigo IN (1, 3, 6);
+
+/*y) Mostrar o CD que tem a maior quantidade de músicas cadastradas*/
+SELECT cd_codigo, COUNT(*) AS qtd_musicas
+FROM colecaocd_musica
+GROUP BY cd_codigo
+HAVING COUNT(*) = (
+    SELECT MAX(qtd_musicas)
+    FROM (
+        SELECT cd_codigo, COUNT(*) AS qtd_musicas
+        FROM colecaocd_musica
+        GROUP BY cd_codigo
+    ) AS sub
+);
+
+
+/*z) Mostrar o artista que possui a maior quantidade de CDs cadastrados*/
+SELECT artista, COUNT(*) AS qtd_cds
+FROM colecaocd_cd
+GROUP BY artista
+HAVING COUNT(*) = (
+    SELECT MAX(qtd_cds)
+    FROM (
+        SELECT artista, COUNT(*) AS qtd_cds
+        FROM colecaocd_cd
+        GROUP BY artista
+    ) AS sub
+);
+
+
+
 SELECT * FROM colecaocd_musica ORDER BY nome;
 SELECT * FROM colecaocd_cd WHERE album = S;
 SELECT * FROM colecaocd_cd WHERE datacompra = 2025-07;
