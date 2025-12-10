@@ -1,0 +1,63 @@
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-danger text-white rounded-top-3">
+    <strong><i class="bi bi-people"></i> Gerenciamento de Usuários</strong>
+  </div>
+  <div class="card-body">
+    <!-- Formulário de novo usuário -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h5 class="fw-bold mb-3"><i class="bi bi-person-plus"></i> Adicionar Novo Usuário</h5>
+        <form id="formAddUser" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Nome Completo</label>
+            <input id="userFullName" class="form-control" placeholder="Digite o nome completo" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Usuário (login)</label>
+            <input id="userUsername" class="form-control" placeholder="Nome de usuário" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Senha</label>
+            <input type="password" id="userPassword" class="form-control" placeholder="Digite a senha" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Tipo de Usuário</label>
+            <select id="userRole" class="form-select" required>
+              <option value="user">Usuário Normal</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+          <div class="col-12 pt-2">
+            <button class="btn btn-success btn-lg w-100 py-2" type="submit">
+              <i class="bi bi-person-add"></i> Adicionar Usuário
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lista de usuários -->
+    <div class="row">
+      <div class="col-12">
+        <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill"></i> Usuários Cadastrados</h5>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Nome</th>
+                <th>Usuário</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Criado em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="6" class="text-center py-4">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

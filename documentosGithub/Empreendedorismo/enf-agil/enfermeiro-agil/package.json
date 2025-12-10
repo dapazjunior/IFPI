@@ -1,0 +1,14 @@
+{
+  "name": "enfermeiro-agil",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "serve ."
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

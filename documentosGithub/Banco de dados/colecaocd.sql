@@ -94,7 +94,6 @@ INSERT INTO colecaocd_musica VALUES
 SELECT * 
 FROM colecaocd_cd
 
-
 /*b) Mostrar os campos nome e data da compra dos CDs ordenados por nome*/
 SELECT nome, datacompra
 FROM colecaocd_cd
@@ -236,10 +235,3 @@ HAVING COUNT(*) = (
         GROUP BY artista
     ) AS sub
 );
-
-
-
-SELECT * FROM colecaocd_musica ORDER BY nome;
-SELECT * FROM colecaocd_cd WHERE album = S;
-SELECT * FROM colecaocd_cd WHERE datacompra = 2025-07;
-SELECT * FROM colecaocd_cd WHERE 30 <= valorpago <= 50;

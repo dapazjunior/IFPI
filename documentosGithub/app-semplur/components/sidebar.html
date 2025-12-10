@@ -1,0 +1,53 @@
+<div class="sidebar-sticky pt-3">
+  <div class="mb-4">
+    <div class="text-center mb-3">
+      <div class="avatar mx-auto mb-2">
+        <i class="bi bi-person"></i>
+      </div>
+      <h6 class="mb-1" id="sidebarUserName"></h6>
+      <small class="text-muted" id="sidebarUserRole"></small>
+    </div>
+  </div>
+  
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link active" href="#documents" onclick="document.getElementById('documents-tab').click()">
+        <i class="bi bi-file-earmark-text me-2"></i>
+        Documentos
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#complaints" onclick="document.getElementById('complaints-tab').click()">
+        <i class="bi bi-megaphone me-2"></i>
+        Denúncias
+      </a>
+    </li>
+    <li class="nav-item d-none" id="sidebarAdminItem">
+      <a class="nav-link" href="#admin" onclick="document.getElementById('admin-tab').click()">
+        <i class="bi bi-gear me-2"></i>
+        Administração
+      </a>
+    </li>
+  </ul>
+  
+  <hr class="my-4">
+  
+  <div class="sidebar-stats">
+    <h6 class="sidebar-heading px-3 mb-2 text-muted">
+      <i class="bi bi-graph-up me-2"></i> Estatísticas
+    </h6>
+    <div class="px-3">
+      <small class="d-block text-muted mb-1">Documentos hoje:</small>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span id="todayDocuments">0</span>
+        <span class="badge bg-primary">+0</span>
+      </div>
+      
+      <small class="d-block text-muted mb-1">Denúncias pendentes:</small>
+      <div class="d-flex justify-content-between align-items-center">
+        <span id="pendingComplaints">0</span>
+        <span class="badge bg-warning">+0</span>
+      </div>
+    </div>
+  </div>
+</div>

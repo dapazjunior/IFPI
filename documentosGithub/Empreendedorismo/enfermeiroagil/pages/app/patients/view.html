@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Paciente - Enfermeiro Ágil</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="../../../../css/main.css">
+    
+    <!-- CSS Patient View -->
+    <style>
+        .patient-header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .patient-info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            min-width: 150px;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: #333;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #1a73e8;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #1a73e8;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -23px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #1a73e8;
+        }
+        
+        .timeline-content {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-time {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-author {
+            font-size: 0.85rem;
+            color: #1a73e8;
+            font-weight: 500;
+        }
+        
+        .note-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        
+        .note-evolucao {
+            background: #e8f0fe;
+            color: #1a73e8;
+        }
+        
+        .note-medicacao {
+            background: #e8f5e9;
+            color: #4caf50;
+        }
+        
+        .note-procedimento {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+        
+        .note-observacao {
+            background: #f3e5f5;
+            color: #9c27b0;
+        }
+        
+        .action-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .floating-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .btn-add-note {
+            background: #1a73e8;
+            color: white;
+        }
+        
+        .btn-edit {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .btn-back {
+            background: #6c757d;
+            color: white;
+        }
+    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../../../../public/favicon.ico">
+</head>
+<body>
+    
+    <!-- Global Loading -->
+    <div id="global-loader" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index: 9999; display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <p class="text-muted">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container-custom">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../dashboard.html">
+                <img src="../../../../../public/EnfermeiroAgil.png" alt="Enfermeiro Ágil" height="40" class="me-2">
+                <span class="fw-bold d-none d-md-inline">Enfermeiro<span class="text-primary">Ágil</span></span>
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Menu -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <!-- Perfil do Usuário -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-2">
+                                    <div class="fw-semibold user-name">Carregando...</div>
+                                </div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item logout-btn" href="#">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header do Paciente -->
+    <div class="patient-header">
+        <div class="container-custom">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider-color: rgba(255,255,255,0.7);">
+                            <li class="breadcrumb-item"><a href="../dashboard.html" class="text-white text-decoration-none">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="index.html" class="text-white text-decoration-none">Pacientes</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Visualizar</li>
+                        </ol>
+                    </nav>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle bg-white d-flex align-items-center justify-content-center" 
+                                 style="width: 60px; height: 60px; color: #1a73e8;">
+                                <i class="bi bi-person" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="h2 mb-1" id="patient-name">Carregando...</h1>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-white text-primary me-2" id="patient-priority">...</span>
+                                <span class="text-white-50" id="patient-bed">Leito: ...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-none d-md-block">
+                    <button class="btn btn-light me-2" onclick="window.history.back()">
+                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                    </button>
+                    <button class="btn btn-outline-light" onclick="editPatient()">
+                        <i class="bi bi-pencil me-2"></i>Editar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-custom">
+        <!-- Alertas -->
+        <div id="patient-alert" class="alert-custom alert-custom-info mb-4 d-none"></div>
+
+        <div class="row">
+            <!-- Informações do Paciente -->
+            <div class="col-lg-4 mb-4">
+                <div class="patient-info-card">
+                    <h5 class="section-title">Informações Gerais</h5>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Nome Completo:</div>
+                        <div class="info-value" id="info-name">-</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Leito/Quarto:</div>
+                        <div class="info-value" id="info-bed">-</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Idade:</div>
+                        <div class="info-value" id="info-age">-</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Sexo:</div>
+                        <div class="info-value" id="info-gender">-</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Prioridade:</div>
+                        <div class="info-value">
+                            <span class="badge" id="info-priority-badge">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Cadastrado em:</div>
+                        <div class="info-value" id="info-created">-</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Última atualização:</div>
+                        <div class="info-value" id="info-updated">-</div>
+                    </div>
+                </div>
+
+                <!-- Diagnóstico e Alergias -->
+                <div class="patient-info-card">
+                    <h5 class="section-title">Condições de Saúde</h5>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Diagnóstico Principal:</div>
+                        <div class="info-value" id="info-diagnosis">-</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Alergias:</div>
+                        <div class="info-value" id="info-allergies">
+                            <span class="text-muted">Nenhuma alergia conhecida</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Observações:</div>
+                        <div class="info-value" id="info-notes">
+                            <span class="text-muted">Nenhuma observação</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações Rápidas -->
+                <div class="patient-info-card">
+                    <h5 class="section-title">Ações Rápidas</h5>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-custom btn-custom-primary" onclick="showAddNoteModal()">
+                            <i class="bi bi-plus-circle me-2"></i>Adicionar Evolução
+                        </button>
+                        <button class="btn btn-custom btn-custom-outline" onclick="showShareModal()">
+                            <i class="bi bi-share me-2"></i>Compartilhar Paciente
+                        </button>
+                        <button class="btn btn-custom btn-custom-outline" onclick="showMedicationModal()">
+                            <i class="bi bi-capsule me-2"></i>Registrar Medicação
+                        </button>
+                        <button class="btn btn-custom btn-custom-outline" onclick="exportPatientData()">
+                            <i class="bi bi-download me-2"></i>Exportar Dados
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evoluções e Anotações -->
+            <div class="col-lg-8 mb-4">
+                <div class="patient-info-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="section-title mb-0">Evoluções e Anotações</h5>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-filter me-1"></i>Filtrar
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="filterNotes('all')">Todas</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="filterNotes('evolucao')">Evoluções</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="filterNotes('medicacao')">Medicações</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="filterNotes('procedimento')">Procedimentos</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="filterNotes('observacao')">Observações</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div id="notes-timeline">
+                        <div class="text-center py-5">
+                            <div class="loading-spinner"></div>
+                            <p class="text-muted mt-3">Carregando evoluções...</p>
+                        </div>
+                    </div>
+                    
+                    <div id="empty-notes" class="text-center py-5 d-none">
+                        <i class="bi bi-journal-text text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Nenhuma evolução registrada</h5>
+                        <p class="text-muted">Comece registrando a primeira evolução para este paciente</p>
+                        <button class="btn btn-custom btn-custom-primary" onclick="showAddNoteModal()">
+                            <i class="bi bi-plus-circle me-2"></i>Adicionar Primeira Evolução
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões Flutuantes (Mobile) -->
+    <div class="action-buttons d-md-none">
+        <button class="floating-btn btn-back" onclick="window.history.back()">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <button class="floating-btn btn-add-note" onclick="showAddNoteModal()">
+            <i class="bi bi-plus"></i>
+        </button>
+        <button class="floating-btn btn-edit" onclick="editPatient()">
+            <i class="bi bi-pencil"></i>
+        </button>
+    </div>
+
+    <!-- Modal: Adicionar Evolução -->
+    <div class="modal fade" id="addNoteModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Evolução</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-note-form">
+                        <div class="mb-3">
+                            <label for="note-type" class="form-label">Tipo de Registro *</label>
+                            <select class="form-select" id="note-type" required>
+                                <option value="">Selecione...</option>
+                                <option value="evolucao">Evolução de Enfermagem</option>
+                                <option value="medicacao">Administração de Medicamento</option>
+                                <option value="procedimento">Procedimento Realizado</option>
+                                <option value="observacao">Observação Importante</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="note-content" class="form-label">Conteúdo *</label>
+                            <textarea class="form-control" id="note-content" rows="8" 
+                                      placeholder="Descreva a evolução, procedimento ou observação..." 
+                                      required></textarea>
+                            <div class="form-text">
+                                Dica: Use modelos pré-definidos para agilizar o registro.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Modelos Rápidos</label>
+                            <div class="d-flex flex-wrap gap-2" id="note-templates">
+                                <!-- Templates serão carregados dinamicamente -->
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="note-tags" class="form-label">Tags (opcional)</label>
+                            <input type="text" class="form-control" id="note-tags" 
+                                   placeholder="Ex: febre, dor, curativo, medicamento">
+                            <div class="form-text">Separe as tags por vírgula</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-note-btn">Salvar Evolução</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Compartilhar Paciente -->
+    <div class="modal fade" id="shareModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Compartilhar Paciente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">Compartilhe este paciente com outros profissionais da sua equipe.</p>
+                    
+                    <form id="share-form">
+                        <div class="mb-3">
+                            <label for="share-email" class="form-label">Email do Profissional *</label>
+                            <input type="email" class="form-control" id="share-email" 
+                                   placeholder="colega@email.com" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="share-permission" class="form-label">Permissão *</label>
+                            <select class="form-select" id="share-permission" required>
+                                <option value="view">Apenas Visualização</option>
+                                <option value="edit">Visualização e Edição</option>
+                            </select>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            O profissional receberá acesso apenas a este paciente específico.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="share-patient-btn">Compartilhar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Módulos do App -->
+    <script type="module">
+        import authService from '../../../../js/modules/auth.js';
+        import patientService from '../../../../js/modules/patients.js';
+        import { UTILS } from '../../../../js/config/constants.js';
+        
+        // Variáveis de estado
+        let currentPatient = null;
+        let currentPatientId = null;
+        let notes = [];
+        let currentNoteFilter = 'all';
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initPatientView();
+        });
+        
+        async function initPatientView() {
+            try {
+                // Verificar autenticação
+                if (!authService.isAuthenticated()) {
+                    window.location.href = '../../../auth/login.html';
+                    return;
+                }
+                
+                // Obter ID do paciente da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                currentPatientId = urlParams.get('id');
+                
+                if (!currentPatientId) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // Carregar dados do usuário
+                await loadUserData();
+                
+                // Carregar paciente
+                await loadPatient();
+                
+                // Carregar evoluções
+                await loadNotes();
+                
+                // Configurar eventos
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('Erro ao inicializar visualização do paciente:', error);
+                showError('Erro ao carregar dados do paciente. Tente novamente.');
+            }
+        }
+        
+        async function loadUserData() {
+            const user = authService.getUser();
+            const profile = authService.getUserProfile();
+            
+            // Atualizar UI
+            document.querySelectorAll('.user-name').forEach(el => {
+                el.textContent = profile?.full_name || user?.email?.split('@')[0] || 'Usuário';
+            });
+        }
+        
+        async function loadPatient() {
+            try {
+                authService.showLoading();
+                
+                const result = await patientService.getPatient(currentPatientId);
+                
+                if (result.success) {
+                    currentPatient = result.data;
+                    renderPatientInfo();
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar paciente:', error);
+                showError('Erro ao carregar paciente: ' + error.message);
+                // Redirecionar após 3 segundos
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+            } finally {
+                authService.hideLoading();
+            }
+        }
+        
+        function renderPatientInfo() {
+            if (!currentPatient) return;
+            
+            // Informações básicas
+            document.getElementById('patient-name').textContent = currentPatient.name;
+            document.getElementById('info-name').textContent = currentPatient.name;
+            
+            // Leito
+            const bedInfo = currentPatient.bed_number ? 
+                `Leito ${currentPatient.bed_number}${currentPatient.room ? ` - ${currentPatient.room}` : ''}` : 
+                'Não informado';
+            document.getElementById('patient-bed').textContent = bedInfo;
+            document.getElementById('info-bed').textContent = bedInfo;
+            
+            // Idade e sexo
+            document.getElementById('info-age').textContent = currentPatient.age ? 
+                `${currentPatient.age} anos` : 'Não informada';
+            
+            const genderText = currentPatient.gender === 'M' ? 'Masculino' : 
+                              currentPatient.gender === 'F' ? 'Feminino' : 
+                              currentPatient.gender === 'O' ? 'Outro' : 'Não informado';
+            document.getElementById('info-gender').textContent = genderText;
+            
+            // Prioridade
+            const priorityText = UTILS.getPriorityText(currentPatient.priority);
+            const priorityColor = UTILS.getPriorityColor(currentPatient.priority);
+            
+            document.getElementById('patient-priority').textContent = priorityText;
+            document.getElementById('patient-priority').style.background = priorityColor;
+            
+            const priorityBadge = document.getElementById('info-priority-badge');
+            priorityBadge.textContent = priorityText;
+            priorityBadge.style.background = priorityColor;
+            priorityBadge.style.color = 'white';
+            
+            // Datas
+            document.getElementById('info-created').textContent = UTILS.formatDate(currentPatient.created_at);
+            document.getElementById('info-updated').textContent = UTILS.formatDate(currentPatient.updated_at);
+            
+            // Diagnóstico
+            document.getElementById('info-diagnosis').textContent = currentPatient.main_diagnosis || 
+                '<span class="text-muted">Não informado</span>';
+            
+            // Alergias
+            const allergiesElement = document.getElementById('info-allergies');
+            if (currentPatient.allergies && currentPatient.allergies.length > 0) {
+                allergiesElement.innerHTML = currentPatient.allergies
+                    .map(allergy => `<span class="badge bg-danger me-1">${allergy}</span>`)
+                    .join('');
+            } else {
+                allergiesElement.innerHTML = '<span class="text-muted">Nenhuma alergia conhecida</span>';
+            }
+            
+            // Observações
+            document.getElementById('info-notes').textContent = currentPatient.notes || 
+                '<span class="text-muted">Nenhuma observação</span>';
+        }
+        
+        async function loadNotes() {
+            try {
+                const result = await patientService.getNursingNotes(currentPatientId);
+                
+                if (result.success) {
+                    notes = result.data;
+                    renderNotes();
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar evoluções:', error);
+                document.getElementById('notes-timeline').innerHTML = `
+                    <div class="alert alert-danger">
+                        Erro ao carregar evoluções: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function renderNotes() {
+            const container = document.getElementById('notes-timeline');
+            const emptyState = document.getElementById('empty-notes');
+            
+            if (notes.length === 0) {
+                container.classList.add('d-none');
+                emptyState.classList.remove('d-none');
+                return;
+            }
+            
+            container.classList.remove('d-none');
+            emptyState.classList.add('d-none');
+            
+            // Filtrar notas
+            let filteredNotes = notes;
+            if (currentNoteFilter !== 'all') {
+                filteredNotes = notes.filter(note => note.note_type === currentNoteFilter);
+            }
+            
+            if (filteredNotes.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="bi bi-filter text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">Nenhuma evolução encontrada</h5>
+                        <p class="text-muted">Tente ajustar os filtros</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="timeline">';
+            
+            filteredNotes.forEach(note => {
+                const noteTypeClass = `note-${note.note_type}`;
+                const noteTypeText = note.note_type === 'evolucao' ? 'Evolução' :
+                                   note.note_type === 'medicacao' ? 'Medicação' :
+                                   note.note_type === 'procedimento' ? 'Procedimento' : 'Observação';
+                
+                const formattedTime = UTILS.formatDate(note.created_at);
+                const authorName = note.profiles?.full_name || 'Usuário';
+                
+                html += `
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="note-type-badge ${noteTypeClass}">${noteTypeText}</span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="timeline-time">${formattedTime}</div>
+                                    <div class="timeline-author">${authorName}</div>
+                                </div>
+                            </div>
+                            <div class="note-content">
+                                ${note.content.replace(/\n/g, '<br>')}
+                            </div>
+                            ${note.tags && note.tags.length > 0 ? `
+                                <div class="mt-2">
+                                    ${note.tags.map(tag => `<span class="badge bg-light text-dark me-1">${tag}</span>`).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function setupEventListeners() {
+            // Logout
+            document.querySelectorAll('.logout-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await authService.logout();
+                });
+            });
+            
+            // Salvar nota
+            document.getElementById('save-note-btn').addEventListener('click', saveNote);
+            
+            // Compartilhar paciente
+            document.getElementById('share-patient-btn').addEventListener('click', sharePatient);
+            
+            // Templates
+            loadNoteTemplates();
+        }
+        
+        function loadNoteTemplates() {
+            const templates = patientService.getDefaultTemplates();
+            const container = document.getElementById('note-templates');
+            
+            templates.forEach(template => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-sm btn-outline-secondary';
+                button.textContent = template.name;
+                button.onclick = () => applyTemplate(template);
+                container.appendChild(button);
+            });
+        }
+        
+        function applyTemplate(template) {
+            document.getElementById('note-type').value = template.category;
+            document.getElementById('note-content').value = template.content;
+        }
+        
+        function showAddNoteModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addNoteModal'));
+            modal.show();
+        }
+        
+        function showShareModal() {
+            const modal = new bootstrap.Modal(document.getElementById('shareModal'));
+            modal.show();
+        }
+        
+        function showMedicationModal() {
+            // Em uma versão completa, isso abriria um modal específico para medicamentos
+            document.getElementById('note-type').value = 'medicacao';
+            showAddNoteModal();
+        }
+        
+        async function saveNote() {
+            try {
+                const noteType = document.getElementById('note-type').value;
+                const content = document.getElementById('note-content').value;
+                const tags = document.getElementById('note-tags').value
+                    .split(',')
+                    .map(tag => tag.trim())
+                    .filter(tag => tag);
+                
+                // Validação
+                if (!noteType || !content) {
+                    showError('Preencha todos os campos obrigatórios.');
+                    return;
+                }
+                
+                authService.showLoading();
+                
+                const noteData = {
+                    note_type: noteType,
+                    content: content,
+                    tags: tags
+                };
+                
+                const result = await patientService.createNursingNote(currentPatientId, noteData);
+                
+                if (result.success) {
+                    // Fechar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addNoteModal'));
+                    modal.hide();
+                    
+                    // Limpar formulário
+                    document.getElementById('add-note-form').reset();
+                    
+                    // Mostrar mensagem de sucesso
+                    showSuccess('Evolução registrada com sucesso!');
+                    
+                    // Recarregar notas
+                    await loadNotes();
+                    
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao salvar evolução:', error);
+                showError('Erro ao salvar evolução: ' + error.message);
+            } finally {
+                authService.hideLoading();
+            }
+        }
+        
+        async function sharePatient() {
+            try {
+                const email = document.getElementById('share-email').value;
+                const permission = document.getElementById('share-permission').value;
+                
+                if (!email) {
+                    showError('Informe o email do profissional.');
+                    return;
+                }
+                
+                authService.showLoading();
+                
+                // Aqui implementaríamos o compartilhamento real
+                // Por enquanto, apenas simulação
+                
+                setTimeout(() => {
+                    authService.hideLoading();
+                    
+                    // Fechar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('shareModal'));
+                    modal.hide();
+                    
+                    // Limpar formulário
+                    document.getElementById('share-form').reset();
+                    
+                    showSuccess('Convite de compartilhamento enviado!');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Erro ao compartilhar paciente:', error);
+                showError('Erro ao compartilhar paciente: ' + error.message);
+                authService.hideLoading();
+            }
+        }
+        
+        function editPatient() {
+            window.location.href = `edit.html?id=${currentPatientId}`;
+        }
+        
+        function exportPatientData() {
+            if (!currentPatient) return;
+            
+            const data = {
+                paciente: currentPatient,
+                evolucoes: notes
+            };
+            
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `paciente-${currentPatient.name.replace(/\s+/g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showSuccess('Dados exportados com sucesso!');
+        }
+        
+        // Funções globais
+        window.filterNotes = function(filter) {
+            currentNoteFilter = filter;
+            renderNotes();
+        };
+        
+        function showSuccess(message) {
+            const alert = document.getElementById('patient-alert');
+            alert.textContent = message;
+            alert.className = 'alert-custom alert-custom-success mb-4';
+            alert.classList.remove('d-none');
+            
+            setTimeout(() => {
+                alert.classList.add('d-none');
+            }, 3000);
+        }
+        
+        function showError(message) {
+            const alert = document.getElementById('patient-alert');
+            alert.textContent = message;
+            alert.className = 'alert-custom alert-custom-danger mb-4';
+            alert.classList.remove('d-none');
+            
+            setTimeout(() => {
+                alert.classList.add('d-none');
+            }, 5000);
+        }
+        
+    </script>
+</body>
+</html>

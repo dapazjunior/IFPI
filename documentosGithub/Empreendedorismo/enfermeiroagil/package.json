@@ -1,0 +1,27 @@
+{
+  "name": "enfermeiro-agil",
+  "version": "1.0.0",
+  "description": "Ferramenta para profissionais de enfermagem",
+  "main": "src/js/app.js",
+  "scripts": {
+    "dev": "live-server src --port=3000 --open=/pages/index.html",
+    "build": "npm run copy-assets",
+    "copy-assets": "cp -r src/pages/* public/ && cp -r src/css public/assets/ && cp -r src/js public/assets/",
+    "deploy": "npm run build && netlify deploy --prod",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [
+    "enfermagem",
+    "saúde",
+    "produtividade",
+    "ferramenta"
+  ],
+  "author": "Enfermeiro Ágil",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}

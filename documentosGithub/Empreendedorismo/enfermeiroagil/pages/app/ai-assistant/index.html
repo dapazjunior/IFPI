@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente IA - Enfermeiro Ágil</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="../../../../css/main.css">
+    
+    <!-- CSS AI Assistant -->
+    <style>
+        .ai-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        .ai-header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .ai-chat-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .ai-chat-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+        
+        .ai-chat-body {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .ai-message {
+            max-width: 80%;
+            padding: 1rem 1.25rem;
+            border-radius: 18px;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .ai-message-user {
+            align-self: flex-end;
+            background: #1a73e8;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message-assistant {
+            align-self: flex-start;
+            background: #f0f2f5;
+            color: #1c1e21;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .ai-message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+        
+        .ai-chat-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+        
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .suggestion-chip {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .suggestion-chip:hover {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+        
+        .ai-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .ai-feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ai-feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .ai-feature-icon {
+            width: 70px;
+            height: 70px;
+            background: #e8f0fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #1a73e8;
+            margin: 0 auto 1rem;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .context-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .context-badge {
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-radius: 50px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .context-badge.active {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+        
+        .ai-limitations {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../../../../public/favicon.ico">
+</head>
+<body>
+    
+    <!-- Global Loading -->
+    <div id="global-loader" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index: 9999; display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <p class="text-muted">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container-custom">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../dashboard.html">
+                <img src="../../../../../public/EnfermeiroAgil.png" alt="Enfermeiro Ágil" height="40" class="me-2">
+                <span class="fw-bold d-none d-md-inline">Enfermeiro<span class="text-primary">Ágil</span></span>
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Menu -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <!-- Perfil do Usuário -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-2">
+                                    <div class="fw-semibold user-name">Carregando...</div>
+                                </div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item logout-btn" href="#">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid" style="margin-top: 80px;">
+        <div class="ai-container">
+            <!-- Header -->
+            <div class="ai-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 class="h2 mb-3">
+                            <i class="bi bi-robot me-2"></i>Assistente IA
+                        </h1>
+                        <p class="mb-0 opacity-75">
+                            Tire dúvidas técnicas, consulte protocolos e receba orientações baseadas em boas práticas de enfermagem.
+                        </p>
+                    </div>
+                    <div class="d-none d-md-block">
+                        <span class="badge bg-white text-primary">Beta</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alertas -->
+            <div id="ai-alert" class="alert-custom alert-custom-info mb-4 d-none"></div>
+            
+            <!-- Container do Chat -->
+            <div class="ai-chat-container">
+                <!-- Header do Chat -->
+                <div class="ai-chat-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Assistente de Enfermagem</h5>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-success me-2">Online</span>
+                                <small class="text-muted">Baseado em protocolos atualizados</small>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear me-1"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" onclick="clearChat()">
+                                    <i class="bi bi-trash me-2"></i>Limpar Conversa
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="exportConversation()">
+                                    <i class="bi bi-download me-2"></i>Exportar Conversa
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Seleção de Contexto -->
+                    <div class="context-selector mt-3">
+                        <small class="text-muted me-2">Contexto:</small>
+                        <span class="context-badge active" data-context="geral" onclick="setContext('geral')">Geral</span>
+                        <span class="context-badge" data-context="medicacao" onclick="setContext('medicacao')">Medicação</span>
+                        <span class="context-badge" data-context="procedimento" onclick="setContext('procedimento')">Procedimento</span>
+                        <span class="context-badge" data-context="pediatria" onclick="setContext('pediatria')">Pediatria</span>
+                        <span class="context-badge" data-context="uti" onclick="setContext('uti')">UTI</span>
+                    </div>
+                </div>
+                
+                <!-- Corpo do Chat -->
+                <div class="ai-chat-body" id="chat-messages">
+                    <!-- Mensagens serão carregadas aqui -->
+                    <div class="text-center py-5">
+                        <div class="ai-feature-icon mb-3">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h5>Olá! Sou seu assistente de enfermagem</h5>
+                        <p class="text-muted">
+                            Estou aqui para ajudar com dúvidas técnicas, protocolos e boas práticas.
+                            Como posso ajudá-lo hoje?
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Rodapé do Chat -->
+                <div class="ai-chat-footer">
+                    <!-- Perguntas Sugeridas -->
+                    <div class="suggested-questions" id="suggested-questions">
+                        <!-- Sugestões serão carregadas aqui -->
+                    </div>
+                    
+                    <!-- Formulário de Pergunta -->
+                    <form id="ai-question-form">
+                        <div class="input-group">
+                            <textarea class="form-control" id="question-input" 
+                                      rows="1" 
+                                      placeholder="Digite sua pergunta sobre enfermagem..." 
+                                      style="resize: none;"
+                                      oninput="autoResize(this)"></textarea>
+                            <button class="btn btn-primary" type="submit" id="send-btn">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle me-1"></i>
+                                O assistente fornece orientações baseadas em protocolos, mas não substitui o julgamento clínico.
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Recursos do Assistente -->
+            <div class="ai-features">
+                <div class="ai-feature-card" onclick="quickAction('calculos')">
+                    <div class="ai-feature-icon">
+                        <i class="bi bi-calculator"></i>
+                    </div>
+                    <h6>Cálculos de Enfermagem</h6>
+                    <p class="text-muted small">Dosagens, gotejamento, diluição</p>
+                </div>
+                
+                <div class="ai-feature-card" onclick="quickAction('protocolos')">
+                    <div class="ai-feature-icon">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <h6>Protocolos Rápidos</h6>
+                    <p class="text-muted small">Acesso a procedimentos padronizados</p>
+                </div>
+                
+                <div class="ai-feature-card" onclick="quickAction('medicamentos')">
+                    <div class="ai-feature-icon">
+                        <i class="bi bi-capsule"></i>
+                    </div>
+                    <h6>Consultar Medicamentos</h6>
+                    <p class="text-muted small">Bulas simplificadas para enfermagem</p>
+                </div>
+                
+                <div class="ai-feature-card" onclick="quickAction('documentacao')">
+                    <div class="ai-feature-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h6>Documentação</h6>
+                    <p class="text-muted small">Modelos e boas práticas de registro</p>
+                </div>
+            </div>
+            
+            <!-- Limitações e Avisos -->
+            <div class="ai-limitations mt-4">
+                <div class="d-flex">
+                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                    <div>
+                        <strong>Importante:</strong> Este assistente utiliza conhecimento baseado em protocolos de enfermagem. 
+                        Sempre consulte: 1) Protocolos específicos da sua instituição, 2) Prescrição médica atualizada, 
+                        3) Supervisor/enfermeiro chefe para orientações específicas, 4) Literatura científica recente.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Módulos do App -->
+    <script type="module">
+        import authService from '../../../../js/modules/auth.js';
+        import aiService from '../../../../js/modules/ai.js';
+        import { UTILS } from '../../../../js/config/constants.js';
+        
+        // Variáveis de estado
+        let currentContext = 'geral';
+        let conversationHistory = [];
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initAIAssistant();
+        });
+        
+        async function initAIAssistant() {
+            try {
+                // Verificar autenticação
+                if (!authService.isAuthenticated()) {
+                    window.location.href = '../../../auth/login.html';
+                    return;
+                }
+                
+                // Carregar dados do usuário
+                await loadUserData();
+                
+                // Carregar histórico
+                await loadConversationHistory();
+                
+                // Carregar sugestões
+                loadSuggestedQuestions();
+                
+                // Configurar eventos
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('Erro ao inicializar assistente IA:', error);
+                showError('Erro ao carregar assistente. Tente novamente.');
+            }
+        }
+        
+        async function loadUserData() {
+            const user = authService.getUser();
+            const profile = authService.getUserProfile();
+            
+            // Atualizar UI
+            document.querySelectorAll('.user-name').forEach(el => {
+                el.textContent = profile?.full_name || user?.email?.split('@')[0] || 'Usuário';
+            });
+        }
+        
+        async function loadConversationHistory() {
+            try {
+                const result = await aiService.getConversationHistory(10);
+                
+                if (result.success && result.data.length > 0) {
+                    conversationHistory = result.data;
+                    renderConversationHistory();
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar histórico:', error);
+            }
+        }
+        
+        function renderConversationHistory() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+            
+            // Adicionar mensagens do histórico (em ordem cronológica inversa)
+            [...conversationHistory].reverse().forEach(item => {
+                addMessageToChat(item.question, 'user');
+                addMessageToChat(item.answer, 'assistant', item.created_at);
+            });
+            
+            // Rolagem para baixo
+            scrollToBottom();
+        }
+        
+        function loadSuggestedQuestions() {
+            const suggestions = aiService.getSuggestedQuestions();
+            const container = document.getElementById('suggested-questions');
+            
+            suggestions.forEach(question => {
+                const chip = document.createElement('div');
+                chip.className = 'suggestion-chip';
+                chip.textContent = question;
+                chip.onclick = () => askQuestion(question);
+                container.appendChild(chip);
+            });
+        }
+        
+        function setupEventListeners() {
+            // Logout
+            document.querySelectorAll('.logout-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await authService.logout();
+                });
+            });
+            
+            // Formulário de pergunta
+            const form = document.getElementById('ai-question-form');
+            const input = document.getElementById('question-input');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const question = input.value.trim();
+                
+                if (question) {
+                    await askQuestion(question);
+                    input.value = '';
+                    autoResize(input);
+                }
+            });
+            
+            // Auto-resize do textarea
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+            
+            // Focus no input
+            input.focus();
+        }
+        
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+        
+        window.setContext = function(context) {
+            currentContext = context;
+            
+            // Atualizar badges
+            document.querySelectorAll('.context-badge').forEach(badge => {
+                badge.classList.remove('active');
+                if (badge.getAttribute('data-context') === context) {
+                    badge.classList.add('active');
+                }
+            });
+            
+            // Feedback visual
+            showMessage(`Contexto alterado para: ${getContextName(context)}`, 'info');
+        };
+        
+        function getContextName(context) {
+            const contexts = {
+                'geral': 'Geral',
+                'medicacao': 'Medicação',
+                'procedimento': 'Procedimento',
+                'pediatria': 'Pediatria',
+                'uti': 'UTI'
+            };
+            return contexts[context] || 'Geral';
+        }
+        
+        async function askQuestion(question) {
+            try {
+                // Adicionar mensagem do usuário
+                addMessageToChat(question, 'user');
+                
+                // Mostrar indicador de digitação
+                showTypingIndicator();
+                
+                // Preparar contexto
+                const context = {
+                    setting: currentContext,
+                    professional: {
+                        role: authService.getUserRole() || 'enfermeiro'
+                    }
+                };
+                
+                // Enviar pergunta
+                const result = await aiService.askQuestion(question, context);
+                
+                // Remover indicador de digitação
+                removeTypingIndicator();
+                
+                if (result.success) {
+                    // Adicionar resposta
+                    addMessageToChat(result.data.answer, 'assistant', result.data.timestamp);
+                    
+                    // Adicionar ao histórico local
+                    conversationHistory.push(result.data);
+                    
+                    // Manter histórico limitado
+                    if (conversationHistory.length > 50) {
+                        conversationHistory = conversationHistory.slice(-50);
+                    }
+                    
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao fazer pergunta:', error);
+                removeTypingIndicator();
+                addMessageToChat(
+                    'Desculpe, ocorreu um erro ao processar sua pergunta. Por favor, tente novamente.',
+                    'assistant'
+                );
+            }
+        }
+        
+        function addMessageToChat(message, sender, timestamp = null) {
+            const container = document.getElementById('chat-messages');
+            
+            // Remover placeholder se existir
+            const placeholder = container.querySelector('.text-center');
+            if (placeholder && conversationHistory.length === 0) {
+                placeholder.remove();
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `ai-message ai-message-${sender}`;
+            
+            const time = timestamp ? new Date(timestamp) : new Date();
+            const formattedTime = UTILS.formatTime(time);
+            
+            messageDiv.innerHTML = `
+                <div>${formatMessageContent(message)}</div>
+                <div class="ai-message-time">${formattedTime}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function formatMessageContent(content) {
+            // Converter quebras de linha
+            content = content.replace(/\n/g, '<br>');
+            
+            // Destacar títulos e listas
+            content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            content = content.replace(/^•\s*(.*?)$/gm, '• $1<br>');
+            content = content.replace(/^\d+\.\s*(.*?)$/gm, '$1<br>');
+            
+            return content;
+        }
+        
+        function showTypingIndicator() {
+            const container = document.getElementById('chat-messages');
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'ai-message ai-message-assistant';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            
+            container.appendChild(typingDiv);
+            scrollToBottom();
+        }
+        
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        function scrollToBottom() {
+            const container = document.getElementById('chat-messages');
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        window.clearChat = function() {
+            if (confirm('Tem certeza que deseja limpar toda a conversa?')) {
+                aiService.clearHistory();
+                conversationHistory = [];
+                
+                const container = document.getElementById('chat-messages');
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="ai-feature-icon mb-3">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h5>Conversa limpa</h5>
+                        <p class="text-muted">
+                            Como posso ajudá-lo hoje?
+                        </p>
+                    </div>
+                `;
+                
+                showMessage('Conversa limpa com sucesso!', 'success');
+            }
+        };
+        
+        function exportConversation() {
+            if (conversationHistory.length === 0) {
+                showMessage('Nenhuma conversa para exportar.', 'info');
+                return;
+            }
+            
+            const data = {
+                exportedAt: new Date().toISOString(),
+                conversations: conversationHistory
+            };
+            
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `conversa-enfermagem-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('Conversa exportada com sucesso!', 'success');
+        }
+        
+        function quickAction(action) {
+            const actions = {
+                'calculos': 'Como calcular gotejamento de soro?',
+                'protocolos': 'Quais são os passos para curativo estéril?',
+                'medicamentos': 'Como administrar insulina corretamente?',
+                'documentacao': 'Como fazer uma boa evolução de enfermagem?'
+            };
+            
+            if (actions[action]) {
+                askQuestion(actions[action]);
+            }
+        }
+        
+        function showMessage(message, type = 'info') {
+            const alert = document.getElementById('ai-alert');
+            alert.textContent = message;
+            alert.className = `alert-custom alert-custom-${type} mb-4`;
+            alert.classList.remove('d-none');
+            
+            setTimeout(() => {
+                alert.classList.add('d-none');
+            }, 3000);
+        }
+        
+        // Funções globais
+        window.askQuestion = askQuestion;
+        window.clearChat = clearChat;
+        window.exportConversation = exportConversation;
+        window.quickAction = quickAction;
+        
+    </script>
+</body>
+</html>

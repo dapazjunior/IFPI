@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Paciente - Enfermeiro Ágil</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="../../../../css/main.css">
+    
+    <!-- CSS New Patient -->
+    <style>
+        .new-patient-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #1a73e8;
+            color: #1a73e8;
+        }
+        
+        .priority-indicator {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .priority-option {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .priority-option:hover {
+            border-color: #1a73e8;
+        }
+        
+        .priority-option.selected {
+            border-color: #1a73e8;
+            background: #e8f0fe;
+        }
+        
+        .priority-high {
+            border-color: #dc3545 !important;
+            background: #ffebee !important;
+        }
+        
+        .priority-medium {
+            border-color: #ffc107 !important;
+            background: #fff3e0 !important;
+        }
+        
+        .priority-low {
+            border-color: #28a745 !important;
+            background: #e8f5e9 !important;
+        }
+        
+        .form-actions {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            bottom: 20px;
+            z-index: 100;
+        }
+        
+        .form-step {
+            display: none;
+        }
+        
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .step {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 5px;
+            position: relative;
+            font-size: 0.9rem;
+        }
+        
+        .step.active {
+            background: #1a73e8;
+            color: white;
+        }
+        
+        .step.completed {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .step-line {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 20px;
+            height: 2px;
+            background: #e9ecef;
+        }
+        
+        .step:last-child .step-line {
+            display: none;
+        }
+        
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .chip-remove {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../../../../public/favicon.ico">
+</head>
+<body>
+    
+    <!-- Global Loading -->
+    <div id="global-loader" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index: 9999; display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <p class="text-muted">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container-custom">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="../dashboard.html">
+                <img src="../../../../../public/EnfermeiroAgil.png" alt="Enfermeiro Ágil" height="40" class="me-2">
+                <span class="fw-bold d-none d-md-inline">Enfermeiro<span class="text-primary">Ágil</span></span>
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Menu -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <!-- Perfil do Usuário -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-2">
+                                    <div class="fw-semibold user-name">Carregando...</div>
+                                </div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item logout-btn" href="#">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Sair
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid" style="margin-top: 80px;">
+        <div class="new-patient-container">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../dashboard.html">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="index.html">Pacientes</a></li>
+                    <li class="breadcrumb-item active">Novo Paciente</li>
+                </ol>
+            </nav>
+            
+            <!-- Título -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2 mb-1">Novo Paciente</h1>
+                    <p class="text-muted mb-0">Preencha os dados do paciente</p>
+                </div>
+                <div>
+                    <button class="btn btn-outline-secondary" onclick="window.history.back()">
+                        <i class="bi bi-x me-2"></i>Cancelar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Alertas -->
+            <div id="patient-alert" class="alert-custom alert-custom-info mb-4 d-none"></div>
+            
+            <!-- Indicador de Passos -->
+            <div class="step-indicator">
+                <div class="step active" id="step1-indicator">
+                    1
+                    <div class="step-line"></div>
+                </div>
+                <div class="step" id="step2-indicator">
+                    2
+                    <div class="step-line"></div>
+                </div>
+                <div class="step" id="step3-indicator">
+                    3
+                </div>
+            </div>
+            
+            <!-- Formulário -->
+            <form id="new-patient-form">
+                <!-- Passo 1: Identificação -->
+                <div class="form-step active" id="step1">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="bi bi-person me-2"></i>Identificação
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="patient-name" class="form-label">Nome Completo *</label>
+                                <input type="text" class="form-control" id="patient-name" 
+                                       placeholder="Digite o nome completo do paciente" required>
+                                <div class="form-text">Use o nome completo para fácil identificação</div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="patient-age" class="form-label">Idade</label>
+                                <input type="number" class="form-control" id="patient-age" 
+                                       min="0" max="150" placeholder="Ex: 45">
+                                <div class="form-text">Em anos completos</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="patient-gender" class="form-label">Sexo</label>
+                                <select class="form-select" id="patient-gender">
+                                    <option value="">Selecione...</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Feminino</option>
+                                    <option value="O">Outro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="patient-bed" class="form-label">Leito/Quarto</label>
+                                <input type="text" class="form-control" id="patient-bed" 
+                                       placeholder="Ex: 204B ou Quarto 3">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <div></div>
+                        <button type="button" class="btn btn-custom btn-custom-primary" onclick="nextStep(2)">
+                            Continuar <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Passo 2: Condições de Saúde -->
+                <div class="form-step" id="step2">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="bi bi-heart-pulse me-2"></i>Condições de Saúde
+                        </h3>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Prioridade *</label>
+                            <div class="priority-indicator">
+                                <div class="priority-option priority-low" data-priority="baixa" onclick="selectPriority('baixa')">
+                                    <div class="fw-bold">Baixa</div>
+                                    <div class="small text-muted">Rotineiro</div>
+                                </div>
+                                <div class="priority-option priority-medium" data-priority="media" onclick="selectPriority('media')">
+                                    <div class="fw-bold">Média</div>
+                                    <div class="small text-muted">Monitorar</div>
+                                </div>
+                                <div class="priority-option priority-high" data-priority="alta" onclick="selectPriority('alta')">
+                                    <div class="fw-bold">Alta</div>
+                                    <div class="small text-muted">Urgente</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="patient-priority" value="baixa" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="patient-diagnosis" class="form-label">Diagnóstico Principal</label>
+                            <textarea class="form-control" id="patient-diagnosis" rows="3" 
+                                      placeholder="Descreva o diagnóstico principal ou queixa..."></textarea>
+                            <div class="form-text">Seja claro e objetivo</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Alergias Conhecidas</label>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" id="allergy-input" 
+                                       placeholder="Digite uma alergia e pressione Enter">
+                                <button class="btn btn-outline-secondary" type="button" onclick="addAllergy()">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                            <div id="allergies-list" class="d-flex flex-wrap">
+                                <!-- Alergias serão adicionadas aqui -->
+                            </div>
+                            <input type="hidden" id="patient-allergies">
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-custom btn-custom-outline" onclick="prevStep(1)">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar
+                        </button>
+                        <button type="button" class="btn btn-custom btn-custom-primary" onclick="nextStep(3)">
+                            Continuar <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Passo 3: Informações Adicionais -->
+                <div class="form-step" id="step3">
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="bi bi-clipboard-plus me-2"></i>Informações Adicionais
+                        </h3>
+                        
+                        <div class="mb-3">
+                            <label for="patient-notes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="patient-notes" rows="4" 
+                                      placeholder="Outras informações relevantes sobre o paciente..."></textarea>
+                            <div class="form-text">Histórico, cuidados especiais, preferências, etc.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="patient-contacts" class="form-label">Contatos de Emergência (opcional)</label>
+                            <textarea class="form-control" id="patient-contacts" rows="3" 
+                                      placeholder="Nome e telefone dos contatos..."></textarea>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Os dados serão armazenados de forma segura e em conformidade com a LGPD.
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-custom btn-custom-outline" onclick="prevStep(2)">
+                            <i class="bi bi-arrow-left me-2"></i>Voltar
+                        </button>
+                        <button type="submit" class="btn btn-custom btn-custom-primary" id="submit-btn">
+                            <i class="bi bi-check-circle me-2"></i>Salvar Paciente
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Módulos do App -->
+    <script type="module">
+        import authService from '../../../../js/modules/auth.js';
+        import patientService from '../../../../js/modules/patients.js';
+        import { UTILS } from '../../../../js/config/constants.js';
+        
+        // Variáveis de estado
+        let currentStep = 1;
+        let allergies = [];
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initNewPatientPage();
+        });
+        
+        async function initNewPatientPage() {
+            try {
+                // Verificar autenticação
+                if (!authService.isAuthenticated()) {
+                    window.location.href = '../../../auth/login.html';
+                    return;
+                }
+                
+                // Carregar dados do usuário
+                await loadUserData();
+                
+                // Configurar eventos
+                setupEventListeners();
+                
+                // Selecionar prioridade padrão
+                selectPriority('baixa');
+                
+            } catch (error) {
+                console.error('Erro ao inicializar página de novo paciente:', error);
+                showError('Erro ao carregar página. Tente novamente.');
+            }
+        }
+        
+        async function loadUserData() {
+            const user = authService.getUser();
+            const profile = authService.getUserProfile();
+            
+            // Atualizar UI
+            document.querySelectorAll('.user-name').forEach(el => {
+                el.textContent = profile?.full_name || user?.email?.split('@')[0] || 'Usuário';
+            });
+        }
+        
+        function setupEventListeners() {
+            // Logout
+            document.querySelectorAll('.logout-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await authService.logout();
+                });
+            });
+            
+            // Adicionar alergia ao pressionar Enter
+            document.getElementById('allergy-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addAllergy();
+                }
+            });
+            
+            // Formulário
+            document.getElementById('new-patient-form').addEventListener('submit', savePatient);
+        }
+        
+        // Navegação entre passos
+        window.nextStep = function(next) {
+            if (!validateStep(currentStep)) {
+                return;
+            }
+            
+            // Atualizar indicadores
+            document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+            document.getElementById(`step${currentStep}-indicator`).classList.add('completed');
+            document.getElementById(`step${next}-indicator`).classList.add('active');
+            
+            // Trocar steps
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${next}`).classList.add('active');
+            
+            currentStep = next;
+        };
+        
+        window.prevStep = function(prev) {
+            // Atualizar indicadores
+            document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+            document.getElementById(`step${prev}-indicator`).classList.add('active');
+            document.getElementById(`step${prev}-indicator`).classList.remove('completed');
+            
+            // Trocar steps
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${prev}`).classList.add('active');
+            
+            currentStep = prev;
+        };
+        
+        function validateStep(step) {
+            let isValid = true;
+            
+            if (step === 1) {
+                const name = document.getElementById('patient-name').value;
+                if (!name.trim()) {
+                    showError('O nome do paciente é obrigatório.');
+                    document.getElementById('patient-name').focus();
+                    isValid = false;
+                }
+            } else if (step === 2) {
+                const priority = document.getElementById('patient-priority').value;
+                if (!priority) {
+                    showError('Selecione a prioridade do paciente.');
+                    isValid = false;
+                }
+            }
+            
+            return isValid;
+        }
+        
+        window.selectPriority = function(priority) {
+            // Remover seleção anterior
+            document.querySelectorAll('.priority-option').forEach(option => {
+                option.classList.remove('selected');
+                option.classList.remove('priority-high');
+                option.classList.remove('priority-medium');
+                option.classList.remove('priority-low');
+                
+                // Restaurar classes de cor
+                const dataPriority = option.getAttribute('data-priority');
+                if (dataPriority) {
+                    option.classList.add(`priority-${dataPriority}`);
+                }
+            });
+            
+            // Adicionar seleção atual
+            const selectedOption = document.querySelector(`[data-priority="${priority}"]`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+            
+            // Atualizar campo hidden
+            document.getElementById('patient-priority').value = priority;
+        };
+        
+        window.addAllergy = function() {
+            const input = document.getElementById('allergy-input');
+            const allergy = input.value.trim();
+            
+            if (!allergy) return;
+            
+            // Verificar se já existe
+            if (allergies.includes(allergy.toLowerCase())) {
+                showError('Esta alergia já foi adicionada.');
+                return;
+            }
+            
+            // Adicionar à lista
+            allergies.push(allergy.toLowerCase());
+            renderAllergies();
+            
+            // Limpar input
+            input.value = '';
+            input.focus();
+        };
+        
+        function removeAllergy(index) {
+            allergies.splice(index, 1);
+            renderAllergies();
+        }
+        
+        function renderAllergies() {
+            const container = document.getElementById('allergies-list');
+            container.innerHTML = '';
+            
+            allergies.forEach((allergy, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.innerHTML = `
+                    ${allergy}
+                    <span class="chip-remove" onclick="removeAllergy(${index})">
+                        <i class="bi bi-x"></i>
+                    </span>
+                `;
+                container.appendChild(chip);
+            });
+            
+            // Atualizar campo hidden
+            document.getElementById('patient-allergies').value = JSON.stringify(allergies);
+        }
+        
+        async function savePatient(e) {
+            e.preventDefault();
+            
+            try {
+                // Validar dados
+                if (!validateStep(currentStep)) {
+                    showError('Por favor, complete todas as informações obrigatórias.');
+                    return;
+                }
+                
+                authService.showLoading();
+                
+                // Coletar dados
+                const patientData = {
+                    name: document.getElementById('patient-name').value,
+                    age: parseInt(document.getElementById('patient-age').value) || null,
+                    gender: document.getElementById('patient-gender').value || null,
+                    bed_number: document.getElementById('patient-bed').value || null,
+                    priority: document.getElementById('patient-priority').value,
+                    main_diagnosis: document.getElementById('patient-diagnosis').value || null,
+                    allergies: allergies,
+                    notes: document.getElementById('patient-notes').value || null,
+                    emergency_contacts: document.getElementById('patient-contacts').value || null
+                };
+                
+                // Salvar paciente
+                const result = await patientService.createPatient(patientData);
+                
+                if (result.success) {
+                    // Sucesso
+                    showSuccess('Paciente cadastrado com sucesso!');
+                    
+                    // Redirecionar após 2 segundos
+                    setTimeout(() => {
+                        window.location.href = `view.html?id=${result.data.id}`;
+                    }, 2000);
+                    
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao salvar paciente:', error);
+                showError('Erro ao salvar paciente: ' + error.message);
+            } finally {
+                authService.hideLoading();
+            }
+        }
+        
+        function showSuccess(message) {
+            const alert = document.getElementById('patient-alert');
+            alert.textContent = message;
+            alert.className = 'alert-custom alert-custom-success mb-4';
+            alert.classList.remove('d-none');
+        }
+        
+        function showError(message) {
+            const alert = document.getElementById('patient-alert');
+            alert.textContent = message;
+            alert.className = 'alert-custom alert-custom-danger mb-4';
+            alert.classList.remove('d-none');
+            
+            setTimeout(() => {
+                alert.classList.add('d-none');
+            }, 5000);
+        }
+        
+    </script>
+</body>
+</html>

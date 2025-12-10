@@ -1,0 +1,8 @@
+/*    /index.html    200
+
+# Auth
+/login    /auth/login.html    200
+/register    /auth/register.html    200
+
+# App
+/app/*    /app/dashboard.html    200

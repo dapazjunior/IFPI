@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Enfermeiro Ágil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-light">
+
+    <div class="container">
+        <div class="auth-container">
+            <h3 class="text-center mb-4 text-success">Criar Conta</h3>
+            <form id="formCadastro">
+                <div class="mb-3">
+                    <label class="form-label">Nome Completo</label>
+                    <input type="text" id="nome" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Senha</label>
+                    <input type="password" id="senha" class="form-control" minlength="6" required>
+                </div>
+                <div id="msgErro" class="alert alert-danger hidden"></div>
+                <button type="submit" class="btn btn-success w-100" id="btnCadastro">Cadastrar</button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="login.html">Já tem conta? Faça login</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { fazerCadastro } from './js/modules/auth.js';
+
+        document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnCadastro');
+            const msg = document.getElementById('msgErro');
+            
+            btn.disabled = true;
+            btn.innerText = 'Criando...';
+            msg.classList.add('hidden');
+
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            const { data, error } = await fazerCadastro(nome, email, senha);
+
+            if (error) {
+                msg.innerText = error.message;
+                msg.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerText = 'Cadastrar';
+            } else {
+                alert('Conta criada com sucesso! Faça login.');
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

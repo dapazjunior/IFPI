@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Enfermeiro Ágil</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="../../css/main.css">
+    
+    <!-- CSS Register -->
+    <style>
+        .register-step {
+            display: none;
+        }
+        
+        .register-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 10px;
+            position: relative;
+        }
+        
+        .step.active {
+            background: #1a73e8;
+            color: white;
+        }
+        
+        .step.completed {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .step-line {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 20px;
+            height: 2px;
+            background: #e9ecef;
+        }
+        
+        .step:last-child .step-line {
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .role-card {
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .role-card:hover {
+            border-color: #1a73e8;
+            transform: translateY(-2px);
+        }
+        
+        .role-card.selected {
+            border-color: #1a73e8;
+            background: #e8f0fe;
+        }
+        
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #1a73e8;
+        }
+    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../../public/favicon.ico">
+</head>
+<body class="bg-light">
+    
+    <!-- Global Loading -->
+    <div id="global-loader" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index: 9999; display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <p class="text-muted">Carregando...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100 py-4">
+            <div class="col-md-10 col-lg-8">
+                <!-- Logo -->
+                <div class="text-center mb-4">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <img src="../../../public/EnfermeiroAgil.png" alt="Enfermeiro Ágil" height="50" class="me-2">
+                        <h2 class="mb-0">Enfermeiro<span class="text-primary">Ágil</span></h2>
+                    </div>
+                    <p class="text-muted">Crie sua conta para começar a usar</p>
+                </div>
+
+                <!-- Card de Registro -->
+                <div class="card-custom">
+                    <div class="card-custom-body p-4 p-md-5">
+                        <!-- Indicador de Passos -->
+                        <div class="step-indicator mb-5">
+                            <div class="step active" id="step1-indicator">
+                                1
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step" id="step2-indicator">
+                                2
+                                <div class="step-line"></div>
+                            </div>
+                            <div class="step" id="step3-indicator">
+                                3
+                            </div>
+                        </div>
+
+                        <!-- Alertas -->
+                        <div id="register-alert" class="alert-custom alert-custom-danger d-none mb-4"></div>
+
+                        <!-- Formulário de Registro -->
+                        <form id="register-form">
+                            <!-- Passo 1: Informações Básicas -->
+                            <div class="register-step active" id="step1">
+                                <h4 class="text-center mb-4">Informações Básicas</h4>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="fullName" class="form-custom-label">Nome Completo *</label>
+                                        <input type="text" 
+                                               id="fullName" 
+                                               class="form-custom-control" 
+                                               placeholder="Seu nome completo"
+                                               required>
+                                        <div class="form-custom-invalid-feedback d-none" id="fullName-error"></div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-custom-label">Email *</label>
+                                        <input type="email" 
+                                               id="email" 
+                                               class="form-custom-control" 
+                                               placeholder="seu@email.com"
+                                               required>
+                                        <div class="form-custom-invalid-feedback d-none" id="email-error"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="password" class="form-custom-label">Senha *</label>
+                                        <input type="password" 
+                                               id="password" 
+                                               class="form-custom-control" 
+                                               placeholder="Mínimo 8 caracteres"
+                                               required>
+                                        <div class="form-custom-invalid-feedback d-none" id="password-error"></div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="confirmPassword" class="form-custom-label">Confirmar Senha *</label>
+                                        <input type="password" 
+                                               id="confirmPassword" 
+                                               class="form-custom-control" 
+                                               placeholder="Digite novamente"
+                                               required>
+                                        <div class="form-custom-invalid-feedback d-none" id="confirmPassword-error"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mt-4">
+                                    <button type="button" class="btn btn-custom btn-custom-primary" onclick="nextStep(2)">
+                                        Próximo <i class="bi bi-arrow-right ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Passo 2: Informações Profissionais -->
+                            <div class="register-step" id="step2">
+                                <h4 class="text-center mb-4">Informações Profissionais</h4>
+                                
+                                <!-- Seleção de Cargo -->
+                                <div class="mb-4">
+                                    <label class="form-custom-label mb-3">Você é: *</label>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="role-card" data-role="enfermeiro">
+                                                <div class="role-icon">
+                                                    <i class="bi bi-heart-pulse"></i>
+                                                </div>
+                                                <h6>Enfermeiro(a)</h6>
+                                                <p class="text-muted small">Profissional com formação superior</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="role-card" data-role="tecnico">
+                                                <div class="role-icon">
+                                                    <i class="bi bi-heart"></i>
+                                                </div>
+                                                <h6>Técnico(a)</h6>
+                                                <p class="text-muted small">Técnico em enfermagem</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="role-card" data-role="estudante">
+                                                <div class="role-icon">
+                                                    <i class="bi bi-mortarboard"></i>
+                                                </div>
+                                                <h6>Estudante</h6>
+                                                <p class="text-muted small">Estudante de enfermagem</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="role" required>
+                                    <div class="form-custom-invalid-feedback d-none" id="role-error"></div>
+                                </div>
+                                
+                                <!-- Informações Adicionais -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cpf" class="form-custom-label">CPF</label>
+                                        <input type="text" 
+                                               id="cpf" 
+                                               class="form-custom-control" 
+                                               placeholder="000.000.000-00">
+                                        <div class="form-custom-invalid-feedback d-none" id="cpf-error"></div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="professionalId" class="form-custom-label">Registro Profissional (COREN/Outro)</label>
+                                        <input type="text" 
+                                               id="professionalId" 
+                                               class="form-custom-control" 
+                                               placeholder="Número do registro">
+                                        <div class="form-custom-invalid-feedback d-none" id="professionalId-error"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="specialization" class="form-custom-label">Especialização</label>
+                                        <input type="text" 
+                                               id="specialization" 
+                                               class="form-custom-control" 
+                                               placeholder="Ex: UTI, Emergência">
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="institution" class="form-custom-label">Instituição</label>
+                                        <input type="text" 
+                                               id="institution" 
+                                               class="form-custom-control" 
+                                               placeholder="Onde trabalha/estuda">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="phone" class="form-custom-label">Telefone</label>
+                                    <input type="tel" 
+                                           id="phone" 
+                                           class="form-custom-control" 
+                                           placeholder="(11) 99999-9999">
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-4">
+                                    <button type="button" class="btn btn-custom btn-custom-outline" onclick="prevStep(1)">
+                                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                                    </button>
+                                    <button type="button" class="btn btn-custom btn-custom-primary" onclick="nextStep(3)">
+                                        Próximo <i class="bi bi-arrow-right ms-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Passo 3: Confirmação -->
+                            <div class="register-step" id="step3">
+                                <h4 class="text-center mb-4">Confirmação</h4>
+                                
+                                <div class="card-custom mb-4">
+                                    <div class="card-custom-body">
+                                        <h6>Resumo do Cadastro</h6>
+                                        <div class="row mt-3">
+                                            <div class="col-md-6">
+                                                <p class="mb-2"><strong>Nome:</strong> <span id="summary-name">-</span></p>
+                                                <p class="mb-2"><strong>Email:</strong> <span id="summary-email">-</span></p>
+                                                <p class="mb-2"><strong>CPF:</strong> <span id="summary-cpf">-</span></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-2"><strong>Cargo:</strong> <span id="summary-role">-</span></p>
+                                                <p class="mb-2"><strong>Registro:</strong> <span id="summary-register">-</span></p>
+                                                <p class="mb-2"><strong>Instituição:</strong> <span id="summary-institution">-</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Termos -->
+                                <div class="form-check mb-4">
+                                    <input type="checkbox" class="form-check-input" id="acceptTerms" required>
+                                    <label class="form-check-label" for="acceptTerms">
+                                        Concordo com os 
+                                        <a href="#" class="text-primary">Termos de Uso</a> e 
+                                        <a href="#" class="text-primary">Política de Privacidade</a>
+                                    </label>
+                                    <div class="form-custom-invalid-feedback d-none" id="terms-error"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mt-4">
+                                    <button type="button" class="btn btn-custom btn-custom-outline" onclick="prevStep(2)">
+                                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                                    </button>
+                                    <button type="submit" class="btn btn-custom btn-custom-primary" id="submit-btn">
+                                        <i class="bi bi-check-circle me-2"></i>Criar Conta
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <!-- Já tem conta -->
+                        <div class="text-center mt-4">
+                            <p class="text-muted mb-0">
+                                Já tem uma conta? 
+                                <a href="login.html" class="text-decoration-none fw-semibold text-primary">
+                                    Faça login
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Módulos do App -->
+    <script type="module">
+        import authService from '../../js/modules/auth.js';
+        
+        // Se já estiver autenticado, redirecionar
+        await authService.init();
+        if (authService.isAuthenticated()) {
+            window.location.href = '../app/dashboard.html';
+        }
+        
+        // Configuração inicial
+        let currentStep = 1;
+        let formData = {};
+        
+        // Seleção de cargo
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remover seleção anterior
+                document.querySelectorAll('.role-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // Adicionar seleção atual
+                this.classList.add('selected');
+                const role = this.getAttribute('data-role');
+                document.getElementById('role').value = role;
+                
+                // Atualizar resumo
+                updateRoleSummary(role);
+            });
+        });
+        
+        // Funções de navegação
+        window.nextStep = function(next) {
+            if (!validateStep(currentStep)) {
+                return;
+            }
+            
+            saveStepData(currentStep);
+            
+            // Atualizar indicadores
+            document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+            document.getElementById(`step${currentStep}-indicator`).classList.add('completed');
+            document.getElementById(`step${next}-indicator`).classList.add('active');
+            
+            // Trocar steps
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${next}`).classList.add('active');
+            
+            currentStep = next;
+            
+            // Se for o último passo, atualizar resumo
+            if (currentStep === 3) {
+                updateSummary();
+            }
+        };
+        
+        window.prevStep = function(prev) {
+            // Atualizar indicadores
+            document.getElementById(`step${currentStep}-indicator`).classList.remove('active');
+            document.getElementById(`step${prev}-indicator`).classList.add('active');
+            document.getElementById(`step${prev}-indicator`).classList.remove('completed');
+            
+            // Trocar steps
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${prev}`).classList.add('active');
+            
+            currentStep = prev;
+        };
+        
+        function validateStep(step) {
+            let isValid = true;
+            
+            // Limpar erros
+            clearErrors();
+            
+            if (step === 1) {
+                const fullName = document.getElementById('fullName').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!fullName.trim()) {
+                    showFieldError('fullName', 'Nome completo é obrigatório.');
+                    isValid = false;
+                }
+                
+                if (!email.trim()) {
+                    showFieldError('email', 'Email é obrigatório.');
+                    isValid = false;
+                } else if (!validateEmail(email)) {
+                    showFieldError('email', 'Email inválido.');
+                    isValid = false;
+                }
+                
+                if (!password) {
+                    showFieldError('password', 'Senha é obrigatória.');
+                    isValid = false;
+                } else if (password.length < 8) {
+                    showFieldError('password', 'A senha deve ter pelo menos 8 caracteres.');
+                    isValid = false;
+                }
+                
+                if (!confirmPassword) {
+                    showFieldError('confirmPassword', 'Confirme sua senha.');
+                    isValid = false;
+                } else if (password !== confirmPassword) {
+                    showFieldError('confirmPassword', 'As senhas não coincidem.');
+                    isValid = false;
+                }
+                
+            } else if (step === 2) {
+                const role = document.getElementById('role').value;
+                
+                if (!role) {
+                    showFieldError('role', 'Selecione seu cargo.');
+                    isValid = false;
+                }
+                
+                const cpf = document.getElementById('cpf').value;
+                if (cpf && !validateCPF(cpf)) {
+                    showFieldError('cpf', 'CPF inválido.');
+                    isValid = false;
+                }
+            }
+            
+            return isValid;
+        }
+        
+        function saveStepData(step) {
+            if (step === 1) {
+                formData.fullName = document.getElementById('fullName').value;
+                formData.email = document.getElementById('email').value;
+                formData.password = document.getElementById('password').value;
+            } else if (step === 2) {
+                formData.role = document.getElementById('role').value;
+                formData.cpf = document.getElementById('cpf').value;
+                formData.professionalId = document.getElementById('professionalId').value;
+                formData.specialization = document.getElementById('specialization').value;
+                formData.institution = document.getElementById('institution').value;
+                formData.phone = document.getElementById('phone').value;
+            }
+        }
+        
+        function updateSummary() {
+            document.getElementById('summary-name').textContent = formData.fullName || '-';
+            document.getElementById('summary-email').textContent = formData.email || '-';
+            document.getElementById('summary-cpf').textContent = formData.cpf || 'Não informado';
+            document.getElementById('summary-register').textContent = formData.professionalId || 'Não informado';
+            document.getElementById('summary-institution').textContent = formData.institution || 'Não informado';
+            
+            // Traduzir role
+            const roleNames = {
+                'enfermeiro': 'Enfermeiro(a)',
+                'tecnico': 'Técnico(a) de Enfermagem',
+                'estudante': 'Estudante de Enfermagem'
+            };
+            document.getElementById('summary-role').textContent = roleNames[formData.role] || formData.role || '-';
+        }
+        
+        function updateRoleSummary(role) {
+            const roleNames = {
+                'enfermeiro': 'Enfermeiro(a)',
+                'tecnico': 'Técnico(a) de Enfermagem',
+                'estudante': 'Estudante de Enfermagem'
+            };
+            document.getElementById('summary-role').textContent = roleNames[role] || role;
+        }
+        
+        // Formulário final
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validar termos
+            if (!document.getElementById('acceptTerms').checked) {
+                showFieldError('terms', 'Você precisa aceitar os termos.');
+                return;
+            }
+            
+            // Salvar dados do passo 3
+            saveStepData(2);
+            
+            // Registrar
+            authService.showLoading();
+            const result = await authService.register(formData);
+            authService.hideLoading();
+            
+            if (result.success) {
+                // Sucesso
+                document.getElementById('register-form').reset();
+                
+                // Mostrar mensagem de sucesso
+                document.getElementById('register-alert').className = 'alert-custom alert-custom-success mb-4';
+                document.getElementById('register-alert').textContent = result.message || 'Conta criada com sucesso!';
+                document.getElementById('register-alert').classList.remove('d-none');
+                
+                // Redirecionar após 2 segundos
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                
+            } else {
+                // Erro
+                showError(result.error || 'Erro ao criar conta.');
+            }
+        });
+        
+        // Funções auxiliares
+        function showError(message) {
+            const alert = document.getElementById('register-alert');
+            alert.textContent = message;
+            alert.className = 'alert-custom alert-custom-danger mb-4';
+            alert.classList.remove('d-none');
+        }
+        
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(`${fieldId}-error`);
+            
+            if (field) {
+                field.classList.add('is-invalid');
+            }
+            
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.classList.remove('d-none');
+                errorElement.classList.add('d-block');
+            }
+        }
+        
+        function clearErrors() {
+            // Limpar alerta geral
+            document.getElementById('register-alert').classList.add('d-none');
+            
+            // Limpar erros de campo
+            document.querySelectorAll('.is-invalid').forEach(el => {
+                el.classList.remove('is-invalid');
+            });
+            
+            document.querySelectorAll('.form-custom-invalid-feedback').forEach(el => {
+                el.classList.add('d-none');
+                el.classList.remove('d-block');
+            });
+        }
+        
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+            if (cpf.length !== 11) return false;
+            
+            // Validação básica de CPF
+            let sum = 0;
+            let remainder;
+            
+            for (let i = 1; i <= 9; i++) {
+                sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            }
+            
+            remainder = (sum * 10) % 11;
+            if (remainder === 10 || remainder === 11) remainder = 0;
+            if (remainder !== parseInt(cpf.substring(9, 10))) return false;
+            
+            sum = 0;
+            for (let i = 1; i <= 10; i++) {
+                sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            }
+            
+            remainder = (sum * 10) % 11;
+            if (remainder === 10 || remainder === 11) remainder = 0;
+            return remainder === parseInt(cpf.substring(10, 11));
+        }
+        
+        // Máscara para CPF
+        document.getElementById('cpf')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 3 && value.length <= 6) {
+                value = value.replace(/^(\d{3})(\d+)/, '$1.$2');
+            } else if (value.length > 6 && value.length <= 9) {
+                value = value.replace(/^(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
+            } else if (value.length > 9) {
+                value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d+)/, '$1.$2.$3-$4');
+            }
+            
+            e.target.value = value.substring(0, 14);
+        });
+        
+        // Máscara para telefone
+        document.getElementById('phone')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length > 2 && value.length <= 6) {
+                value = value.replace(/^(\d{2})(\d+)/, '($1) $2');
+            } else if (value.length > 6 && value.length <= 10) {
+                value = value.replace(/^(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
+            } else if (value.length > 10) {
+                value = value.replace(/^(\d{2})(\d{5})(\d+)/, '($1) $2-$3');
+            } else if (value.length === 2) {
+                value = value.replace(/^(\d{2})/, '($1) ');
+            }
+            
+            e.target.value = value.substring(0, 15);
+        });
+        
+    </script>
+</body>
+</html>

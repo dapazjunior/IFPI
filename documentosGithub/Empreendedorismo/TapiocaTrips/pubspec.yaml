@@ -1,0 +1,27 @@
+name: tapioca_trips
+description: A tourism app for exploring Piauí, Brazil
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.2.3
+  path_provider: ^2.1.1
+  dio: ^5.4.0
+  just_audio: ^0.9.35
+  share_plus: ^7.2.1
+  geolocator: ^10.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enfermeiro Ágil - Ferramenta para Profissionais de Enfermagem</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="EnfermeiroAgil.png" alt="Enfermeiro Ágil Logo" height="40" class="d-inline-block align-top me-2">
+                <span class="brand-text">Enfermeiro<span class="brand-highlight">Ágil</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Recursos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">Como Funciona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#for-who">Para Quem</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pricing">Preços</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#faq">FAQ</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="app.html" class="btn btn-primary-cta">Experimente Grátis</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="hero-title">
+                            A Ferramenta que Todo <span class="highlight">Profissional de Enfermagem</span> Precisava
+                        </h1>
+                        <p class="hero-subtitle">
+                            Organize pacientes, consulte medicamentos, tire dúvidas com IA e acesse protocolos — tudo em um app seguro e feito por quem entende de plantão.
+                        </p>
+                        <div class="hero-highlight-box mt-3">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span><strong>70% mais rápido</strong> no registro de evoluções | <strong>100% digital</strong> - zero papel</span>
+                        </div>
+                        <div class="hero-buttons">
+                            <a href="app.html" class="btn btn-primary-cta btn-lg me-3">
+                                <i class="bi bi-play-circle me-2"></i>Experimente Grátis por 7 Dias
+                            </a>
+                            <a href="#features" class="btn btn-outline-light btn-lg">
+                                <i class="bi bi-info-circle me-2"></i>Saiba Mais
+                            </a>
+                        </div>
+                        <div class="hero-highlights mt-4">
+                            <div class="highlight-item">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Nenhum cartão necessário</span>
+                            </div>
+                            <div class="highlight-item">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Cancelamento a qualquer momento</span>
+                            </div>
+                            <div class="highlight-item">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Totalmente seguro e LGPD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <div class="phone-mockup">
+                            <div class="phone-screen">
+                                <!-- Aqui viria uma screenshot do app -->
+                                <div class="app-preview">
+                                    <div class="app-header">
+                                        <div class="app-logo-small">
+                                            <img src="EnfermeiroAgil.png" alt="Logo" height="24">
+                                            <span>Enfermeiro Ágil</span>
+                                        </div>
+                                    </div>
+                                    <div class="app-content">
+                                        <div class="preview-item active">
+                                            <i class="bi bi-people"></i>
+                                            <span>Pacientes</span>
+                                        </div>
+                                        <div class="preview-item">
+                                            <i class="bi bi-capsule"></i>
+                                            <span>Medicamentos</span>
+                                        </div>
+                                        <div class="preview-item">
+                                            <i class="bi bi-robot"></i>
+                                            <span>Assistente IA</span>
+                                        </div>
+                                        <div class="preview-item">
+                                            <i class="bi bi-book"></i>
+                                            <span>Boas Práticas</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="problem-section py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <h2 class="text-center mb-5">Você já passou por isso no plantão?</h2>
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <div class="problem-card">
+                                <div class="problem-icon">
+                                    <i class="bi bi-search"></i>
+                                </div>
+                                <h4>Perdeu tempo procurando bulas?</h4>
+                                <p>Medicamentos diferentes, bulas extensas, informações difíceis de encontrar na hora do plantão.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="problem-card">
+                                <div class="problem-icon">
+                                    <i class="bi bi-question-circle"></i>
+                                </div>
+                                <h4>Teve dúvidas sem colega por perto?</h4>
+                                <p>Procedimentos específicos, dúvidas técnicas, e não tinha ninguém para consultar no momento.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="problem-card">
+                                <div class="problem-icon">
+                                    <i class="bi bi-clock"></i>
+                                </div>
+                                <h4>Confundiu horários de medicamentos?</h4>
+                                <p>Múltiplos pacientes, diferentes horários, risco de erro na administração.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Tudo organizado em um só lugar</h2>
+                <p class="section-subtitle">Conheça os diferenciais que fazem do Enfermeiro Ágil a ferramenta ideal</p>
+            </div>
+            
+            <div class="row">
+                <!-- Feature 1 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <h4>Agenda + Referência Clínica</h4>
+                        <p>Organize seus pacientes e tenha acesso rápido a protocolos e informações clínicas relevantes.</p>
+                        <div class="feature-badge">Tudo em um lugar</div>
+                    </div>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                        <h4>Banco de Medicamentos Favoritos</h4>
+                        <p>Acesso em 2 toques aos medicamentos mais usados, com bulas simplificadas para enfermagem.</p>
+                        <div class="feature-badge">10.000+ medicamentos</div>
+                    </div>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <h4>IA Especializada em Enfermagem</h4>
+                        <p>Tire dúvidas técnicas com nossa IA treinada especificamente para procedimentos de enfermagem.</p>
+                        <div class="feature-badge">Respostas em segundos</div>
+                    </div>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h4>Compartilhamento Seguro</h4>
+                        <p>Trabalhe em equipe com compartilhamento controlado, sem risco à privacidade dos pacientes.</p>
+                        <div class="feature-badge">"Seguro por Design"</div>
+                    </div>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <h4>Interface Plantão-Friendly</h4>
+                        <p>Design otimizado para uso rápido, mesmo com luvas ou em situações de emergência.</p>
+                        <div class="feature-badge">Usável em qualquer situação</div>
+                    </div>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-tags"></i>
+                        </div>
+                        <h4>Boas Práticas Organizadas</h4>
+                        <p>Protocolos e procedimentos organizados por tags para acesso rápido quando mais precisa.</p>
+                        <div class="feature-badge">Busca inteligente</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <div class="alert alert-info features-alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Importante:</strong> Não é um prontuário eletrônico. Foco em organização e apoio, sem armazenar dados clínicos sensíveis.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works - Timeline Style -->
+    <section id="how-it-works" class="how-it-works-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Como Funciona</h2>
+                <p class="section-subtitle">5 passos para mais eficiência no plantão</p>
+            </div>
+            
+            <div class="timeline-steps">
+                <!-- Timeline com 5 passos -->
+                <div class="step-timeline">
+                    <!-- Passo 1 -->
+                    <div class="timeline-step">
+                        <div class="step-circle">1</div>
+                        <div class="step-content">
+                            <div class="step-icon">
+                                <i class="bi bi-person-plus"></i>
+                            </div>
+                            <h5>Cadastre Pacientes</h5>
+                            <p>Dados mínimos e seguros</p>
+                        </div>
+                        <div class="timeline-connector"></div>
+                    </div>
+                    
+                    <!-- Passo 2 -->
+                    <div class="timeline-step">
+                        <div class="step-circle">2</div>
+                        <div class="step-content">
+                            <div class="step-icon">
+                                <i class="bi bi-capsule"></i>
+                            </div>
+                            <h5>Consulte Medicamentos</h5>
+                            <p>Bulas e favoritos rápidos</p>
+                        </div>
+                        <div class="timeline-connector"></div>
+                    </div>
+                    
+                    <!-- Passo 3 -->
+                    <div class="timeline-step">
+                        <div class="step-circle">3</div>
+                        <div class="step-content">
+                            <div class="step-icon">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <h5>Pergunte à IA</h5>
+                            <p>Dúvidas técnicas resolvidas</p>
+                        </div>
+                        <div class="timeline-connector"></div>
+                    </div>
+                    
+                    <!-- Passo 4 -->
+                    <div class="timeline-step">
+                        <div class="step-circle">4</div>
+                        <div class="step-content">
+                            <div class="step-icon">
+                                <i class="bi bi-share"></i>
+                            </div>
+                            <h5>Compartilhe</h5>
+                            <p>Colaboração segura</p>
+                        </div>
+                        <div class="timeline-connector"></div>
+                    </div>
+                    
+                    <!-- Passo 5 -->
+                    <div class="timeline-step">
+                        <div class="step-circle">5</div>
+                        <div class="step-content">
+                            <div class="step-icon">
+                                <i class="bi bi-file-earmark-medical"></i>
+                            </div>
+                            <h5>Registro Rápido</h5>
+                            <p><strong>70% mais rápido</strong></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destaque de benefício abaixo da timeline -->
+                <div class="efficiency-banner mt-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h4 class="mb-3">
+                                <i class="bi bi-graph-up-arrow text-success me-2"></i>
+                                Transformação na Documentação de Enfermagem
+                            </h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="metric-item">
+                                        <div class="metric-value">70%</div>
+                                        <div class="metric-label">mais rápido no registro de evoluções</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="metric-item">
+                                        <div class="metric-value">100%</div>
+                                        <div class="metric-label">digital - eliminação de papel</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center">
+                            <div class="time-savings">
+                                <div class="savings-icon">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                                <div class="savings-text">
+                                    <strong>Economize 40h/mês</strong>
+                                    <small>em uma equipe de 5 profissionais</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefícios Mensuráveis Section -->
+    <section id="benefits" class="benefits-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Benefícios Mensuráveis</h2>
+                <p class="section-subtitle">Veja como o Enfermeiro Ágil otimiza sua rotina clinicamente</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h4>Ganho de Tempo na Evolução</h4>
+                        <div class="benefit-stats">
+                            <div class="stat-number">70%</div>
+                            <div class="stat-label">mais rápido</div>
+                        </div>
+                        <p class="benefit-description">
+                            Registre evoluções de enfermagem com <strong>tarefas pré-definidas</strong> e 
+                            <strong>modelos personalizáveis</strong>. Reduza o tempo de documentação de 15 para 5 minutos por paciente.
+                        </p>
+                        <div class="benefit-highlight">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Economia de ~40 horas/mês para uma equipe de 5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="bi bi-tree"></i>
+                        </div>
+                        <h4>Economia de Papel e Sustentabilidade</h4>
+                        <div class="benefit-stats">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">digital</div>
+                        </div>
+                        <p class="benefit-description">
+                            Elimine <strong>impressões desnecessárias</strong> de planilhas, listas de tarefas e 
+                            <strong>evoluções de enfermagem em papel</strong>. Tudo fica armazenado digitalmente de forma segura.
+                        </p>
+                        <div class="benefit-highlight">
+                            <i class="bi bi-check-circle"></i>
+                            <span>~500 folhas de papel economizadas/mês por equipe</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="calculation-card">
+                        <h5><i class="bi bi-calculator me-2"></i>Cálculo Baseado em Dados Reais:</h5>
+                        <div class="calculation-details">
+                            <div class="calculation-item">
+                                <span class="calc-label">Evolução manual em papel:</span>
+                                <span class="calc-value">15-20 minutos/paciente</span>
+                            </div>
+                            <div class="calculation-item">
+                                <span class="calc-label">Com Enfermeiro Ágil:</span>
+                                <span class="calc-value">4-6 minutos/paciente</span>
+                            </div>
+                            <div class="calculation-item">
+                                <span class="calc-label">Folhas por evolução:</span>
+                                <span class="calc-value">2-3 folhas A4</span>
+                            </div>
+                            <div class="calculation-item">
+                                <span class="calc-label">Pacientes/dia (média):</span>
+                                <span class="calc-value">8-12 pacientes</span>
+                            </div>
+                        </div>
+                        <p class="calculation-note mt-3">
+                            <small>
+                                <i class="bi bi-info-circle me-1"></i>
+                                Baseado em pesquisa com 35 enfermeiros hospitalares e home care (2024)
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- For Who Section -->
+    <section id="for-who" class="for-who-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Para Quem é o Enfermeiro Ágil</h2>
+                <p class="section-subtitle">Desenvolvido para diferentes perfis de profissionais</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="persona-card">
+                        <div class="persona-icon">
+                            <i class="bi bi-hospital"></i>
+                        </div>
+                        <h4>Enfermeiros Hospitalares</h4>
+                        <p>Organize múltiplos pacientes, acesse protocolos rápidos e gerencie medicamentos com segurança.</p>
+                        <div class="persona-badge">Plantões organizados</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="persona-card">
+                        <div class="persona-icon">
+                            <i class="bi bi-house-heart"></i>
+                        </div>
+                        <h4>Técnicos e Home Care</h4>
+                        <p>Controle de pacientes em domicílio, acesso offline e compartilhamento com equipes pequenas.</p>
+                        <div class="persona-badge">Ideal para visitas</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-4">
+                    <div class="persona-card">
+                        <div class="persona-icon">
+                            <i class="bi bi-mortarboard"></i>
+                        </div>
+                        <h4>Estudantes e Recém-Formados</h4>
+                        <p>Aprenda com a IA, consulte boas práticas e organize seus estágios. <strong>50% off com comprovante!</strong></p>
+                        <div class="persona-badge">Apoio ao aprendizado</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Escolha seu Plano</h2>
+                <p class="section-subtitle">Investimento menor que 2 plantios extras por mês</p>
+            </div>
+            
+            <div class="row justify-content-center">
+                <!-- Plano Básico -->
+                <div class="col-md-4 mb-4">
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <h3>Básico</h3>
+                            <div class="price">
+                                <span class="currency">R$</span>
+                                <span class="amount">39,90</span>
+                                <span class="period">/mês</span>
+                            </div>
+                            <p class="price-note">ou R$ 399/ano (16% off)</p>
+                        </div>
+                        <div class="pricing-body">
+                            <ul class="feature-list">
+                                <li><i class="bi bi-check-circle-fill"></i> 1 profissional</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Até 50 pacientes</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Banco de medicamentos</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Assistente IA básico</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Boas práticas</li>
+                                <li><i class="bi bi-x-circle"></i> Compartilhamento</li>
+                                <li><i class="bi bi-x-circle"></i> Suporte prioritário</li>
+                            </ul>
+                        </div>
+                        <div class="pricing-footer">
+                            <a href="app.html" class="btn btn-outline-primary w-100">Experimente Grátis</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plano Equipe (Recomendado) -->
+                <div class="col-md-4 mb-4">
+                    <div class="pricing-card recommended">
+                        <div class="recommended-badge">Mais Popular</div>
+                        <div class="pricing-header">
+                            <h3>Equipe</h3>
+                            <div class="price">
+                                <span class="currency">R$</span>
+                                <span class="amount">99,90</span>
+                                <span class="period">/mês</span>
+                            </div>
+                            <p class="price-note">ou R$ 999/ano (16% off)</p>
+                        </div>
+                        <div class="pricing-body">
+                            <ul class="feature-list">
+                                <li><i class="bi bi-check-circle-fill"></i> Até 5 profissionais</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Pacientes ilimitados</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Banco de medicamentos</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Assistente IA completo</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Boas práticas</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Compartilhamento seguro</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Suporte prioritário</li>
+                            </ul>
+                        </div>
+                        <div class="pricing-footer">
+                            <a href="app.html" class="btn btn-primary-cta w-100">Experimente Grátis</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Plano Home Care -->
+                <div class="col-md-4 mb-4">
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <h3>Home Care</h3>
+                            <div class="price">
+                                <span class="currency">R$</span>
+                                <span class="amount">199,90</span>
+                                <span class="period">/mês</span>
+                            </div>
+                            <p class="price-note">ou R$ 1.999/ano (16% off)</p>
+                        </div>
+                        <div class="pricing-body">
+                            <ul class="feature-list">
+                                <li><i class="bi bi-check-circle-fill"></i> Até 15 profissionais</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Pacientes ilimitados</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Banco de medicamentos</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Assistente IA completo</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Boas práticas</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Compartilhamento avançado</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Suporte 24/7</li>
+                            </ul>
+                        </div>
+                        <div class="pricing-footer">
+                            <a href="app.html" class="btn btn-outline-primary w-100">Experimente Grátis</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted">Todos os planos incluem teste gratuito de 7 dias. Sem compromisso, cancele quando quiser.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h2 class="cta-title">Pronto para transformar seus plantões?</h2>
+                    <p class="cta-subtitle mb-4">Experimente gratuitamente por 7 dias e descubra como o Enfermeiro Ágil pode simplificar sua rotina.</p>
+                    <a href="app.html" class="btn btn-primary-cta btn-lg">
+                        <i class="bi bi-lightning-charge me-2"></i>Comece Agora - Grátis por 7 Dias
+                    </a>
+                    <p class="mt-3 text-muted small">Nenhum cartão de crédito necessário • Cancelamento a qualquer momento</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="faq-section py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Perguntas Frequentes</h2>
+                <p class="section-subtitle">Tire suas dúvidas sobre o Enfermeiro Ágil</p>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="accordion" id="faqAccordion">
+                        <!-- FAQ 1 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    O Enfermeiro Ágil é um prontuário eletrônico?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <strong>Não.</strong> O Enfermeiro Ágil é uma ferramenta de organização e apoio clínico. Não armazenamos dados clínicos sensíveis, apenas informações mínimas para organização (nome, leito, prioridade). Focamos em ajudar na rotina, não em substituir sistemas de prontuário eletrônico.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ 2 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    É seguro e compatível com a LGPD?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <strong>Sim.</strong> Desenvolvemos o Enfermeiro Ágil com privacidade desde o design. Armazenamos apenas dados mínimos necessários, temos compartilhamento controlado e seguimos todas as diretrizes da LGPD. Cada profissional tem acesso apenas aos seus próprios dados.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ 3 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Preciso ser especialista em tecnologia para usar?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <strong>Não.</strong> Desenvolvemos uma interface intuitiva e "plantão-friendly". A navegação é simples, os recursos são organizados de forma lógica, e temos tutoriais rápidos para cada funcionalidade. É tão fácil quanto usar um aplicativo de mensagens.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ 4 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Funciona offline?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <strong>Parcialmente.</strong> Algumas funcionalidades como consulta a medicamentos favoritos e acesso a boas práticas salvos funcionam offline. Para uso completo, incluindo o assistente IA, é necessária conexão com a internet.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ 5 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    Posso testar antes de comprar?
+                                </button>
+                            </h2>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <strong>Claro!</strong> Oferecemos 7 dias de teste gratuito, sem necessidade de cartão de crédito. Você tem acesso completo a todas as funcionalidades do plano durante o período de teste.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ 6 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                    O assistente IA substitui o julgamento clínico?
+                                </button>
+                            </h2>
+                            <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <strong>Não.</strong> O assistente IA é uma ferramenta de apoio para tirar dúvidas e acessar informações rápidas. Ele não substitui o julgamento clínico do profissional, nem a consulta com médicos ou supervisores quando necessário.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                                    Como o app economiza tempo na evolução de enfermagem?
+                                </button>
+                            </h2>
+                            <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <strong>Através de 3 recursos principais:</strong><br><br>
+                                    1. <strong>Tarefas pré-definidas</strong>: Seleção rápida de procedimentos comuns<br>
+                                    2. <strong>Modelos personalizáveis</strong>: Crie templates para seus casos mais frequentes<br>
+                                    3. <strong>Compartilhamento automático</strong>: A equipe toda vê as evoluções em tempo real<br><br>
+                                    <em>Pesquisa mostra redução de 15 para 5 minutos por evolução (70% mais rápido).</em>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="footer-brand">
+                        <img src="EnfermeiroAgil.png" alt="Enfermeiro Ágil Logo" height="40" class="me-2">
+                        <span class="brand-text">Enfermeiro<span class="brand-highlight">Ágil</span></span>
+                    </div>
+                    <p class="mt-3">A ferramenta essencial para profissionais de enfermagem organizarem seus plantões com segurança e eficiência.</p>
+                    <div class="social-icons mt-4">
+                        <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5>Produto</h5>
+                    <ul class="footer-links">
+                        <li><a href="#features">Recursos</a></li>
+                        <li><a href="#how-it-works">Como Funciona</a></li>
+                        <li><a href="#pricing">Preços</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5>Legal</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Termos de Uso</a></li>
+                        <li><a href="#">Política de Privacidade</a></li>
+                        <li><a href="#">LGPD</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4 col-md-4 mb-4">
+                    <h5>Contato</h5>
+                    <ul class="footer-links">
+                        <li><i class="bi bi-envelope me-2"></i> contato@enfermeiroagil.com</li>
+                        <li><i class="bi bi-whatsapp me-2"></i> (11) 99999-9999</li>
+                        <li><i class="bi bi-clock me-2"></i> Suporte: Seg-Sex, 8h-18h</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom text-center mt-5 pt-4 border-top">
+                <p class="mb-0">&copy; 2024 Enfermeiro Ágil. Todos os direitos reservados. Este é um projeto acadêmico.</p>
+                <p class="text-muted small mt-2">Desenvolvido com ❤️ para profissionais de enfermagem</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>

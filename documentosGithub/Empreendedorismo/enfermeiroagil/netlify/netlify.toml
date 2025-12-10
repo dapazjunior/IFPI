@@ -1,0 +1,59 @@
+[build]
+  publish = "public"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[context.production]
+  environment = { 
+    VITE_SUPABASE_URL = "https://your-project.supabase.co",
+    VITE_SUPABASE_ANON_KEY = "your-anon-key",
+    NODE_ENV = "production"
+  }
+
+[context.develop]
+  environment = { 
+    VITE_SUPABASE_URL = "https://your-project.supabase.co",
+    VITE_SUPABASE_ANON_KEY = "your-dev-key",
+    NODE_ENV = "development"
+  }
+
+# Redirecionamentos para SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Páginas de autenticação
+[[redirects]]
+  from = "/login"
+  to = "/auth/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/register"
+  to = "/auth/register.html"
+  status = 200
+
+# Área do aplicativo
+[[redirects]]
+  from = "/app/*"
+  to = "/app/dashboard.html"
+  status = 200
+
+# Headers de segurança
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = """
+      default-src 'self' https://*.supabase.co;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://*.supabase.co;
+      style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https:;
+      connect-src 'self' https://*.supabase.co;
+    """
