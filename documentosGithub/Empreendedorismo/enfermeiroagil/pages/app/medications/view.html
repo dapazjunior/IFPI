@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bula de Medicamento - Enfermeiro Ágil</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="../../../../css/main.css">
+    
+    <!-- CSS Medication View -->
+    <style>
+        .medication-header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #1a73e8;
+            color: #1a73e8;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            min-width: 180px;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: #333;
+        }
+        
+        .dosage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .dosage-table th {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .dosage-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .warning-card {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .nursing-tips {
+            background: #e8f0fe;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .quick-actions {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../../../../public/favicon.ico">
+</head>
+<body>
+    
+    <!-- Global Loading -->
+    <div id="global-loader" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index: 9999; display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <p class="text-muted">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div data-include="../../../../components/header.html"></div>
+
+    <!-- Header do Medicamento -->
+    <div class="medication-header">
+        <div class="container-custom">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-2" style="--bs-breadcrumb-divider-color: rgba(255,255,255,0.7);">
+                            <li class="breadcrumb-item"><a href="../dashboard.html" class="text-white text-decoration-none">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="index.html" class="text-white text-decoration-none">Medicamentos</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Bula</li>
+                        </ol>
+                    </nav>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="rounded-circle bg-white d-flex align-items-center justify-content-center" 
+                                 style="width: 60px; height: 60px; color: #1a73e8;">
+                                <i class="bi bi-capsule" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="h2 mb-1" id="medication-name">Carregando...</h1>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-white text-primary me-2" id="medication-category">...</span>
+                                <span class="text-white-50" id="medication-principle">Princípio ativo: ...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-none d-md-block">
+                    <button class="btn btn-light me-2" onclick="window.history.back()">
+                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                    </button>
+                    <button class="btn btn-outline-light" onclick="printBula()">
+                        <i class="bi bi-printer me-2"></i>Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-custom">
+        <!-- Alertas -->
+        <div id="medication-alert" class="alert-custom alert-custom-info mb-4 d-none"></div>
+
+        <div class="row">
+            <!-- Informações Principais -->
+            <div class="col-lg-8 mb-4">
+                <!-- Informações Básicas -->
+                <div class="section-card">
+                    <h5 class="section-title">Informações Básicas</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Nome Comercial:</div>
+                                <div class="info-value" id="info-name">-</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Princípio Ativo:</div>
+                                <div class="info-value" id="info-principle">-</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Concentração:</div>
+                                <div class="info-value" id="info-concentration">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Apresentação:</div>
+                                <div class="info-value" id="info-presentation">-</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Categoria:</div>
+                                <div class="info-value" id="info-category">-</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Laboratório:</div>
+                                <div class="info-value" id="info-laboratory">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indicações e Dosagem -->
+                <div class="section-card">
+                    <h5 class="section-title">Indicações e Dosagem</h5>
+                    
+                    <div class="mb-3">
+                        <strong>Indicações:</strong>
+                        <div id="info-indications" class="mt-1">-</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Dosagem:</strong>
+                        <div id="info-dosage" class="mt-1">-</div>
+                    </div>
+                    
+                    <div>
+                        <strong>Vias de Administração:</strong>
+                        <div id="info-routes" class="mt-1">-</div>
+                    </div>
+                </div>
+
+                <!-- Cuidados de Enfermagem -->
+                <div class="nursing-tips">
+                    <h6><i class="bi bi-clipboard-heart me-2"></i>Cuidados de Enfermagem</h6>
+                    <div id="nursing-tips-content">
+                        <p class="mb-2">1. Verifique sempre a prescrição médica antes da administração</p>
+                        <p class="mb-2">2. Confirme alergias do paciente</p>
+                        <p class="mb-2">3. Observe reações adversas durante e após administração</p>
+                        <p class="mb-2">4. Registre horário, dose e via de administração</p>
+                        <p class="mb-0">5. Eduque paciente/família sobre medicamento quando necessário</p>
+                    </div>
+                </div>
+
+                <!-- Contraindicações e Precauções -->
+                <div class="section-card">
+                    <h5 class="section-title">Contraindicações e Precauções</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Contraindicações:</strong>
+                                <div id="info-contraindications" class="mt-1">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Precauções:</strong>
+                                <div id="info-precautions" class="mt-1">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Efeitos Adversos -->
+                <div class="section-card">
+                    <h5 class="section-title">Efeitos Adversos</h5>
+                    <div id="info-sideeffects">-</div>
+                </div>
+
+                <!-- Interações Medicamentosas -->
+                <div class="section-card">
+                    <h5 class="section-title">Interações Medicamentosas</h5>
+                    <div id="info-interactions">-</div>
+                </div>
+            </div>
+
+            <!-- Sidebar - Informações Rápidas -->
+            <div class="col-lg-4 mb-4">
+                <!-- Ações Rápidas -->
+                <div class="section-card">
+                    <h5 class="section-title">Ações Rápidas</h5>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-custom btn-custom-primary" onclick="addToFavorites()">
+                            <i class="bi bi-star me-2"></i>Adicionar aos Favoritos
+                        </button>
+                        <button class="btn btn-custom btn-custom-outline" onclick="calculateDosage()">
+                            <i class="bi bi-calculator me-2"></i>Calcular Dosagem
+                        </button>
+                        <button class="btn btn-custom btn-custom-outline" onclick="showNursingProtocol()">
+                            <i class="bi bi-clipboard-check me-2"></i>Protocolo de Enfermagem
+                        </button>
+                        <button class="btn btn-custom btn-custom-outline" onclick="printBula()">
+                            <i class="bi bi-printer me-2"></i>Imprimir Bula
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Informações Técnicas -->
+                <div class="section-card">
+                    <h5 class="section-title">Informações Técnicas</h5>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Registro ANVISA:</div>
+                        <div class="info-value" id="info-anvisa">-</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Armazenamento:</div>
+                        <div class="info-value" id="info-storage">-</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Validade após aberto:</div>
+                        <div class="info-value" id="info-shelfLife">-</div>
+                    </div>
+                </div>
+
+                <!-- Avisos Importantes -->
+                <div class="warning-card">
+                    <div class="d-flex">
+                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                        <div>
+                            <strong>Importante para Enfermagem:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Nunca administre sem prescrição médica válida</li>
+                                <li>Verifique sempre a data de validade</li>
+                                <li>Observe técnicas assépticas</li>
+                                <li>Registre qualquer intercorrência</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compartilhar -->
+                <div class="section-card">
+                    <h5 class="section-title">Compartilhar</h5>
+                    
+                    <div class="d-flex justify-content-around">
+                        <button class="btn btn-outline-secondary" onclick="shareViaWhatsApp()">
+                            <i class="bi bi-whatsapp"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="shareViaEmail()">
+                            <i class="bi bi-envelope"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="copyLink()">
+                            <i class="bi bi-link-45deg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div data-include="../../../../components/footer.html"></div>
+
+    <!-- Botões Flutuantes (Mobile) -->
+    <div class="quick-actions d-md-none">
+        <button class="action-btn btn-primary" onclick="window.history.back()">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <button class="action-btn btn-success" onclick="addToFavorites()">
+            <i class="bi bi-star"></i>
+        </button>
+        <button class="action-btn btn-warning" onclick="printBula()">
+            <i class="bi bi-printer"></i>
+        </button>
+    </div>
+
+    <!-- Modal: Calcular Dosagem -->
+    <div class="modal fade" id="dosageModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Calcular Dosagem</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="dosage-form">
+                        <div class="mb-3">
+                            <label for="patient-weight" class="form-label">Peso do Paciente (kg)</label>
+                            <input type="number" class="form-control" id="patient-weight" min="0" step="0.1" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="dosage-per-kg" class="form-label">Dose por kg</label>
+                            <input type="number" class="form-control" id="dosage-per-kg" 
+                                   value="10" min="0" step="0.1" required>
+                            <div class="form-text">Ex: 10mg/kg para dipirona pediátrica</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="med-concentration" class="form-label">Concentração do Medicamento (mg/ml)</label>
+                            <input type="number" class="form-control" id="med-concentration" 
+                                   value="50" min="0" step="0.1" required>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <strong>Resultado:</strong>
+                            <div id="dosage-result" class="mt-2 fw-bold"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="calculate()">Calcular</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Módulos do App -->
+    <script type="module">
+        import authService from '../../../../js/modules/auth.js';
+        import medicationService from '../../../../js/modules/medications.js';
+        import alertComponent from '../../../../js/components/AlertComponent.js';
+        
+        // Variáveis de estado
+        let currentMedication = null;
+        let currentMedicationId = null;
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initMedicationView();
+        });
+        
+        async function initMedicationView() {
+            try {
+                // Verificar autenticação
+                if (!authService.isAuthenticated()) {
+                    window.location.href = '../../../auth/login.html';
+                    return;
+                }
+                
+                // Obter ID do medicamento da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                currentMedicationId = urlParams.get('id');
+                
+                if (!currentMedicationId) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // Carregar medicamento
+                await loadMedication();
+                
+                // Configurar eventos
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('Erro ao inicializar visualização do medicamento:', error);
+                showError('Erro ao carregar dados do medicamento. Tente novamente.');
+                // Redirecionar após 3 segundos
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+            }
+        }
+        
+        async function loadMedication() {
+            try {
+                authService.showLoading();
+                
+                const result = await medicationService.getMedicationDetails(currentMedicationId);
+                
+                if (result.success) {
+                    currentMedication = result.data;
+                    renderMedicationInfo();
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar medicamento:', error);
+                showError('Erro ao carregar medicamento: ' + error.message);
+            } finally {
+                authService.hideLoading();
+            }
+        }
+        
+        function renderMedicationInfo() {
+            if (!currentMedication) return;
+            
+            // Informações básicas
+            document.getElementById('medication-name').textContent = currentMedication.name;
+            document.getElementById('medication-category').textContent = currentMedication.category;
+            document.getElementById('medication-principle').textContent = 
+                `Princípio ativo: ${currentMedication.activePrinciple}`;
+            
+            // Informações detalhadas
+            document.getElementById('info-name').textContent = currentMedication.name;
+            document.getElementById('info-principle').textContent = currentMedication.activePrinciple;
+            document.getElementById('info-concentration').textContent = currentMedication.concentration;
+            document.getElementById('info-presentation').textContent = currentMedication.presentation;
+            document.getElementById('info-category').textContent = currentMedication.category;
+            document.getElementById('info-laboratory').textContent = currentMedication.laboratory || 'Não informado';
+            document.getElementById('info-anvisa').textContent = currentMedication.anvisaRegister || 'Não informado';
+            document.getElementById('info-storage').textContent = currentMedication.storage || 'Não informado';
+            
+            // Indicações e dosagem
+            document.getElementById('info-indications').textContent = currentMedication.indications || 'Não informado';
+            document.getElementById('info-dosage').textContent = currentMedication.dosage || 'Não informado';
+            
+            // Vias de administração
+            const routesElement = document.getElementById('info-routes');
+            if (currentMedication.administrationRoutes && currentMedication.administrationRoutes.length > 0) {
+                routesElement.innerHTML = currentMedication.administrationRoutes
+                    .map(route => `<span class="badge bg-primary me-1">${route}</span>`)
+                    .join('');
+            } else {
+                routesElement.textContent = 'Não informado';
+            }
+            
+            // Contraindicações e precauções
+            document.getElementById('info-contraindications').textContent = 
+                currentMedication.contraindications || 'Não informado';
+            document.getElementById('info-precautions').textContent = 
+                currentMedication.precautions || 'Não informado';
+            
+            // Efeitos adversos
+            document.getElementById('info-sideeffects').textContent = 
+                currentMedication.sideEffects || 'Não informado';
+            
+            // Interações
+            document.getElementById('info-interactions').textContent = 
+                currentMedication.interactions || 'Não informado';
+            
+            // Validade após aberto (estimativa)
+            const shelfLifeElement = document.getElementById('info-shelfLife');
+            if (currentMedication.presentation?.toLowerCase().includes('ampola') || 
+                currentMedication.presentation?.toLowerCase().includes('frasco')) {
+                shelfLifeElement.textContent = '28 dias após abertos';
+            } else if (currentMedication.presentation?.toLowerCase().includes('comprimido')) {
+                shelfLifeElement.textContent = 'Conservar em embalagem original';
+            } else {
+                shelfLifeElement.textContent = 'Consultar bula original';
+            }
+        }
+        
+        function setupEventListeners() {
+            // Formulário de cálculo de dosagem
+            document.getElementById('patient-weight')?.addEventListener('input', calculate);
+            document.getElementById('dosage-per-kg')?.addEventListener('input', calculate);
+            document.getElementById('med-concentration')?.addEventListener('input', calculate);
+        }
+        
+        // Funções globais
+        window.printBula = function() {
+            window.print();
+        };
+        
+        window.addToFavorites = async function() {
+            try {
+                const result = await medicationService.addFavorite(currentMedicationId, {
+                    customName: `${currentMedication.name} - Bula Rápida`
+                });
+                
+                if (result.success) {
+                    showSuccess('Medicamento adicionado aos favoritos!');
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao adicionar favorito:', error);
+                showError('Erro ao adicionar aos favoritos: ' + error.message);
+            }
+        };
+        
+        window.calculateDosage = function() {
+            const modal = new bootstrap.Modal(document.getElementById('dosageModal'));
+            modal.show();
+            // Calcular imediatamente se houver dados
+            setTimeout(calculate, 100);
+        };
+        
+        window.calculate = function() {
+            const weight = parseFloat(document.getElementById('patient-weight').value) || 0;
+            const dosagePerKg = parseFloat(document.getElementById('dosage-per-kg').value) || 0;
+            const concentration = parseFloat(document.getElementById('med-concentration').value) || 1;
+            
+            if (weight > 0 && dosagePerKg > 0) {
+                const totalDosageMg = weight * dosagePerKg;
+                const totalDosageMl = totalDosageMg / concentration;
+                
+                document.getElementById('dosage-result').innerHTML = `
+                    <div>Dose total: <span class="text-primary">${totalDosageMg.toFixed(1)} mg</span></div>
+                    <div>Volume a administrar: <span class="text-success">${totalDosageMl.toFixed(1)} ml</span></div>
+                `;
+            }
+        };
+        
+        window.showNursingProtocol = function() {
+            alert('Protocolo de enfermagem para ' + currentMedication.name + ':\n\n' +
+                  '1. Verificar prescrição médica\n' +
+                  '2. Confirmar identidade do paciente\n' +
+                  '3. Verificar alergias\n' +
+                  '4. Preparar medicamento com técnica asséptica\n' +
+                  '5. Administrar conforme via prescrita\n' +
+                  '6. Observar reações\n' +
+                  '7. Registrar administração');
+        };
+        
+        window.shareViaWhatsApp = function() {
+            const text = `Bula de ${currentMedication.name} - Enfermeiro Ágil\n` +
+                        `${window.location.href}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        };
+        
+        window.shareViaEmail = function() {
+            const subject = `Bula: ${currentMedication.name}`;
+            const body = `Confira a bula simplificada de ${currentMedication.name}:\n\n` +
+                        `Princípio ativo: ${currentMedication.activePrinciple}\n` +
+                        `Dosagem: ${currentMedication.dosage?.split('.')[0]}\n\n` +
+                        `Link completo: ${window.location.href}`;
+            window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+        };
+        
+        window.copyLink = function() {
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => showSuccess('Link copiado para a área de transferência!'))
+                .catch(() => showError('Erro ao copiar link.'));
+        };
+        
+        function showSuccess(message) {
+            if (alertComponent) {
+                alertComponent.success(message);
+            } else {
+                const alert = document.getElementById('medication-alert');
+                alert.textContent = message;
+                alert.className = 'alert-custom alert-custom-success mb-4';
+                alert.classList.remove('d-none');
+                
+                setTimeout(() => alert.classList.add('d-none'), 3000);
+            }
+        }
+        
+        function showError(message) {
+            if (alertComponent) {
+                alertComponent.error(message);
+            } else {
+                const alert = document.getElementById('medication-alert');
+                alert.textContent = message;
+                alert.className = 'alert-custom alert-custom-danger mb-4';
+                alert.classList.remove('d-none');
+                
+                setTimeout(() => alert.classList.add('d-none'), 5000);
+            }
+        }
+        
+    </script>
+</body>
+</html>

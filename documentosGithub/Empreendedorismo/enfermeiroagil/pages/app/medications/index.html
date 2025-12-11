@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicamentos - Enfermeiro Ágil</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="../../../../css/main.css">
+    
+    <!-- CSS Medicamentos -->
+    <style>
+        .medications-container {
+            padding: 20px 0;
+        }
+        
+        .medication-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #1a73e8;
+            transition: all 0.3s ease;
+        }
+        
+        .medication-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .medication-category {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .route-badge {
+            background: #e8f5e9;
+            color: #4caf50;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.25rem;
+        }
+        
+        .favorite-btn {
+            color: #ffc107;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .favorite-btn.active {
+            color: #ff9800;
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .category-card:hover {
+            border-color: #1a73e8;
+            transform: translateY(-3px);
+        }
+        
+        .category-icon {
+            font-size: 2rem;
+            color: #1a73e8;
+            margin-bottom: 1rem;
+        }
+    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../../../../public/favicon.ico">
+</head>
+<body>
+    
+    <!-- Global Loading -->
+    <div id="global-loader" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index: 9999; display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <p class="text-muted">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div data-include="../../../../components/header.html"></div>
+
+    <!-- Sidebar -->
+    <div data-include="../../../../components/sidebar.html"></div>
+
+    <!-- Main Content -->
+    <div class="container-fluid" style="margin-top: 80px;">
+        <div class="row">
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 medications-container">
+                <!-- Header -->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <div>
+                        <h1 class="h2">Medicamentos</h1>
+                        <p class="text-muted mb-0">Consulte bulas simplificadas para enfermagem</p>
+                    </div>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-custom btn-custom-primary" onclick="window.location.href='search.html'">
+                            <i class="bi bi-search me-2"></i>Buscar Medicamento
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alertas -->
+                <div id="medications-alert" class="alert-custom alert-custom-info mb-4 d-none"></div>
+
+                <!-- Caixa de Busca Rápida -->
+                <div class="search-box">
+                    <h5 class="mb-3">Busca Rápida</h5>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control border-start-0" 
+                               id="quick-search" 
+                               placeholder="Digite o nome do medicamento..."
+                               onkeyup="quickSearch(this.value)">
+                        <button class="btn btn-custom btn-custom-outline" onclick="clearSearch()">
+                            Limpar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Categorias de Medicamentos -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Categorias</h5>
+                    <div class="categories-grid">
+                        <div class="category-card" onclick="filterByCategory('Analgésicos')">
+                            <div class="category-icon">
+                                <i class="bi bi-prescription2"></i>
+                            </div>
+                            <h6>Analgésicos</h6>
+                            <p class="text-muted small mb-0">Controle da dor</p>
+                        </div>
+                        
+                        <div class="category-card" onclick="filterByCategory('Antibióticos')">
+                            <div class="category-icon">
+                                <i class="bi bi-virus"></i>
+                            </div>
+                            <h6>Antibióticos</h6>
+                            <p class="text-muted small mb-0">Infecções bacterianas</p>
+                        </div>
+                        
+                        <div class="category-card" onclick="filterByCategory('Anti-hipertensivos')">
+                            <div class="category-icon">
+                                <i class="bi bi-heart-pulse"></i>
+                            </div>
+                            <h6>Anti-hipertensivos</h6>
+                            <p class="text-muted small mb-0">Pressão arterial</p>
+                        </div>
+                        
+                        <div class="category-card" onclick="filterByCategory('Anticoagulantes')">
+                            <div class="category-icon">
+                                <i class="bi bi-droplet"></i>
+                            </div>
+                            <h6>Anticoagulantes</h6>
+                            <p class="text-muted small mb-0">Coagulação sanguínea</p>
+                        </div>
+                        
+                        <div class="category-card" onclick="filterByCategory('Broncodilatadores')">
+                            <div class="category-icon">
+                                <i class="bi bi-lungs"></i>
+                            </div>
+                            <h6>Broncodilatadores</h6>
+                            <p class="text-muted small mb-0">Vias respiratórias</p>
+                        </div>
+                        
+                        <div class="category-card" onclick="showAllMedications()">
+                            <div class="category-icon">
+                                <i class="bi bi-grid-3x3-gap"></i>
+                            </div>
+                            <h6>Todos</h6>
+                            <p class="text-muted small mb-0">Ver todos os medicamentos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Favoritos -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Seus Favoritos</h5>
+                        <a href="#" class="text-primary text-decoration-none small" onclick="viewAllFavorites()">
+                            Ver todos
+                        </a>
+                    </div>
+                    <div id="favorites-container" class="row">
+                        <!-- Favoritos serão carregados aqui -->
+                    </div>
+                </div>
+
+                <!-- Medicamentos Populares -->
+                <div>
+                    <h5 class="mb-3">Medicamentos Populares</h5>
+                    <div id="medications-list">
+                        <!-- Medicamentos serão carregados aqui -->
+                        <div class="text-center py-5">
+                            <div class="loading-spinner"></div>
+                            <p class="text-muted mt-3">Carregando medicamentos...</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div data-include="../../../../components/footer.html"></div>
+
+    <!-- Modal: Adicionar aos Favoritos -->
+    <div class="modal fade" id="addFavoriteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar aos Favoritos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="favorite-form">
+                        <div class="mb-3">
+                            <label for="favorite-name" class="form-label">Nome Personalizado (opcional)</label>
+                            <input type="text" class="form-control" id="favorite-name" 
+                                   placeholder="Ex: Dipirona 500mg - Paciente João">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="favorite-dosage" class="form-label">Dosagem Usual</label>
+                            <input type="text" class="form-control" id="favorite-dosage" 
+                                   placeholder="Ex: 500mg a cada 6h">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="favorite-route" class="form-label">Via de Administração</label>
+                            <select class="form-select" id="favorite-route">
+                                <option value="Oral">Oral</option>
+                                <option value="IV">Intravenosa</option>
+                                <option value="IM">Intramuscular</option>
+                                <option value="SC">Subcutânea</option>
+                                <option value="Tópica">Tópica</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="favorite-indications" class="form-label">Indicações Específicas</label>
+                            <textarea class="form-control" id="favorite-indications" rows="2" 
+                                      placeholder="Observações para administração..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-favorite-btn">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Módulos do App -->
+    <script type="module">
+        import authService from '../../../../js/modules/auth.js';
+        import medicationService from '../../../../js/modules/medications.js';
+        import alertComponent from '../../../../js/components/AlertComponent.js';
+        
+        // Variáveis de estado
+        let allMedications = [];
+        let favorites = [];
+        let currentMedicationToFavorite = null;
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initMedicationsPage();
+        });
+        
+        async function initMedicationsPage() {
+            try {
+                // Verificar autenticação
+                if (!authService.isAuthenticated()) {
+                    window.location.href = '../../../auth/login.html';
+                    return;
+                }
+                
+                // Carregar dados
+                await loadMedications();
+                await loadFavorites();
+                
+                // Configurar eventos
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('Erro ao inicializar página de medicamentos:', error);
+                showError('Erro ao carregar medicamentos. Tente novamente.');
+            }
+        }
+        
+        async function loadMedications() {
+            try {
+                // Buscar medicamentos
+                const result = await medicationService.searchMedications('');
+                
+                if (result.success) {
+                    allMedications = result.data;
+                    renderPopularMedications(allMedications.slice(0, 6));
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar medicamentos:', error);
+                document.getElementById('medications-list').innerHTML = `
+                    <div class="alert alert-danger">
+                        Erro ao carregar medicamentos: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function loadFavorites() {
+            try {
+                const result = await medicationService.getFavorites();
+                
+                if (result.success) {
+                    favorites = result.data;
+                    renderFavorites(favorites.slice(0, 3));
+                }
+                
+            } catch (error) {
+                console.error('Erro ao carregar favoritos:', error);
+                // Não mostrar erro, apenas não exibir favoritos
+            }
+        }
+        
+        function renderPopularMedications(medications) {
+            const container = document.getElementById('medications-list');
+            
+            if (!medications || medications.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-capsule text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">Nenhum medicamento encontrado</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            medications.forEach(med => {
+                const isFavorite = favorites.some(fav => fav.medication_id === med.id);
+                
+                html += `
+                    <div class="medication-card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="medication-category">${med.category}</span>
+                                <h5 class="mb-1">${med.name}</h5>
+                                <p class="text-muted small mb-2">${med.activePrinciple}</p>
+                            </div>
+                            <div>
+                                <i class="bi bi-star${isFavorite ? '-fill' : ''} favorite-btn ${isFavorite ? 'active' : ''}" 
+                                   onclick="toggleFavorite('${med.id}', this)"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Apresentação:</strong> ${med.concentration} - ${med.presentation}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Vias:</strong>
+                            ${med.administrationRoutes.map(route => 
+                                `<span class="route-badge">${route}</span>`
+                            ).join('')}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Dose:</strong> ${med.dosage.split('.')[0]}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button class="btn btn-sm btn-custom btn-custom-outline" onclick="viewMedication('${med.id}')">
+                                <i class="bi bi-eye me-1"></i>Ver Bula
+                            </button>
+                            <button class="btn btn-sm btn-custom btn-custom-primary" onclick="addToFavorites('${med.id}')">
+                                <i class="bi bi-plus-circle me-1"></i>Adicionar
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function renderFavorites(favoriteList) {
+            const container = document.getElementById('favorites-container');
+            
+            if (!favoriteList || favoriteList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="text-center py-4">
+                            <i class="bi bi-star text-muted" style="font-size: 2rem;"></i>
+                            <p class="text-muted mt-2">Nenhum medicamento favorito</p>
+                            <p class="text-muted small">Adicione medicamentos aos favoritos para acesso rápido</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            favoriteList.forEach(fav => {
+                const med = fav.medication || { name: fav.custom_name || 'Medicamento' };
+                
+                html += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">${med.name}</h6>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                </div>
+                                ${fav.dosage ? `<p class="text-muted small mb-1">${fav.dosage}</p>` : ''}
+                                ${fav.route ? `<span class="badge bg-light text-dark">${fav.route}</span>` : ''}
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <button class="btn btn-sm btn-outline-primary w-100" onclick="useFavorite('${fav.id}')">
+                                    Usar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function setupEventListeners() {
+            // Salvar favorito
+            document.getElementById('save-favorite-btn').addEventListener('click', saveFavorite);
+        }
+        
+        // Funções globais
+        window.quickSearch = function(query) {
+            if (query.length < 2) return;
+            
+            const filtered = allMedications.filter(med => 
+                med.name.toLowerCase().includes(query.toLowerCase()) ||
+                med.activePrinciple.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            renderPopularMedications(filtered);
+        };
+        
+        window.clearSearch = function() {
+            document.getElementById('quick-search').value = '';
+            renderPopularMedications(allMedications.slice(0, 6));
+        };
+        
+        window.filterByCategory = function(category) {
+            const filtered = allMedications.filter(med => med.category === category);
+            renderPopularMedications(filtered);
+        };
+        
+        window.showAllMedications = function() {
+            renderPopularMedications(allMedications);
+        };
+        
+        window.viewAllFavorites = function() {
+            // Em produção, redirecionaria para página de favoritos
+            alert('Página de favoritos completa em desenvolvimento');
+        };
+        
+        window.toggleFavorite = async function(medicationId, element) {
+            try {
+                const isCurrentlyFavorite = element.classList.contains('active');
+                
+                if (isCurrentlyFavorite) {
+                    // Remover dos favoritos
+                    const favorite = favorites.find(fav => fav.medication_id === medicationId);
+                    if (favorite) {
+                        await medicationService.removeFavorite(favorite.id);
+                        element.classList.remove('active');
+                        element.classList.remove('bi-star-fill');
+                        element.classList.add('bi-star');
+                        showSuccess('Removido dos favoritos!');
+                    }
+                } else {
+                    // Adicionar aos favoritos
+                    addToFavorites(medicationId);
+                }
+                
+                // Recarregar favoritos
+                await loadFavorites();
+                
+            } catch (error) {
+                console.error('Erro ao alternar favorito:', error);
+                showError('Erro ao atualizar favoritos.');
+            }
+        };
+        
+        window.addToFavorites = function(medicationId) {
+            currentMedicationToFavorite = medicationId;
+            const modal = new bootstrap.Modal(document.getElementById('addFavoriteModal'));
+            modal.show();
+        };
+        
+        async function saveFavorite() {
+            try {
+                const favoriteData = {
+                    customName: document.getElementById('favorite-name').value,
+                    dosage: document.getElementById('favorite-dosage').value,
+                    route: document.getElementById('favorite-route').value,
+                    indications: document.getElementById('favorite-indications').value
+                };
+                
+                const result = await medicationService.addFavorite(currentMedicationToFavorite, favoriteData);
+                
+                if (result.success) {
+                    // Fechar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addFavoriteModal'));
+                    modal.hide();
+                    
+                    // Limpar formulário
+                    document.getElementById('favorite-form').reset();
+                    
+                    // Mostrar mensagem
+                    showSuccess('Adicionado aos favoritos!');
+                    
+                    // Recarregar favoritos
+                    await loadFavorites();
+                    
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao salvar favorito:', error);
+                showError('Erro ao salvar favorito: ' + error.message);
+            }
+        }
+        
+        window.viewMedication = function(medicationId) {
+            window.location.href = `view.html?id=${medicationId}`;
+        };
+        
+        window.useFavorite = function(favoriteId) {
+            // Em produção, abriria modal para usar o medicamento
+            alert('Funcionalidade de uso do medicamento em desenvolvimento');
+        };
+        
+        function showSuccess(message) {
+            if (alertComponent) {
+                alertComponent.success(message);
+            } else {
+                const alert = document.getElementById('medications-alert');
+                alert.textContent = message;
+                alert.className = 'alert-custom alert-custom-success mb-4';
+                alert.classList.remove('d-none');
+                
+                setTimeout(() => alert.classList.add('d-none'), 3000);
+            }
+        }
+        
+        function showError(message) {
+            if (alertComponent) {
+                alertComponent.error(message);
+            } else {
+                const alert = document.getElementById('medications-alert');
+                alert.textContent = message;
+                alert.className = 'alert-custom alert-custom-danger mb-4';
+                alert.classList.remove('d-none');
+                
+                setTimeout(() => alert.classList.add('d-none'), 5000);
+            }
+        }
+        
+    </script>
+</body>
+</html>

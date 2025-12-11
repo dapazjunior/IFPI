@@ -386,3 +386,8 @@ a:hover {
     overflow-x: auto;
   }
 }
+
+/* ===== IMPORTAR COMPONENTES ===== */
+@import url('auth.css');
+@import url('dashboard.css');
+@import url('components.css');

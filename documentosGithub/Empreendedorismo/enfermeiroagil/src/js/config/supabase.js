@@ -1,6 +1,6 @@
 // Configuração do Supabase
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://eskczlbhjnmwyioojzyt.supabase.co';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVza2N6bGJoam5td3lpb29qenl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzODk2MTgsImV4cCI6MjA4MDk2NTYxOH0.K9LCxM1JuU2T9h2WjQ_3eeUpJnBV1UfaOL_iW0Sp6Hc';
+const SUPABASE_URL = 'https://eskczlbhjnmwyioojzyt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVza2N6bGJoam5td3lpb29qenl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzODk2MTgsImV4cCI6MjA4MDk2NTYxOH0.K9LCxM1JuU2T9h2WjQ_3eeUpJnBV1UfaOL_iW0Sp6Hc';
 
 // Verificar se estamos no navegador
 const isBrowser = typeof window !== 'undefined';

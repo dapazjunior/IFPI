@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Medicamento - Enfermeiro Ágil</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="../../../../css/main.css">
+    
+    <!-- CSS Search -->
+    <style>
+        .search-container {
+            padding: 20px 0;
+        }
+        
+        .search-header {
+            background: linear-gradient(135deg, #1a73e8, #0d47a1);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .search-box {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .search-filters {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-tag-remove {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #1a73e8;
+            transition: all 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 12px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .search-tips {
+            background: #fff3e0;
+            border: 1px solid #ff9800;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../../../../public/favicon.ico">
+</head>
+<body>
+    
+    <!-- Global Loading -->
+    <div id="global-loader" class="position-fixed top-0 start-0 w-100 h-100 bg-white d-flex align-items-center justify-content-center" style="z-index: 9999; display: none;">
+        <div class="text-center">
+            <div class="loading-spinner mb-3"></div>
+            <p class="text-muted">Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div data-include="../../../../components/header.html"></div>
+
+    <!-- Sidebar -->
+    <div data-include="../../../../components/sidebar.html"></div>
+
+    <!-- Main Content -->
+    <div class="container-fluid" style="margin-top: 80px;">
+        <div class="row">
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 search-container">
+                <!-- Header -->
+                <div class="search-header">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="h2 mb-3">
+                                <i class="bi bi-search me-2"></i>Buscar Medicamento
+                            </h1>
+                            <p class="mb-0 opacity-75">
+                                Consulte bulas simplificadas, dosagens e cuidados de enfermagem
+                            </p>
+                        </div>
+                        <div class="d-none d-md-block">
+                            <span class="badge bg-white text-primary">Atualizado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alertas -->
+                <div id="search-alert" class="alert-custom alert-custom-info mb-4 d-none"></div>
+
+                <!-- Caixa de Busca -->
+                <div class="search-box">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control border-start-0" 
+                               id="search-input" 
+                               placeholder="Digite o nome do medicamento, princípio ativo ou apresentação..."
+                               autofocus>
+                        <button class="btn btn-custom btn-custom-primary" onclick="performSearch()">
+                            <i class="bi bi-search me-2"></i>Buscar
+                        </button>
+                    </div>
+                    
+                    <!-- Dicas de busca -->
+                    <div class="search-tips mt-3">
+                        <div class="d-flex">
+                            <i class="bi bi-lightbulb text-warning me-2"></i>
+                            <div>
+                                <strong>Dicas:</strong> 
+                                Busque por "dipirona", "amoxicilina 500mg", "insulina" ou use categorias abaixo.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="search-filters">
+                    <h5 class="mb-3">Filtrar por:</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Categoria</label>
+                            <select class="form-select" id="category-filter">
+                                <option value="">Todas as categorias</option>
+                                <option value="Analgésicos">Analgésicos</option>
+                                <option value="Antibióticos">Antibióticos</option>
+                                <option value="Anti-hipertensivos">Anti-hipertensivos</option>
+                                <option value="Anticoagulantes">Anticoagulantes</option>
+                                <option value="Broncodilatadores">Broncodilatadores</option>
+                                <option value="Diuréticos">Diuréticos</option>
+                                <option value="Hormônios">Hormônios</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Via de Administração</label>
+                            <select class="form-select" id="route-filter">
+                                <option value="">Todas as vias</option>
+                                <option value="Oral">Oral</option>
+                                <option value="Intravenosa (IV)">Intravenosa (IV)</option>
+                                <option value="Intramuscular (IM)">Intramuscular (IM)</option>
+                                <option value="Subcutânea (SC)">Subcutânea (SC)</option>
+                                <option value="Tópica">Tópica</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Ordenar por</label>
+                            <select class="form-select" id="sort-filter">
+                                <option value="relevance">Relevância</option>
+                                <option value="name">Nome A-Z</option>
+                                <option value="category">Categoria</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Tags de filtros ativos -->
+                    <div id="active-filters" class="mt-3">
+                        <!-- Filtros ativos serão mostrados aqui -->
+                    </div>
+                </div>
+
+                <!-- Resultados -->
+                <div id="search-results">
+                    <div class="text-center py-5">
+                        <div class="search-placeholder-icon mb-3">
+                            <i class="bi bi-capsule text-muted" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4>Busque um medicamento</h4>
+                        <p class="text-muted">
+                            Digite o nome do medicamento na barra de busca acima para começar
+                        </p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div data-include="../../../../components/footer.html"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Módulos do App -->
+    <script type="module">
+        import authService from '../../../../js/modules/auth.js';
+        import medicationService from '../../../../js/modules/medications.js';
+        import alertComponent from '../../../../js/components/AlertComponent.js';
+        
+        // Variáveis de estado
+        let currentResults = [];
+        let activeFilters = {};
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initSearchPage();
+        });
+        
+        async function initSearchPage() {
+            try {
+                // Verificar autenticação
+                if (!authService.isAuthenticated()) {
+                    window.location.href = '../../../auth/login.html';
+                    return;
+                }
+                
+                // Configurar eventos
+                setupEventListeners();
+                
+                // Busca inicial (populares)
+                performInitialSearch();
+                
+            } catch (error) {
+                console.error('Erro ao inicializar página de busca:', error);
+                showError('Erro ao inicializar busca. Tente novamente.');
+            }
+        }
+        
+        function setupEventListeners() {
+            // Busca ao pressionar Enter
+            document.getElementById('search-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Atualizar filtros
+            document.getElementById('category-filter').addEventListener('change', updateFilters);
+            document.getElementById('route-filter').addEventListener('change', updateFilters);
+            document.getElementById('sort-filter').addEventListener('change', updateFilters);
+        }
+        
+        function performInitialSearch() {
+            // Mostrar medicamentos populares inicialmente
+            const popularTerms = ['dipirona', 'amoxicilina', 'insulina', 'furosemida'];
+            const randomTerm = popularTerms[Math.floor(Math.random() * popularTerms.length)];
+            
+            document.getElementById('search-input').value = randomTerm;
+            performSearch();
+        }
+        
+        window.performSearch = async function() {
+            try {
+                const searchTerm = document.getElementById('search-input').value.trim();
+                
+                if (!searchTerm) {
+                    showError('Digite um termo para buscar.');
+                    return;
+                }
+                
+                authService.showLoading();
+                
+                // Aplicar filtros
+                const filters = {
+                    category: activeFilters.category || '',
+                    route: activeFilters.route || ''
+                };
+                
+                const result = await medicationService.searchMedications(searchTerm, filters);
+                
+                if (result.success) {
+                    currentResults = result.data;
+                    
+                    // Ordenar resultados
+                    sortResults(currentResults);
+                    
+                    // Renderizar resultados
+                    renderResults(currentResults);
+                    
+                    // Atualizar contador
+                    updateResultsCount(result.total);
+                    
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro na busca:', error);
+                showError('Erro ao buscar medicamentos: ' + error.message);
+                renderNoResults();
+            } finally {
+                authService.hideLoading();
+            }
+        };
+        
+        function updateFilters() {
+            activeFilters = {
+                category: document.getElementById('category-filter').value,
+                route: document.getElementById('route-filter').value
+            };
+            
+            renderActiveFilters();
+            
+            // Se houver resultados, refiltrar
+            if (currentResults.length > 0) {
+                filterCurrentResults();
+            }
+        }
+        
+        function filterCurrentResults() {
+            let filtered = [...currentResults];
+            
+            if (activeFilters.category) {
+                filtered = filtered.filter(med => med.category === activeFilters.category);
+            }
+            
+            if (activeFilters.route) {
+                filtered = filtered.filter(med => 
+                    med.administrationRoutes.includes(activeFilters.route)
+                );
+            }
+            
+            sortResults(filtered);
+            renderResults(filtered);
+            updateResultsCount(filtered.length);
+        }
+        
+        function sortResults(results) {
+            const sortBy = document.getElementById('sort-filter').value;
+            
+            switch (sortBy) {
+                case 'name':
+                    results.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'category':
+                    results.sort((a, b) => a.category.localeCompare(b.category));
+                    break;
+                default: // relevance
+                    // Mantém a ordem retornada pela busca
+                    break;
+            }
+        }
+        
+        function renderResults(medications) {
+            const container = document.getElementById('search-results');
+            
+            if (!medications || medications.length === 0) {
+                renderNoResults();
+                return;
+            }
+            
+            let html = '';
+            
+            medications.forEach(med => {
+                html += `
+                    <div class="result-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="badge bg-primary mb-2">${med.category}</span>
+                                <h5 class="mb-1">${med.name}</h5>
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-capsule me-1"></i>
+                                    ${med.activePrinciple}
+                                </p>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-custom btn-custom-primary" onclick="viewMedication('${med.id}')">
+                                    Ver Bula
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-2">
+                                    <strong>Apresentação:</strong>
+                                    <div>${med.concentration} - ${med.presentation}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-2">
+                                    <strong>Vias:</strong>
+                                    <div>
+                                        ${med.administrationRoutes.map(route => 
+                                            `<span class="badge bg-light text-dark me-1">${route}</span>`
+                                        ).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-2">
+                                    <strong>Indicações:</strong>
+                                    <div class="text-truncate">${med.indications}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="viewMedication('${med.id}')">
+                                <i class="bi bi-eye me-1"></i>Ver Detalhes
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="addToFavorites('${med.id}')">
+                                <i class="bi bi-plus-circle me-1"></i>Adicionar aos Favoritos
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function renderNoResults() {
+            const container = document.getElementById('search-results');
+            
+            container.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon mb-3">
+                        <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4>Nenhum medicamento encontrado</h4>
+                    <p class="text-muted mb-4">
+                        Tente ajustar os termos de busca ou filtros
+                    </p>
+                    <button class="btn btn-custom btn-custom-outline" onclick="clearSearch()">
+                        <i class="bi bi-x-circle me-2"></i>Limpar Busca
+                    </button>
+                </div>
+            `;
+        }
+        
+        function renderActiveFilters() {
+            const container = document.getElementById('active-filters');
+            const filters = [];
+            
+            if (activeFilters.category) {
+                filters.push({
+                    type: 'Categoria',
+                    value: activeFilters.category,
+                    key: 'category'
+                });
+            }
+            
+            if (activeFilters.route) {
+                filters.push({
+                    type: 'Via',
+                    value: activeFilters.route,
+                    key: 'route'
+                });
+            }
+            
+            if (filters.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '<div class="d-flex flex-wrap">';
+            
+            filters.forEach(filter => {
+                html += `
+                    <div class="filter-tag">
+                        ${filter.type}: ${filter.value}
+                        <span class="filter-tag-remove" onclick="removeFilter('${filter.key}')">
+                            <i class="bi bi-x"></i>
+                        </span>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <button class="btn btn-sm btn-outline-secondary" onclick="clearAllFilters()">
+                    Limpar Todos
+                </button>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        function updateResultsCount(count) {
+            const header = document.querySelector('.search-header h1');
+            if (header && count > 0) {
+                const subtitle = document.createElement('p');
+                subtitle.className = 'mb-0 opacity-75';
+                subtitle.textContent = `${count} medicamento${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
+                
+                // Remover subtítulo anterior se existir
+                const oldSubtitle = document.querySelector('.search-header p');
+                if (oldSubtitle) {
+                    oldSubtitle.remove();
+                }
+                
+                header.parentNode.insertBefore(subtitle, header.nextSibling);
+            }
+        }
+        
+        // Funções globais
+        window.clearSearch = function() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('category-filter').value = '';
+            document.getElementById('route-filter').value = '';
+            document.getElementById('sort-filter').value = 'relevance';
+            
+            activeFilters = {};
+            renderActiveFilters();
+            
+            document.getElementById('search-results').innerHTML = `
+                <div class="text-center py-5">
+                    <div class="search-placeholder-icon mb-3">
+                        <i class="bi bi-capsule text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4>Busque um medicamento</h4>
+                    <p class="text-muted">
+                        Digite o nome do medicamento na barra de busca acima para começar
+                    </p>
+                </div>
+            `;
+        };
+        
+        window.removeFilter = function(filterKey) {
+            activeFilters[filterKey] = '';
+            document.getElementById(`${filterKey}-filter`).value = '';
+            renderActiveFilters();
+            
+            if (currentResults.length > 0) {
+                filterCurrentResults();
+            }
+        };
+        
+        window.clearAllFilters = function() {
+            activeFilters = {};
+            document.getElementById('category-filter').value = '';
+            document.getElementById('route-filter').value = '';
+            renderActiveFilters();
+            
+            if (currentResults.length > 0) {
+                filterCurrentResults();
+            }
+        };
+        
+        window.viewMedication = function(medicationId) {
+            window.location.href = `view.html?id=${medicationId}`;
+        };
+        
+        window.addToFavorites = async function(medicationId) {
+            try {
+                // Em uma implementação completa, abriria modal para configurar favorito
+                const result = await medicationService.addFavorite(medicationId, {});
+                
+                if (result.success) {
+                    showSuccess('Medicamento adicionado aos favoritos!');
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                console.error('Erro ao adicionar favorito:', error);
+                showError('Erro ao adicionar aos favoritos: ' + error.message);
+            }
+        };
+        
+        function showSuccess(message) {
+            if (alertComponent) {
+                alertComponent.success(message);
+            } else {
+                const alert = document.getElementById('search-alert');
+                alert.textContent = message;
+                alert.className = 'alert-custom alert-custom-success mb-4';
+                alert.classList.remove('d-none');
+                
+                setTimeout(() => alert.classList.add('d-none'), 3000);
+            }
+        }
+        
+        function showError(message) {
+            if (alertComponent) {
+                alertComponent.error(message);
+            } else {
+                const alert = document.getElementById('search-alert');
+                alert.textContent = message;
+                alert.className = 'alert-custom alert-custom-danger mb-4';
+                alert.classList.remove('d-none');
+                
+                setTimeout(() => alert.classList.add('d-none'), 5000);
+            }
+        }
+        
+    </script>
+</body>
+</html>
