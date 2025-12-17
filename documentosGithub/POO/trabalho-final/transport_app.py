@@ -1,6 +1,7 @@
 from datetime import datetime
 
 # 1. Classe Base: ServicoDeTransporte (Superclasse)
+
 class ServicoDeTransporte:
     def __init__(self, nome, tarifa_base, preco_km):
         self.__nome = nome
@@ -20,9 +21,17 @@ class ServicoDeTransporte:
         return self.__preco_km
     
     def calcular_valor_corrida(self, distancia_km, tempo_minutos):
+        """Cálculo genérico que os filhos podem adaptar"""
+        return self.__tarifa_base + (distancia_km * self.__preco_km) + (tempo_minutos * 0.5)
+    
+
+    """
+    def calcular_valor_corrida(self, distancia_km, tempo_minutos):
         raise NotImplementedError("Método deve ser implementado nas subclasses")
+    """
 
 # 2. Subclasses (Herança e Polimorfismo)
+
 class ModalidadePadrao(ServicoDeTransporte):
     def __init__(self, tarifa_base, preco_km, taxa_bandeira):
         super().__init__("Padrão", tarifa_base, preco_km)
@@ -33,8 +42,21 @@ class ModalidadePadrao(ServicoDeTransporte):
         return self.__taxa_bandeira
     
     def calcular_valor_corrida(self, distancia_km, tempo_minutos):
+        """Sobrescreve cálculo do pai aplicando taxa_bandeira"""
+        # Método ATUAL: aproveita cálculo do pai e ajusta com taxa_bandeira
+        valor_base = super().calcular_valor_corrida(distancia_km, tempo_minutos)
+        
+        # Ajusta: substitui (distancia * preco_km) por (distancia * preco_km * taxa_bandeira)
+        valor_sem_distancia = self.tarifa_base + (tempo_minutos * 0.5)
+        valor_distancia_com_taxa = distancia_km * self.preco_km * self.taxa_bandeira
+        
+        return valor_sem_distancia + valor_distancia_com_taxa
+        
+    """
+    def calcular_valor_corrida(self, distancia_km, tempo_minutos):
         # Cálculo: tarifa_base + (distancia_km * preco_km * taxa_bandeira) + (tempo_minutos * 0.5)
         return self.tarifa_base + (distancia_km * self.preco_km * self.taxa_bandeira) + (tempo_minutos * 0.5)
+    """
 
 class ModalidadeLuxo(ServicoDeTransporte):
     def __init__(self, tarifa_base, preco_km, tarifa_cancelamento):
@@ -46,11 +68,21 @@ class ModalidadeLuxo(ServicoDeTransporte):
         return self.__tarifa_cancelamento
     
     def calcular_valor_corrida(self, distancia_km, tempo_minutos):
+        """20% sobre cálculo genérico do pai (ServicoDeTransporte)"""
+        # Método ATUAL: usa cálculo do pai diretamente
+        valor_base = super().calcular_valor_corrida(distancia_km, tempo_minutos)
+        
+        # Aplica 20% sobre o valor base
+        return valor_base * 1.2
+        
+        """
+            def calcular_valor_corrida(self, distancia_km, tempo_minutos):
         # Primeiro calcula como se fosse Padrão com taxa_bandeira = 1.0
         valor_como_padrao = self.tarifa_base + (distancia_km * self.preco_km * 1.0) + (tempo_minutos * 0.5)
         
         # Aplica acréscimo de 20% sobre o valor da Modalidade Padrão
         return valor_como_padrao * 1.2
+        """
 
 # 3. Classe Associação 1:1: Veículo
 class Veiculo:
@@ -86,15 +118,13 @@ class Veiculo:
         
         return self.__servico_associado.calcular_valor_corrida(distancia_km, tempo_minutos)
 
-# 5. Classe Transação: Corrida
+# 4. Classe Transação: Corrida
 class Corrida:
     def __init__(self, veiculo_utilizado, distancia_km, tempo_minutos):
         self.__veiculo_utilizado = veiculo_utilizado
         self.__distancia_km = distancia_km
         self.__tempo_minutos = tempo_minutos
         self.__data_hora = datetime.now()
-        
-        # Calcula valor usando o método do veículo (que usa método polimórfico)
         self.__valor_total_pago = veiculo_utilizado.realizar_corrida(distancia_km, tempo_minutos)
     
     @property
@@ -124,7 +154,7 @@ class Corrida:
         print(f"Distância: {self.distancia_km} km | Tempo: {self.tempo_minutos} min")
         print(f"Valor total: R$ {self.valor_total_pago:.2f}")
 
-# 4. Classe Associação 1:N: PlataformaDeTransporte
+# 5. Classe Associação 1:N: PlataformaDeTransporte
 class PlataformaDeTransporte:
     def __init__(self):
         self.__veiculos = []
@@ -159,109 +189,113 @@ class PlataformaDeTransporte:
         print(f"Faturamento do dia {hoje.strftime('%d/%m/%Y')}: R$ {total:.2f}")
         return total
     
-    # Método polimórfico para exibir detalhes (requisito adicional 1)
     def exibir_detalhes_corrida(self, corrida):
         if isinstance(corrida, Corrida):
             corrida.exibir_resumo()
         else:
             print("Objeto não é uma corrida válida")
 
-# Exemplo de uso
+# EXEMPLO DE USO
 if __name__ == "__main__":
-    print("=== SISTEMA DE TRANSPORTE POR APLICATIVO ===\n")
+    print("=" * 50)
+    print("SISTEMA DE TRANSPORTE POR APLICATIVO - VERSÃO FINAL")
+    print("=" * 50)
     
-    # Criando serviços com valores DIFERENTES (luxo é mais caro)
-    padrao = ModalidadePadrao(5.0, 2.0, 1.2)  # Padrão: tarifa=5, km=2, taxa_bandeira=1.2
-    luxo = ModalidadeLuxo(8.0, 3.0, 15.0)     # Luxo: tarifa=8, km=3 (mais caro), cancelamento=15
+    # 1. Criar serviços
+    padrao = ModalidadePadrao(tarifa_base=5.0, preco_km=2.0, taxa_bandeira=1.2)
+    luxo = ModalidadeLuxo(tarifa_base=8.0, preco_km=3.0, tarifa_cancelamento=15.0)
     
-    print("1. Criando serviços:")
-    print(f"   - Modalidade Padrão: tarifa_base=R${padrao.tarifa_base}, preco_km=R${padrao.preco_km}/km")
-    print(f"   - Modalidade Luxo: tarifa_base=R${luxo.tarifa_base}, preco_km=R${luxo.preco_km}/km")
-    print(f"     (Luxo tem tarifas mais altas e ainda + 20% sobre cálculo padrão)\n")
+    print("\n1. SERVIÇOS CRIADOS:")
+    print(f"   Padrão: R${padrao.tarifa_base} + R${padrao.preco_km}/km × taxa {padrao.taxa_bandeira}")
+    print(f"   Luxo: 20% sobre cálculo base (R${luxo.tarifa_base} + R${luxo.preco_km}/km)")
+    print(f"   Cancelamento Luxo: R${luxo.tarifa_cancelamento}")
     
-    # Criando veículos
-    carro1 = Veiculo("ABC-1234", "Fiat Uno")
-    carro2 = Veiculo("XYZ-5678", "Toyota Corolla")
+    # 2. Demonstrar polimorfismo
+    print("\n2. DEMONSTRAÇÃO DE POLIMORFISMO (10km, 15min):")
     
-    # Associando serviços (1:1)
+    # Cálculo detalhado do Padrão
+    valor_padrao = padrao.calcular_valor_corrida(10.0, 15.0)
+    print(f"   Padrão: R${padrao.tarifa_base} + (10×{padrao.preco_km}×{padrao.taxa_bandeira}) + (15×0.5)")
+    print(f"          = 5.0 + (10×2.0×1.2) + 7.5")
+    print(f"          = 5.0 + 24.0 + 7.5 = R$ {valor_padrao:.2f}")
+    
+    # Cálculo detalhado do Luxo
+    valor_luxo = luxo.calcular_valor_corrida(10.0, 15.0)
+    print(f"\n   Luxo: [R${luxo.tarifa_base} + (10×{luxo.preco_km}) + (15×0.5)] × 1.2")
+    print(f"        = [8.0 + (10×3.0) + 7.5] × 1.2")
+    print(f"        = [8.0 + 30.0 + 7.5] × 1.2")
+    print(f"        = 45.5 × 1.2 = R$ {valor_luxo:.2f}")
+    
+    print(f"\n   Polimorfismo: mesma chamada 'calcular_valor_corrida(10, 15)'")
+    print(f"                resultados diferentes: R${valor_padrao:.2f} vs R${valor_luxo:.2f}")
+    
+    # 3. Criar veículos
+    carro1 = Veiculo(placa="ABC-1234", modelo="Fiat Uno")
+    carro2 = Veiculo(placa="XYZ-5678", modelo="Toyota Corolla")
+    
+    # 4. Associar serviços (1:1)
     carro1.associar_servico(padrao)
     carro2.associar_servico(luxo)
     
-    print("2. Associando serviços aos veículos:")
-    print(f"   - {carro1.modelo} ({carro1.placa}) → Serviço {carro1.servico_associado.nome}")
-    print(f"   - {carro2.modelo} ({carro2.placa}) → Serviço {carro2.servico_associado.nome}\n")
+    print("\n3. VEÍCULOS E SERVIÇOS (Associação 1:1):")
+    print(f"   {carro1.placa} ({carro1.modelo}) → {carro1.servico_associado.nome}")
+    print(f"   {carro2.placa} ({carro2.modelo}) → {carro2.servico_associado.nome}")
     
-    # Criando plataforma
+    # 5. Criar plataforma e adicionar veículos (1:N)
     plataforma = PlataformaDeTransporte()
-    
-    # Adicionando veículos (1:N)
     plataforma.adicionar_veiculo(carro1)
     plataforma.adicionar_veiculo(carro2)
     
-    print("3. Veículos cadastrados na plataforma:")
+    print("\n4. VEÍCULOS NA PLATAFORMA (Associação 1:N):")
     plataforma.listar_veiculos()
-    print()
     
-    # Registrando corridas
-    print("4. Realizando corridas:")
+    # 6. Registrar corridas
+    print("\n5. REGISTRANDO CORRIDAS:")
     
-    # Corrida 1: Padrão
     try:
-        corrida1 = plataforma.registrar_corrida(carro1, 10.0, 15.0)  # 10km, 15min
-        print("   Corrida 1 (Padrão):")
-        print(f"   - Distância: 10km, Tempo: 15min")
-        print(f"   - Cálculo: {padrao.tarifa_base} + (10 × {padrao.preco_km} × {padrao.taxa_bandeira}) + (15 × 0.5)")
-        print(f"   - Valor: R$ {corrida1.valor_total_pago:.2f}\n")
+        corrida1 = plataforma.registrar_corrida(carro1, distancia_km=10.0, tempo_minutos=15.0)
+        print(f"   ✓ Corrida Padrão registrada")
+        print(f"     Valor: R$ {corrida1.valor_total_pago:.2f}")
     except ValueError as e:
-        print(f"   Erro na corrida 1: {e}\n")
+        print(f"   ✗ Erro: {e}")
     
-    # Corrida 2: Luxo
     try:
-        corrida2 = plataforma.registrar_corrida(carro2, 10.0, 15.0)  # Mesma distância e tempo
-        print("   Corrida 2 (Luxo):")
-        print(f"   - Distância: 10km, Tempo: 15min")
-        print(f"   - Cálculo como Padrão: {luxo.tarifa_base} + (10 × {luxo.preco_km} × 1.0) + (15 × 0.5)")
-        print(f"   - Cálculo Padrão: R$ {luxo.tarifa_base + (10.0 * luxo.preco_km * 1.0) + (15.0 * 0.5):.2f}")
-        print(f"   - Valor final (+20%): R$ {corrida2.valor_total_pago:.2f}\n")
+        corrida2 = plataforma.registrar_corrida(carro2, distancia_km=10.0, tempo_minutos=15.0)
+        print(f"   ✓ Corrida Luxo registrada")
+        print(f"     Valor: R$ {corrida2.valor_total_pago:.2f}")
     except ValueError as e:
-        print(f"   Erro na corrida 2: {e}\n")
+        print(f"   ✗ Erro: {e}")
     
-    # Demonstração do polimorfismo
-    print("5. Demonstração do polimorfismo:")
-    print("   Mesma chamada 'calcular_valor_corrida(10, 15)' resulta em:")
-    print(f"   - Padrão: R$ {padrao.calcular_valor_corrida(10.0, 15.0):.2f}")
-    print(f"   - Luxo: R$ {luxo.calcular_valor_corrida(10.0, 15.0):.2f}")
-    print("   (Cada modalidade calcula do seu jeito!)\n")
+    # 7. Testar tratamento de exceções
+    print("\n6. TESTE DE TRATAMENTO DE ERROS:")
     
-    # Testando tratamento de exceções
-    print("6. Testando tratamento de erros:")
-    carro3 = Veiculo("DEF-9012", "Ford Ka")
+    carro3 = Veiculo(placa="DEF-9012", modelo="Ford Ka")
     
-    # Tentativa de corrida sem serviço
+    # Teste 1: Veículo sem serviço
     try:
-        print("   a) Tentando corrida sem serviço associado:")
         carro3.realizar_corrida(5.0, 10.0)
+        print("   ✗ DEVERIA ter dado erro (sem serviço)!")
     except ValueError as e:
-        print(f"      ✓ Erro capturado: {e}")
+        print(f"   ✓ Erro correto: {e}")
     
-    # Tentativa de corrida com distância inválida
+    # Teste 2: Distância inválida
     try:
-        print("   b) Tentando corrida com distância zero:")
         carro1.realizar_corrida(0, 15.0)
+        print("   ✗ DEVERIA ter dado erro (distância zero)!")
     except ValueError as e:
-        print(f"      ✓ Erro capturado: {e}")
+        print(f"   ✓ Erro correto: {e}")
     
-    # Tentativa de registrar corrida com veículo não cadastrado
+    # Teste 3: Veículo não cadastrado
     try:
-        print("   c) Tentando registrar corrida com veículo não cadastrado:")
         plataforma.registrar_corrida(carro3, 5.0, 10.0)
+        print("   ✗ DEVERIA ter dado erro (veículo não cadastrado)!")
     except ValueError as e:
-        print(f"      ✓ Erro capturado: {e}")
+        print(f"   ✓ Erro correto: {e}")
     
-    print()
-    
-    # Resumo de faturamento
-    print("7. Resumo financeiro:")
+    # 8. Faturamento
+    print("\n7. RESUMO FINANCEIRO:")
     plataforma.resumo_faturamento_diario()
     
-    print("\n=== FIM DA DEMONSTRAÇÃO ===")
+    print("\n" + "=" * 50)
+    print("FIM DO SISTEMA")
+    print("=" * 50)
