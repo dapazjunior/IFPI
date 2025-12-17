@@ -140,20 +140,10 @@ def test_plataforma_veiculo_nao_cadastrado():
     servico = ModalidadePadrao(5.0, 2.0, 1.2)
     veiculo.associar_servico(servico)
     
-    # Teste 1: Veículo não cadastrado
+    # Teste Veículo não cadastrado
     try:
         plataforma.registrar_corrida(veiculo, 10.0, 15.0)
         assert False, "Deveria ter lançado ValueError para veículo não cadastrado"
-    except ValueError as e:
-        assert "Veículo não cadastrado na plataforma" in str(e)
-    
-    # Teste 2: Veículo diferente não cadastrado
-    outro_veiculo = Veiculo("XYZ-9999", "Outro Carro")
-    outro_veiculo.associar_servico(servico)
-    
-    try:
-        plataforma.registrar_corrida(outro_veiculo, 5.0, 10.0)
-        assert False, "Deveria ter lançado ValueError para outro veículo não cadastrado"
     except ValueError as e:
         assert "Veículo não cadastrado na plataforma" in str(e)
     
