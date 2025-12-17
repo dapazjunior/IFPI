@@ -147,7 +147,7 @@ def test_plataforma_veiculo_nao_cadastrado():
     except ValueError as e:
         assert "Veículo não cadastrado na plataforma" in str(e)
     
-    # Teste 3: Verifica que após adicionar, funciona
+    # Verifica que após adicionar, funciona
     plataforma.adicionar_veiculo(veiculo)
     corrida = plataforma.registrar_corrida(veiculo, 10.0, 15.0)
     assert corrida is not None
