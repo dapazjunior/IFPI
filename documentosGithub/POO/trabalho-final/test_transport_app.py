@@ -60,19 +60,31 @@ def test_veiculo_realizar_corrida():
 
 def test_veiculo_realizar_corrida_sem_servico():
     veiculo = Veiculo("ABC-1234", "Fiat Uno")
-    with pytest.raises(ValueError, match="Veículo não possui serviço associado"):
+    
+    try:
         veiculo.realizar_corrida(10.0, 15.0)
+        assert False, "Deveria ter lançado ValueError"
+    except ValueError as e:
+        assert "Veículo não possui serviço associado" in str(e)
 
 def test_veiculo_realizar_corrida_dados_invalidos():
     veiculo = Veiculo("ABC-1234", "Fiat Uno")
     servico = ModalidadePadrao(5.0, 2.0, 1.2)
     veiculo.associar_servico(servico)
     
-    with pytest.raises(ValueError, match="Distância deve ser maior que zero"):
+    # Distância inválida
+    try:
         veiculo.realizar_corrida(0, 15.0)
+        assert False, "Deveria ter lançado ValueError para distância zero"
+    except ValueError as e:
+        assert "Distância deve ser maior que zero" in str(e)
     
-    with pytest.raises(ValueError, match="Tempo deve ser maior que zero"):
+    # Tempo inválido
+    try:
         veiculo.realizar_corrida(10.0, 0)
+        assert False, "Deveria ter lançado ValueError para tempo zero"
+    except ValueError as e:
+        assert "Tempo deve ser maior que zero" in str(e)
 
 # Testes para Corrida
 def test_corrida():
@@ -100,8 +112,27 @@ def test_plataforma():
 
 def test_plataforma_adicionar_veiculo_invalido():
     plataforma = PlataformaDeTransporte()
-    with pytest.raises(ValueError, match="Objeto deve ser instância de Veiculo"):
+    
+    # Teste com objeto inválido (string)
+    try:
         plataforma.adicionar_veiculo("invalido")
+        assert False, "Deveria ter lançado ValueError para objeto inválido"
+    except ValueError as e:
+        assert "Objeto deve ser instância de Veiculo" in str(e)
+    
+    # Teste com número
+    try:
+        plataforma.adicionar_veiculo(123)
+        assert False, "Deveria ter lançado ValueError para número"
+    except ValueError as e:
+        assert "Objeto deve ser instância de Veiculo" in str(e)
+    
+    # Teste com lista
+    try:
+        plataforma.adicionar_veiculo([])
+        assert False, "Deveria ter lançado ValueError para lista"
+    except ValueError as e:
+        assert "Objeto deve ser instância de Veiculo" in str(e)
 
 def test_plataforma_veiculo_nao_cadastrado():
     plataforma = PlataformaDeTransporte()
@@ -109,8 +140,28 @@ def test_plataforma_veiculo_nao_cadastrado():
     servico = ModalidadePadrao(5.0, 2.0, 1.2)
     veiculo.associar_servico(servico)
     
-    with pytest.raises(ValueError, match="Veículo não cadastrado na plataforma"):
+    # Teste 1: Veículo não cadastrado
+    try:
         plataforma.registrar_corrida(veiculo, 10.0, 15.0)
+        assert False, "Deveria ter lançado ValueError para veículo não cadastrado"
+    except ValueError as e:
+        assert "Veículo não cadastrado na plataforma" in str(e)
+    
+    # Teste 2: Veículo diferente não cadastrado
+    outro_veiculo = Veiculo("XYZ-9999", "Outro Carro")
+    outro_veiculo.associar_servico(servico)
+    
+    try:
+        plataforma.registrar_corrida(outro_veiculo, 5.0, 10.0)
+        assert False, "Deveria ter lançado ValueError para outro veículo não cadastrado"
+    except ValueError as e:
+        assert "Veículo não cadastrado na plataforma" in str(e)
+    
+    # Teste 3: Verifica que após adicionar, funciona
+    plataforma.adicionar_veiculo(veiculo)
+    corrida = plataforma.registrar_corrida(veiculo, 10.0, 15.0)
+    assert corrida is not None
+    assert corrida.valor_total_pago == 36.5
 
 # Testes de herança
 def test_heranca():
