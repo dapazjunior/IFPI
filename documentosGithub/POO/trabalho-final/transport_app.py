@@ -23,7 +23,6 @@ class ServicoDeTransporte:
     def calcular_valor_corrida(self, distancia_km, tempo_minutos):
         """Cálculo genérico que os filhos podem adaptar"""
         return self.__tarifa_base + (distancia_km * self.__preco_km) + (tempo_minutos * 0.5)
-    
 
     """
     def calcular_valor_corrida(self, distancia_km, tempo_minutos):
@@ -43,15 +42,9 @@ class ModalidadePadrao(ServicoDeTransporte):
     
     def calcular_valor_corrida(self, distancia_km, tempo_minutos):
         """Sobrescreve cálculo do pai aplicando taxa_bandeira"""
-        # Método ATUAL: aproveita cálculo do pai e ajusta com taxa_bandeira
-        valor_base = super().calcular_valor_corrida(distancia_km, tempo_minutos)
-        
-        # Ajusta: substitui (distancia * preco_km) por (distancia * preco_km * taxa_bandeira)
-        valor_sem_distancia = self.tarifa_base + (tempo_minutos * 0.5)
-        valor_distancia_com_taxa = distancia_km * self.preco_km * self.taxa_bandeira
-        
-        return valor_sem_distancia + valor_distancia_com_taxa
-        
+        # Método 1: Recalcula tudo (mais simples)
+        return self.tarifa_base + (distancia_km * self.preco_km * self.taxa_bandeira) + (tempo_minutos * 0.5)
+           
     """
     def calcular_valor_corrida(self, distancia_km, tempo_minutos):
         # Cálculo: tarifa_base + (distancia_km * preco_km * taxa_bandeira) + (tempo_minutos * 0.5)
@@ -75,14 +68,14 @@ class ModalidadeLuxo(ServicoDeTransporte):
         # Aplica 20% sobre o valor base
         return valor_base * 1.2
         
-        """
-            def calcular_valor_corrida(self, distancia_km, tempo_minutos):
+    """
+    def calcular_valor_corrida(self, distancia_km, tempo_minutos):
         # Primeiro calcula como se fosse Padrão com taxa_bandeira = 1.0
         valor_como_padrao = self.tarifa_base + (distancia_km * self.preco_km * 1.0) + (tempo_minutos * 0.5)
         
         # Aplica acréscimo de 20% sobre o valor da Modalidade Padrão
         return valor_como_padrao * 1.2
-        """
+    """
 
 # 3. Classe Associação 1:1: Veículo
 
