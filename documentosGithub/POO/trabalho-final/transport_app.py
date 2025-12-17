@@ -85,6 +85,7 @@ class ModalidadeLuxo(ServicoDeTransporte):
         """
 
 # 3. Classe Associação 1:1: Veículo
+
 class Veiculo:
     def __init__(self, placa, modelo):
         self.__placa = placa
@@ -119,6 +120,7 @@ class Veiculo:
         return self.__servico_associado.calcular_valor_corrida(distancia_km, tempo_minutos)
 
 # 4. Classe Transação: Corrida
+
 class Corrida:
     def __init__(self, veiculo_utilizado, distancia_km, tempo_minutos):
         self.__veiculo_utilizado = veiculo_utilizado
@@ -155,6 +157,7 @@ class Corrida:
         print(f"Valor total: R$ {self.valor_total_pago:.2f}")
 
 # 5. Classe Associação 1:N: PlataformaDeTransporte
+
 class PlataformaDeTransporte:
     def __init__(self):
         self.__veiculos = []
@@ -196,6 +199,7 @@ class PlataformaDeTransporte:
             print("Objeto não é uma corrida válida")
 
 # EXEMPLO DE USO
+
 if __name__ == "__main__":
     print("=" * 50)
     print("SISTEMA DE TRANSPORTE POR APLICATIVO - VERSÃO FINAL")
