@@ -200,7 +200,7 @@ if __name__ == "__main__":
     
     # 1. Criar serviços
     padrao = ModalidadePadrao(tarifa_base=5.0, preco_km=2.0, taxa_bandeira=1.2)
-    luxo = ModalidadeLuxo(tarifa_base=5.0, preco_km=2.0, tarifa_cancelamento=15.0)
+    luxo = ModalidadeLuxo(tarifa_base=8.0, preco_km=3.0, tarifa_cancelamento=15.0)
     
     print("\n1. SERVIÇOS CRIADOS:")
     print(f"   Padrão: R${padrao.tarifa_base} + R${padrao.preco_km}/km × taxa {padrao.taxa_bandeira}")
