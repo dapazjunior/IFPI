@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>API Cidades</title>
+</head>
+<body>
+
+<h1>API Cidades — Frontend</h1>
+
+<div class="grid">
+
+  <!-- LISTAR TODAS -->
+  <div class="card">
+    <div class="section-title">
+      <span class="tag get">GET</span>
+      <h2>/cidades</h2>
+    </div>
+    <p>Lista todas as cidades. Filtre por UF (opcional).</p>
+    <label>Filtrar por UF (opcional)</label>
+    <input id="list-uf" placeholder="ex: PI" maxlength="2" />
+    <button onclick="listarCidades()">Buscar</button>
+    <div class="response" id="res-list"></div>
+  </div>
+
+  <!-- BUSCAR POR ID -->
+  <div class="card">
+    <div class="section-title">
+      <span class="tag get">GET</span>
+      <h2>/cidades/{id}</h2>
+    </div>
+    <p>Retorna uma cidade pelo ID.</p>
+    <label>ID</label>
+    <input id="get-id" type="number" placeholder="ex: 1" />
+    <button onclick="buscarPorId()">Buscar</button>
+    <div class="response" id="res-get"></div>
+  </div>
+
+  <!-- CRIAR -->
+  <div class="card">
+    <div class="section-title">
+      <span class="tag post">POST</span>
+      <h2>/cidades</h2>
+    </div>
+    <p>Cria uma nova cidade.</p>
+    <label>Nome</label>
+    <input id="post-nome" placeholder="ex: Teresina" />
+    <label>UF</label>
+    <input id="post-uf" placeholder="ex: PI" maxlength="2" />
+    <label>População</label>
+    <input id="post-pop" type="number" placeholder="ex: 1000000" />
+    <label>Ponto Turístico</label>
+    <input id="post-pt" placeholder="ex: Parque Encontro dos Rios" />
+    <button onclick="criarCidade()">Criar</button>
+    <div class="response" id="res-post"></div>
+  </div>
+
+  <!-- ATUALIZAR -->
+  <div class="card">
+    <div class="section-title">
+      <span class="tag put">PUT</span>
+      <h2>/cidades/{id}</h2>
+    </div>
+    <p>Atualiza uma cidade existente pelo ID.</p>
+    <label>ID</label>
+    <input id="put-id" type="number" placeholder="ex: 1" />
+    <label>Nome</label>
+    <input id="put-nome" placeholder="ex: Campinas" />
+    <label>UF</label>
+    <input id="put-uf" placeholder="ex: SP" maxlength="2" />
+    <label>População</label>
+    <input id="put-pop" type="number" placeholder="ex: 1200000" />
+    <label>Ponto Turístico</label>
+    <input id="put-pt" placeholder="ex: Igreja Nossa Senhora do Amparo" />
+    <button onclick="atualizarCidade()">Atualizar</button>
+    <div class="response" id="res-put"></div>
+  </div>
+
+  <!-- DELETAR -->
+  <div class="card">
+    <div class="section-title">
+      <span class="tag del">DELETE</span>
+      <h2>/cidades/{id}</h2>
+    </div>
+    <p>Remove uma cidade pelo ID.</p>
+    <label>ID</label>
+    <input id="del-id" type="number" placeholder="ex: 1" />
+    <button class="danger" onclick="deletarCidade()">Deletar</button>
+    <div class="response" id="res-del"></div>
+  </div>
+
+  <!-- CIDADES POR ESTADO -->
+  <div class="card">
+    <div class="section-title">
+      <span class="tag get">GET</span>
+      <h2>/estados/{sigla}/cidades</h2>
+    </div>
+    <p>Lista cidades de um estado pela sigla.</p>
+    <label>Sigla do Estado</label>
+    <input id="est-sigla" placeholder="ex: RJ" maxlength="2" />
+    <button onclick="cidadesPorEstado()">Buscar</button>
+    <div class="response" id="res-est"></div>
+  </div>
+
+</div>
+
+<script>
+  const BASE = 'https://api-cidades-dapaz.onrender.com';
+
+  function mostrar(id, data) {
+    document.getElementById(id).textContent = JSON.stringify(data, null, 2);
+  }
+
+  async function req(method, path, body, resId) {
+    const opts = {
+      method,
+      headers: { 'Content-Type': 'application/json' }
+    };
+    if (body) {
+      opts.body = JSON.stringify(body);
+    }
+    const res = await fetch(BASE + path, opts);
+    const data = await res.json();
+    mostrar(resId, data);
+  }
+
+  function listarCidades() {
+    const uf = document.getElementById('list-uf').value.trim().toUpperCase();
+    const path = uf ? `/cidades?uf=${uf}` : '/cidades';
+    req('GET', path, null, 'res-list');
+  }
+
+  function buscarPorId() {
+    const id = document.getElementById('get-id').value;
+    req('GET', `/cidades/${id}`, null, 'res-get');
+  }
+
+  function criarCidade() {
+    const body = {
+      nome: document.getElementById('post-nome').value,
+      uf: document.getElementById('post-uf').value.toUpperCase(),
+      populacao: parseInt(document.getElementById('post-pop').value),
+      ponto_turistico: document.getElementById('post-pt').value,
+    };
+    req('POST', '/cidades', body, 'res-post');
+  }
+
+  function atualizarCidade() {
+    const id = document.getElementById('put-id').value;
+    const body = {
+      nome: document.getElementById('put-nome').value,
+      uf: document.getElementById('put-uf').value.toUpperCase(),
+      populacao: parseInt(document.getElementById('put-pop').value),
+      ponto_turistico: document.getElementById('put-pt').value,
+    };
+    req('PUT', `/cidades/${id}`, body, 'res-put');
+  }
+
+  function deletarCidade() {
+    const id = document.getElementById('del-id').value;
+    req('DELETE', `/cidades/${id}`, null, 'res-del');
+  }
+
+  function cidadesPorEstado() {
+    const sigla = document.getElementById('est-sigla').value.trim().toUpperCase();
+    req('GET', `/estados/${sigla}/cidades`, null, 'res-est');
+  }
+</script>
+
+</body>
+</html>
