@@ -1,11 +1,10 @@
 void main() {
-  int x = 10;
-  int y = 12;
+  int x = 5;
+  int y = 7;
 
-  if (x > y)
+  if (x > y) {
     print("X é o Maior, possui $x e Y é o menor, possui $y");
-  else if (x < y)
+  } else {
     print("Y é o Maior, possui $y e X é o menor, possui $x");
-  else 
-    print("X é igual a Y e é $x");
+  }
 }
