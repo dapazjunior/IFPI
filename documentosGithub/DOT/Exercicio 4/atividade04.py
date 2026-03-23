@@ -20,8 +20,8 @@ def maior_soma_segmento(lista):
     maior = float('-inf')
 
     for i in range(len(lista)):
-        soma = 0
-        for j in range(i, len(lista)):
+        soma = lista[i]
+        for j in range(i+1, len(lista)):
             soma += lista[j]
             if soma > maior:
                 maior = soma
