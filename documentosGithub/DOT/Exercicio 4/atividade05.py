@@ -1,9 +1,18 @@
+import random
+
 def main():
-    lista = [1, 2, 3]
+    lista = grava_lista(10)
     resultado = soma_cumulativa(lista)
     print(f"Lista original: {lista}")
     print(f"Soma cumulativa: {resultado}")
 
+def grava_lista(num):
+    lista = []
+
+    for _ in range(num):
+        lista.append(random.randint(1, 100))
+
+    return lista
 
 def soma_cumulativa(lista):
     cumulativa = []

@@ -1,8 +1,19 @@
+import random
+
 def main():
-    lista = [5, -2, -2, 5, 3, 5, 10, -2, 3, 10, 3, 1]
+    lista = grava_lista(10)
     resultado = maior_soma_repetidos(lista)
     print(f"Lista: {lista}")
     print(f"Maior soma dos números que se repetem: {resultado}")
+
+
+def grava_lista(num):
+    lista = []
+
+    for _ in range(num):
+        lista.append(random.randint(-10, 10))
+
+    return lista
 
 
 def maior_soma_repetidos(lista):

@@ -1,8 +1,19 @@
+import random
+
 def main():
-    lista = [2.5, 7.5, 10.0, 4.0]
+    lista = grava_lista(6)
     resultado = mais_proximo_da_media(lista)
     print(f"Lista: {lista}")
     print(f"Valor mais próximo da média: {resultado}")
+
+
+def grava_lista(num):
+    lista = []
+
+    for _ in range(num):
+        lista.append(random.randint(1, 100))
+
+    return lista
 
 
 def mais_proximo_da_media(lista):

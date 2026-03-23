@@ -1,9 +1,20 @@
+import random
+
 def main():
-    lista1 = [1, 2, 3]
-    lista2 = [3, 7, 2]
+    lista1 = grava_lista(5)
+    lista2 = grava_lista(5)
 
     print(f"Lista {lista1}: {esta_ordenada(lista1)}")
     print(f"Lista {lista2}: {esta_ordenada(lista2)}")
+
+
+def grava_lista(num):
+    lista = []
+
+    for _ in range(num):
+        lista.append(random.randint(1, 100))
+
+    return lista
 
 
 def esta_ordenada(lista):
