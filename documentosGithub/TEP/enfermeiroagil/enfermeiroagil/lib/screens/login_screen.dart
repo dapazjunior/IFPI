@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _senhaCtrl.text.trim(),
       );
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/router');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -33,6 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _senhaCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -46,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.local_hospital, size: 64, color: Colors.blue),
+                const Icon(Icons.local_hospital, size: 64, color: Colors.teal),
                 const SizedBox(height: 16),
                 const Text(
                   'Enfermeiro Ágil',

@@ -1,28 +1,41 @@
 class Paciente {
   final String id;
   final String nome;
-  final String leito;
-  final String prioridade;
-  final String observacoes;
+  final String? leito;
+  final String prioridade; // alta | media | baixa
+  final String? hospitalId;
+  final String? observacoes;
   final String? criadoPor;
+  final DateTime criadoEm;
+
+  // Campos auxiliares carregados via join (opcionais)
+  final String? hospitalNome;
 
   Paciente({
     required this.id,
     required this.nome,
-    required this.leito,
+    this.leito,
     required this.prioridade,
-    required this.observacoes,
+    this.hospitalId,
+    this.observacoes,
     this.criadoPor,
+    required this.criadoEm,
+    this.hospitalNome,
   });
 
-  factory Paciente.fromJson(Map<String, dynamic> json) {
+  factory Paciente.fromMap(Map<String, dynamic> map) {
+    // Quando usamos select com join do hospital (hospitais: nome)
+    final hospital = map['hospitais'];
     return Paciente(
-      id: json['id'] as String,
-      nome: json['nome'] as String,
-      leito: json['leito'] as String,
-      prioridade: json['prioridade'] as String? ?? 'baixa',
-      observacoes: json['observacoes'] as String? ?? '',
-      criadoPor: json['criado_por'] as String?,
+      id: map['id'] as String,
+      nome: map['nome'] as String? ?? '',
+      leito: map['leito'] as String?,
+      prioridade: map['prioridade'] as String? ?? 'baixa',
+      hospitalId: map['hospital_id'] as String?,
+      observacoes: map['observacoes'] as String?,
+      criadoPor: map['criado_por'] as String?,
+      criadoEm: DateTime.parse(map['criado_em'] as String),
+      hospitalNome: hospital is Map ? hospital['nome'] as String? : null,
     );
   }
 }

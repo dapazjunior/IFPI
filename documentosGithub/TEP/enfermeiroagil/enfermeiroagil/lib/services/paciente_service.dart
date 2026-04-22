@@ -2,43 +2,81 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/paciente.dart';
 
 class PacienteService {
-  final _client = Supabase.instance.client;
+  final SupabaseClient _supabase;
 
-  Future<List<Paciente>> listarPacientes() async {
-    final data = await _client
+  PacienteService(this._supabase);
+
+  /// Lista pacientes que o usuário atual pode ver (RLS já filtra),
+  /// trazendo também o hospital (nome) via join.
+  Future<List<Paciente>> listarPacientesDoUsuario() async {
+    final rows = await _supabase
         .from('pacientes')
-        .select()
-        .order('prioridade', ascending: true) // alta < baixa alfabeticamente
-        .order('nome', ascending: true);
+        .select('*, hospitais (nome)')
+        .order('criado_em', ascending: false);
 
-    // Ordenação manual por prioridade (alta > media > baixa)
-    final lista = (data as List).map((e) => Paciente.fromJson(e)).toList();
-    const ordem = {'alta': 0, 'media': 1, 'baixa': 2};
-    lista.sort((a, b) =>
-        (ordem[a.prioridade] ?? 2).compareTo(ordem[b.prioridade] ?? 2));
-
-    return lista;
+    return rows.map<Paciente>((r) => Paciente.fromMap(r)).toList();
   }
 
-  Future<void> criarPaciente({
+  /// Cria paciente e vincula automaticamente o enfermeiro atual
+  Future<Paciente> criarPaciente({
     required String nome,
-    required String leito,
-    String prioridade = 'baixa',
-    String observacoes = '',
+    String? leito,
+    required String prioridade,
+    String? hospitalId,
+    String? observacoes,
   }) async {
-    final userId = Supabase.instance.client.auth.currentUser?.id;
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      throw Exception('Usuário não autenticado');
+    }
 
-    await _client.from('pacientes').insert({
-      'nome': nome,
-      'leito': leito,
-      'prioridade': prioridade,
-      'observacoes': observacoes,
-      'criado_por': userId,
+    // 1) criar paciente
+    final pacienteRow = await _supabase
+        .from('pacientes')
+        .insert({
+          'nome': nome.trim(),
+          'leito': leito?.trim(),
+          'prioridade': prioridade,
+          'hospital_id': hospitalId,
+          'observacoes': observacoes?.trim(),
+          'criado_por': user.id,
+        })
+        .select('*, hospitais (nome)')
+        .single();
+
+    final paciente = Paciente.fromMap(pacienteRow);
+
+    // 2) vincular enfermeiro atual na tabela paciente_enfermeiros
+    await _supabase.from('paciente_enfermeiros').insert({
+      'paciente_id': paciente.id,
+      'enfermeiro_id': user.id,
+      'adicionado_por': user.id,
+    });
+
+    return paciente;
+  }
+
+  /// Compartilha paciente com outro enfermeiro
+  Future<void> compartilharPacienteComEnfermeiro({
+    required String pacienteId,
+    required String enfermeiroId,
+  }) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      throw Exception('Usuário não autenticado');
+    }
+
+    await _supabase.from('paciente_enfermeiros').upsert({
+      'paciente_id': pacienteId,
+      'enfermeiro_id': enfermeiroId,
+      'adicionado_por': user.id,
     });
   }
 
-  Future<void> deletarPaciente(String id) async {
-    // As tarefas são deletadas automaticamente pelo ON DELETE CASCADE
-    await _client.from('pacientes').delete().eq('id', id);
+  Future<void> deletarPaciente(String pacienteId) async {
+    await _supabase
+        .from('pacientes')
+        .delete()
+        .eq('id', pacienteId);
   }
 }
