@@ -35,6 +35,26 @@ class Atendimento {
     this.prioridade,
   });
 
+  static DateTime? _parseDateNullable(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String && value.isNotEmpty) {
+      return DateTime.tryParse(value);
+    }
+    return null;
+  }
+
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) {
+      return DateTime.now();
+    }
+    if (value is DateTime) return value;
+    if (value is String && value.isNotEmpty) {
+      return DateTime.parse(value);
+    }
+    throw Exception('Formato de data inválido para criado_em: $value');
+  }
+
   factory Atendimento.fromMap(Map<String, dynamic> map) {
     final paciente = map['pacientes'];
     final hospital = paciente is Map ? paciente['hospitais'] : null;
@@ -43,7 +63,10 @@ class Atendimento {
     // recorrencia_dias vem como List<dynamic> do Supabase
     List<int>? dias;
     if (map['recorrencia_dias'] != null) {
-      dias = (map['recorrencia_dias'] as List).map((e) => e as int).toList();
+      final raw = map['recorrencia_dias'];
+      if (raw is List) {
+        dias = raw.map((e) => (e as num).toInt()).toList();
+      }
     }
 
     return Atendimento(
@@ -52,17 +75,13 @@ class Atendimento {
       tipoAtendimentoId: map['tipo_atendimento_id'] as String?,
       descricao: map['descricao'] as String?,
       horarioPrevisto: map['horario_previsto'] as String?,
-      dataPrevista: map['data_prevista'] != null
-          ? DateTime.tryParse(map['data_prevista'] as String)
-          : null,
+      dataPrevista: _parseDateNullable(map['data_prevista']),
       recorrente: map['recorrente'] as bool? ?? false,
       recorrenciaDias: dias,
-      recorrenciaFim: map['recorrencia_fim'] != null
-          ? DateTime.tryParse(map['recorrencia_fim'] as String)
-          : null,
+      recorrenciaFim: _parseDateNullable(map['recorrencia_fim']),
       status: map['status'] as String? ?? 'pendente',
       criadoPor: map['criado_por'] as String?,
-      criadoEm: DateTime.parse(map['criado_em'] as String),
+      criadoEm: _parseDate(map['criado_em']),
       pacienteNome: paciente is Map ? paciente['nome'] as String? : null,
       prioridade: paciente is Map ? paciente['prioridade'] as String? : null,
       hospitalNome: hospital is Map ? hospital['nome'] as String? : null,
@@ -70,10 +89,12 @@ class Atendimento {
     );
   }
 
-  // Label legível dos dias de recorrência
   String get recorrenciaDiasLabel {
     if (recorrenciaDias == null || recorrenciaDias!.isEmpty) return '';
     const nomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    return recorrenciaDias!.map((d) => nomes[d]).join(', ');
+    return recorrenciaDias!.map((d) {
+      if (d < 0 || d > 6) return '?';
+      return nomes[d];
+    }).join(', ');
   }
 }

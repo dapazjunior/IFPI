@@ -19,6 +19,17 @@ class Conta {
     required this.criadoEm,
   });
 
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) {
+      return DateTime.now();
+    }
+    if (value is DateTime) return value;
+    if (value is String && value.isNotEmpty) {
+      return DateTime.parse(value);
+    }
+    throw Exception('Formato de data inválido para criado_em: $value');
+  }
+
   factory Conta.fromMap(Map<String, dynamic> map) {
     return Conta(
       id: map['id'] as String,
@@ -28,7 +39,7 @@ class Conta {
       nomeEquipe: map['nome_equipe'] as String?,
       planoAtivo: map['plano_ativo'] as bool? ?? true,
       statusPagamento: map['status_pagamento'] as String? ?? 'ativo',
-      criadoEm: DateTime.parse(map['criado_em'] as String),
+      criadoEm: _parseDate(map['criado_em']),
     );
   }
 }

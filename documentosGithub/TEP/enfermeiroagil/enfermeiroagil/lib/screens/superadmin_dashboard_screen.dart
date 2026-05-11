@@ -25,6 +25,19 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen> {
     _futureUsuarios = _usuarioService.listarTodosUsuarios();
   }
 
+  Color _corTipoUsuario(Usuario u) {
+    if (u.isAdminSistema) return Colors.purple;
+    if (u.isGestor) return Colors.blue;
+    return Colors.teal;
+  }
+
+  String _labelTipoUsuario(Usuario u) {
+    if (u.isAdminSistema) return 'Admin Sistema';
+    if (u.isGestor) return 'Gestor';
+    if (u.isProfissional) return 'Profissional';
+    return u.tipoUsuario;
+  }
+
   @override
   Widget build(BuildContext context) {
     final u = widget.usuario;
@@ -54,18 +67,18 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen> {
               final user = lista[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: user.role == 'superadmin'
-                      ? Colors.purple
-                      : user.role == 'admin'
-                          ? Colors.blue
-                          : Colors.teal,
+                  backgroundColor: _corTipoUsuario(user),
                   child: Text(
-                    user.nome.substring(0, 1).toUpperCase(),
+                    user.nome.isNotEmpty
+                        ? user.nome.substring(0, 1).toUpperCase()
+                        : '?',
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 title: Text(user.nome),
-                subtitle: Text('${user.email} • ${user.role}'),
+                subtitle: Text(
+                  '${user.email} • ${_labelTipoUsuario(user)}',
+                ),
                 trailing: Switch(
                   value: !user.bloqueado,
                   onChanged: (ativo) async {
@@ -78,8 +91,9 @@ class _SuperAdminDashboardScreenState extends State<SuperAdminDashboardScreen> {
                       if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content:
-                              Text('Erro ao atualizar bloqueio: ${e.toString()}'),
+                          content: Text(
+                            'Erro ao atualizar bloqueio: ${e.toString()}',
+                          ),
                         ),
                       );
                     }

@@ -6,6 +6,7 @@ class Paciente {
   final String? hospitalId;
   final String? observacoes;
   final String? criadoPor;
+  final String? contaId;
   final DateTime criadoEm;
 
   // Campos auxiliares carregados via join (opcionais)
@@ -19,13 +20,26 @@ class Paciente {
     this.hospitalId,
     this.observacoes,
     this.criadoPor,
+    this.contaId,
     required this.criadoEm,
     this.hospitalNome,
   });
 
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) {
+      return DateTime.now();
+    }
+    if (value is DateTime) return value;
+    if (value is String && value.isNotEmpty) {
+      return DateTime.parse(value);
+    }
+    throw Exception('Formato de data inválido para criado_em: $value');
+  }
+
   factory Paciente.fromMap(Map<String, dynamic> map) {
     // Quando usamos select com join do hospital (hospitais: nome)
     final hospital = map['hospitais'];
+
     return Paciente(
       id: map['id'] as String,
       nome: map['nome'] as String? ?? '',
@@ -34,7 +48,8 @@ class Paciente {
       hospitalId: map['hospital_id'] as String?,
       observacoes: map['observacoes'] as String?,
       criadoPor: map['criado_por'] as String?,
-      criadoEm: DateTime.parse(map['criado_em'] as String),
+      contaId: map['conta_id'] as String?,
+      criadoEm: _parseDate(map['criado_em']),
       hospitalNome: hospital is Map ? hospital['nome'] as String? : null,
     );
   }

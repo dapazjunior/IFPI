@@ -4,12 +4,11 @@ class Usuario {
   final String nome;
   final String? telefone;
   final String? documento;
-  final String tipoUsuario; // 'admin_sistema' | 'gestor' | 'profissional'
+  final String tipoUsuario;
   final String? contaId;
   final bool ativo;
   final bool emServico;
-  final bool bloqueado; // se não tiver na tabela, remova
-  final String role; // legado, se já existir; senão pode remover
+  final bool bloqueado;
   final DateTime criadoEm;
 
   Usuario({
@@ -23,15 +22,26 @@ class Usuario {
     required this.ativo,
     required this.emServico,
     required this.bloqueado,
-    required this.role,
     required this.criadoEm,
   });
+
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) {
+      // fallback simples para evitar crash; se preferir, pode lançar exceção
+      return DateTime.now();
+    }
+    if (value is DateTime) return value;
+    if (value is String && value.isNotEmpty) {
+      return DateTime.parse(value);
+    }
+    throw Exception('Formato de data inválido para criado_em: $value');
+  }
 
   factory Usuario.fromMap(Map<String, dynamic> map) {
     return Usuario(
       id: map['id'] as String,
       email: map['email'] as String,
-      nome: map['nome'] as String,
+      nome: map['nome'] as String? ?? '',
       telefone: map['telefone'] as String?,
       documento: map['documento'] as String?,
       tipoUsuario: map['tipo_usuario'] as String? ?? 'profissional',
@@ -39,8 +49,7 @@ class Usuario {
       ativo: map['ativo'] as bool? ?? true,
       emServico: map['em_servico'] as bool? ?? false,
       bloqueado: map['bloqueado'] as bool? ?? false,
-      role: map['role'] as String? ?? 'enfermeiro',
-      criadoEm: DateTime.parse(map['criado_em'] as String),
+      criadoEm: _parseDate(map['criado_em']),
     );
   }
 

@@ -50,4 +50,22 @@ class ContaService {
     if (row == null) return null;
     return Conta.fromMap(row);
   }
+
+  /// Lista todas as contas do sistema.
+  /// Uso exclusivo do admin_sistema — requer RLS permissiva para esse role.
+  Future<List<Conta>> listarTodasContas() async {
+    final rows = await _supabase
+        .from('contas')
+        .select()
+        .order('criado_em', ascending: false);
+
+    return rows.map<Conta>((r) => Conta.fromMap(r)).toList();
+  }
+
+  /// Ativa ou desativa o plano de uma conta (campo plano_ativo).
+  Future<void> setPlanoAtivo(String contaId, bool ativo) async {
+    await _supabase
+        .from('contas')
+        .update({'plano_ativo': ativo}).eq('id', contaId);
+  }
 }

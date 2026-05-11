@@ -17,8 +17,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final _documentoCtrl = TextEditingController();
   final _nomeEquipeCtrl = TextEditingController();
 
-  String _tipoConta = 'individual'; // 'individual' | 'gestor'
-  String _planoGestor = 'homecare'; // 'homecare' | 'equipe'
+  String _tipoConta = 'individual';
+  String _planoGestor = 'homecare';
   bool _carregando = false;
   String? _erro;
 
@@ -57,13 +57,13 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-              'Conta criada com sucesso! Verifique seu e-mail para confirmar.'),
-        ),
+        const SnackBar(content: Text('Conta criada com sucesso!')),
       );
-      Navigator.pop(context);
+
+      // Usuário já está logado após o signup, vai direto para o router
+      Navigator.pushReplacementNamed(context, '/router');
     } catch (e) {
       setState(() {
         _erro = e.toString();
@@ -95,6 +95,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       labelText: 'Nome completo',
                       border: OutlineInputBorder(),
                     ),
+                    textCapitalization: TextCapitalization.words,
                     validator: (value) {
                       if (value == null || value.trim().length < 3) {
                         return 'Informe seu nome completo';
@@ -243,8 +244,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
                         _erro!,
-                        style:
-                            const TextStyle(color: Colors.red, fontSize: 13),
+                        style: const TextStyle(
+                            color: Colors.red, fontSize: 13),
                       ),
                     ),
                   SizedBox(
@@ -257,8 +258,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white),
                               ),
                             )
                           : const Text('Criar conta'),

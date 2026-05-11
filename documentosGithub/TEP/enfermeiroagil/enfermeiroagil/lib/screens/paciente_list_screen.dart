@@ -4,7 +4,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/paciente.dart';
 import '../models/usuario.dart';
 import '../services/paciente_service.dart';
-import 'paciente_form_screen.dart';
 import 'paciente_detalhes_screen.dart';
 
 class PacienteListScreen extends StatefulWidget {
