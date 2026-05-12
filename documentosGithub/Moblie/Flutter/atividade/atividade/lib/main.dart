@@ -34,6 +34,31 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _textEditingControllerAlcool =
   TextEditingController();
 
+  String _resultado = ''; // Variável para armazenar o resultado do cálculo
+
+  void _calcularCombustivel() {
+    double? precoGasolina = double.tryParse(_textEditingControllerGasolina.text);
+    double? precoAlcool = double.tryParse(_textEditingControllerAlcool.text);
+
+    if (precoGasolina == null || precoAlcool == null || precoGasolina <= 0 || precoAlcool <= 0) {
+      setState(() {
+        _resultado = 'Por favor, insira valores válidos.';
+      });
+      return;
+    }
+
+    double proporcao = precoAlcool / precoGasolina;
+    String percentual = (proporcao * 100).toStringAsFixed(2); // Calcula o percentual e formata
+
+    setState(() {
+      if (proporcao < 0.7) {
+        _resultado = 'Compensa mais abastecer com Álcool! O álcool custa $percentual% da gasolina.';
+      } else {
+        _resultado = 'Compensa mais abastecer com Gasolina! O álcool custa $percentual% da gasolina.';
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,11 +93,16 @@ class _MyHomePageState extends State<MyHomePage> {
               controller: _textEditingControllerAlcool,
             ),
             ElevatedButton(
-              onPressed: () {
-              print('Valor da gasolina: ' + _textEditingControllerGasolina.text);
-              print('Valor do Alcool: ' + _textEditingControllerAlcool.text);
-            }, 
-            child: Text('Calcular'),
+              onPressed: _calcularCombustivel,
+              child: const Text('Calcular'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                _resultado,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
