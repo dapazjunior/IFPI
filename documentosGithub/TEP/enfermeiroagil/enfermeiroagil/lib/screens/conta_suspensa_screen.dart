@@ -11,36 +11,67 @@ class ContaSuspensaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.block,
-                  size: 72,
-                  color: Colors.red,
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Ícone com fundo circular
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Acesso suspenso',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Icon(
+                  Icons.lock_outline_rounded,
+                  size: 56,
+                  color: Colors.red.shade400,
                 ),
-                const SizedBox(height: 12),
-                Text(
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                'Acesso suspenso',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.shade100),
+                ),
+                child: Text(
                   motivo,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade700,
+                    height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 40),
-                OutlinedButton.icon(
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Entre em contato com o administrador\ndo sistema para regularizar sua situação.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey.shade500,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton.icon(
                   onPressed: () async {
                     await AuthService().logout();
                     if (!context.mounted) return;
@@ -51,10 +82,10 @@ class ContaSuspensaScreen extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.logout),
-                  label: const Text('Sair'),
+                  label: const Text('Sair da conta'),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

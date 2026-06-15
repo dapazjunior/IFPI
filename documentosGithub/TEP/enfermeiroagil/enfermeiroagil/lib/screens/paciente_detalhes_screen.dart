@@ -34,9 +34,7 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
   late final PacienteService _pacienteService;
   late final HospitalService _hospitalService;
 
-  // Paciente pode ser atualizado após edição
   late Paciente _paciente;
-
   List<Atendimento> _todos = [];
   bool _carregando = true;
   bool _mostrarHistorico = false;
@@ -72,10 +70,38 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
     }
   }
 
+  Color _corPrioridade(String prioridade) {
+    switch (prioridade) {
+      case 'alta':
+        return Colors.red;
+      case 'media':
+        return Colors.orange;
+      default:
+        return Colors.green;
+    }
+  }
+
+  String _labelPrioridade(String prioridade) {
+    switch (prioridade) {
+      case 'alta':
+        return 'Prioridade Alta';
+      case 'media':
+        return 'Prioridade Média';
+      default:
+        return 'Prioridade Baixa';
+    }
+  }
+
+  String _formatarData(DateTime? data) {
+    if (data == null) return '';
+    return '${data.day.toString().padLeft(2, '0')}/'
+        '${data.month.toString().padLeft(2, '0')}/'
+        '${data.year}';
+  }
+
   // ─── Editar paciente ──────────────────────────────────────────────────────
 
   Future<void> _abrirFormEdicao() async {
-    // Carrega hospitais disponíveis
     List<Hospital> hospitais = [];
     try {
       hospitais = await _hospitalService.listarHospitais();
@@ -86,7 +112,6 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
     final obsCtrl = TextEditingController(text: _paciente.observacoes ?? '');
     String prioridade = _paciente.prioridade;
 
-    // Tenta encontrar o hospital atual na lista
     Hospital? hospitalSelecionado;
     if (_paciente.hospitalId != null) {
       try {
@@ -98,7 +123,7 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
 
     final formKey = GlobalKey<FormState>();
 
-    final salvo = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setStateDialog) => AlertDialog(
@@ -108,60 +133,78 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
               key: formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextFormField(
                     controller: nomeCtrl,
                     decoration: const InputDecoration(
                       labelText: 'Nome *',
-                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.person_outline),
                     ),
                     textCapitalization: TextCapitalization.words,
-                    validator: (v) =>
-                        v == null || v.trim().isEmpty ? 'Informe o nome' : null,
+                    validator: (v) => v == null || v.trim().isEmpty
+                        ? 'Informe o nome'
+                        : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: leitoCtrl,
                     decoration: const InputDecoration(
                       labelText: 'Leito (opcional)',
-                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.bed_outlined),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  const Text('Prioridade',
-                      style: TextStyle(fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Prioridade',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  SegmentedButton<String>(
-                    segments: const [
-                      ButtonSegment(
+                  Row(
+                    children: [
+                      _chipPrioridade(
+                        ctx: ctx,
+                        label: 'Alta',
                         value: 'alta',
-                        label: Text('Alta'),
-                        icon: Icon(Icons.priority_high, color: Colors.red),
+                        atual: prioridade,
+                        cor: Colors.red,
+                        onTap: () =>
+                            setStateDialog(() => prioridade = 'alta'),
                       ),
-                      ButtonSegment(
+                      const SizedBox(width: 6),
+                      _chipPrioridade(
+                        ctx: ctx,
+                        label: 'Média',
                         value: 'media',
-                        label: Text('Média'),
-                        icon: Icon(Icons.remove, color: Colors.orange),
+                        atual: prioridade,
+                        cor: Colors.orange,
+                        onTap: () =>
+                            setStateDialog(() => prioridade = 'media'),
                       ),
-                      ButtonSegment(
+                      const SizedBox(width: 6),
+                      _chipPrioridade(
+                        ctx: ctx,
+                        label: 'Baixa',
                         value: 'baixa',
-                        label: Text('Baixa'),
-                        icon: Icon(Icons.arrow_downward, color: Colors.green),
+                        atual: prioridade,
+                        cor: Colors.green,
+                        onTap: () =>
+                            setStateDialog(() => prioridade = 'baixa'),
                       ),
                     ],
-                    selected: {prioridade},
-                    onSelectionChanged: (s) =>
-                        setStateDialog(() => prioridade = s.first),
                   ),
                   const SizedBox(height: 12),
-                  const Text('Hospital',
-                      style: TextStyle(fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 8),
                   DropdownButtonFormField<Hospital>(
                     value: hospitalSelecionado,
                     decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                      labelText: 'Hospital',
+                      prefixIcon: Icon(Icons.local_hospital_outlined),
                     ),
                     hint: const Text('Selecione o hospital'),
                     items: hospitais
@@ -178,7 +221,8 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
                     controller: obsCtrl,
                     decoration: const InputDecoration(
                       labelText: 'Observações (opcional)',
-                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.notes_outlined),
+                      alignLabelWithHint: true,
                     ),
                     maxLines: 3,
                   ),
@@ -188,7 +232,7 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
+              onPressed: () => Navigator.pop(ctx),
               child: const Text('Cancelar'),
             ),
             ElevatedButton(
@@ -208,8 +252,13 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
                         ? null
                         : obsCtrl.text.trim(),
                   );
-                  if (ctx.mounted) Navigator.pop(ctx, true);
                   setState(() => _paciente = pacienteAtualizado);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Paciente atualizado com sucesso!')),
+                  );
                 } catch (e) {
                   if (ctx.mounted) {
                     ScaffoldMessenger.of(ctx).showSnackBar(
@@ -224,13 +273,43 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
         ),
       ),
     );
+  }
 
-    if (salvo == true) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Paciente atualizado com sucesso!')),
-      );
-    }
+  Widget _chipPrioridade({
+    required BuildContext ctx,
+    required String label,
+    required String value,
+    required String atual,
+    required Color cor,
+    required VoidCallback onTap,
+  }) {
+    final selecionado = atual == value;
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: selecionado ? cor.withOpacity(0.15) : Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: selecionado ? cor : Colors.transparent,
+              width: 2,
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+              color: selecionado ? cor : Colors.grey.shade600,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   // ─── Deletar paciente ─────────────────────────────────────────────────────
@@ -270,7 +349,7 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Paciente removido.')),
       );
-      Navigator.pop(context, true); // Volta para a lista sinalizando mudança
+      Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -282,134 +361,129 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
   // ─── Compartilhar paciente ────────────────────────────────────────────────
 
   Future<void> _compartilharPaciente() async {
-  if (widget.usuario.contaId == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Usuário sem conta associada.')),
-    );
-    return;
-  }
-
-  try {
-    final profissionais = await _usuarioService
-        .listarProfissionaisDaConta(widget.usuario.contaId!);
-
-    final outros = profissionais
-        .where((p) => p.id != widget.usuario.id)
-        .toList();
-
-    if (outros.isEmpty) {
-      if (!mounted) return;
+    if (widget.usuario.contaId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Não há outros profissionais na sua equipe para compartilhar.',
-          ),
-        ),
+        const SnackBar(content: Text('Usuário sem conta associada.')),
       );
       return;
     }
 
-    Usuario? selecionado;
-    bool compartilharComTodos = false;
+    try {
+      final profissionais = await _usuarioService
+          .listarProfissionaisDaConta(widget.usuario.contaId!);
 
-    final resultado = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setStateDialog) => AlertDialog(
-          title: const Text('Compartilhar paciente'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (widget.usuario.isGestor) ...[
-                CheckboxListTile(
-                  value: compartilharComTodos,
-                  onChanged: (v) =>
-                      setStateDialog(() => compartilharComTodos = v ?? false),
-                  title: const Text('Compartilhar com toda a equipe'),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                const Divider(),
-              ],
-              if (!compartilharComTodos) ...[
-                const Text(
-                  'Selecione o profissional que poderá ver este paciente:',
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<Usuario>(
-                  decoration: const InputDecoration(
-                    labelText: 'Profissional',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: outros
-                      .map((p) => DropdownMenuItem(
-                            value: p,
-                            child: Text(p.nome),
-                          ))
-                      .toList(),
-                  onChanged: (value) =>
-                      setStateDialog(() => selecionado = value),
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (!compartilharComTodos && selecionado == null) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    const SnackBar(
-                        content: Text('Selecione um profissional')),
-                  );
-                  return;
-                }
-                Navigator.pop(ctx, true);
-              },
-              child: const Text('Compartilhar'),
-            ),
-          ],
-        ),
-      ),
-    );
+      final outros =
+          profissionais.where((p) => p.id != widget.usuario.id).toList();
 
-    if (resultado == true) {
-      if (compartilharComTodos) {
-        await _pacienteService.compartilharComTodaEquipe(
-          pacienteId: _paciente.id,
-          contaId: widget.usuario.contaId!,
-        );
+      if (outros.isEmpty) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Paciente compartilhado com toda a equipe.'),
-          ),
-        );
-      } else if (selecionado != null) {
-        await _pacienteService.compartilharPacienteComEnfermeiro(
-          pacienteId: _paciente.id,
-          enfermeiroId: selecionado!.id,
-        );
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
             content: Text(
-                'Paciente compartilhado com ${selecionado!.nome}.'),
+                'Não há outros profissionais na sua equipe para compartilhar.'),
           ),
         );
+        return;
       }
+
+      Usuario? selecionado;
+      bool compartilharComTodos = false;
+
+      final resultado = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, setStateDialog) => AlertDialog(
+            title: const Text('Compartilhar paciente'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.usuario.isGestor) ...[
+                  CheckboxListTile(
+                    value: compartilharComTodos,
+                    onChanged: (v) => setStateDialog(
+                        () => compartilharComTodos = v ?? false),
+                    title: const Text('Compartilhar com toda a equipe'),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  const Divider(),
+                ],
+                if (!compartilharComTodos) ...[
+                  const Text(
+                      'Selecione o profissional que poderá ver este paciente:'),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<Usuario>(
+                    decoration: const InputDecoration(
+                      labelText: 'Profissional',
+                      prefixIcon: Icon(Icons.person_outline),
+                    ),
+                    items: outros
+                        .map((p) => DropdownMenuItem(
+                              value: p,
+                              child: Text(p.nome),
+                            ))
+                        .toList(),
+                    onChanged: (value) =>
+                        setStateDialog(() => selecionado = value),
+                  ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (!compartilharComTodos && selecionado == null) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(
+                          content: Text('Selecione um profissional')),
+                    );
+                    return;
+                  }
+                  Navigator.pop(ctx, true);
+                },
+                child: const Text('Compartilhar'),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (resultado == true) {
+        if (compartilharComTodos) {
+          await _pacienteService.compartilharComTodaEquipe(
+            pacienteId: _paciente.id,
+            contaId: widget.usuario.contaId!,
+          );
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content:
+                    Text('Paciente compartilhado com toda a equipe.')),
+          );
+        } else if (selecionado != null) {
+          await _pacienteService.compartilharPacienteComEnfermeiro(
+            pacienteId: _paciente.id,
+            enfermeiroId: selecionado!.id,
+          );
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(
+                    'Paciente compartilhado com ${selecionado!.nome}.')),
+          );
+        }
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao compartilhar paciente: $e')),
+      );
     }
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao compartilhar paciente: $e')),
-    );
   }
-}
 
   // ─── Status de atendimento ────────────────────────────────────────────────
 
@@ -417,7 +491,7 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
     setState(() {
       final index = _todos.indexWhere((x) => x.id == a.id);
       if (index != -1) {
-        _todos[index] = _TodosAtendimentosHelper.comStatus(
+        _todos[index] = _AtendimentoHelper.comStatus(
           _todos[index],
           a.status == 'pendente' ? 'concluido' : 'pendente',
         );
@@ -470,9 +544,9 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setStateDialog) => AlertDialog(
-          title: Text(existente == null
-              ? 'Novo atendimento'
-              : 'Editar atendimento'),
+          title: Text(
+            existente == null ? 'Novo atendimento' : 'Editar atendimento',
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -481,7 +555,7 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
                 DropdownButtonFormField<TipoAtendimento>(
                   decoration: const InputDecoration(
                     labelText: 'Tipo de atendimento',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.medical_services_outlined),
                   ),
                   value: tipoSelecionado,
                   items: tipos
@@ -497,60 +571,83 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
                   controller: descCtrl,
                   decoration: const InputDecoration(
                     labelText: 'Descrição (opcional)',
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.notes_outlined),
                   ),
                   maxLines: 2,
                 ),
-                const SizedBox(height: 12),
-                const Text('Data prevista',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
-                const SizedBox(height: 6),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.calendar_today),
-                  label: Text(dataSelecionada == null
-                      ? 'Selecionar data'
-                      : '${dataSelecionada!.day.toString().padLeft(2, '0')}/'
-                          '${dataSelecionada!.month.toString().padLeft(2, '0')}/'
-                          '${dataSelecionada!.year}'),
-                  onPressed: () async {
-                    final picked = await showDatePicker(
-                      context: ctx,
-                      initialDate: dataSelecionada ?? DateTime.now(),
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now()
-                          .add(const Duration(days: 365 * 2)),
-                    );
-                    if (picked != null) {
-                      setStateDialog(() => dataSelecionada = picked);
-                    }
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: horarioCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Horário previsto (ex: 08:00)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.access_time),
+                const SizedBox(height: 16),
+                Text(
+                  'Data e horário',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
-                  onTap: () async {
-                    final picked = await showTimePicker(
-                      context: ctx,
-                      initialTime: TimeOfDay.now(),
-                    );
-                    if (picked != null) {
-                      horarioCtrl.text =
-                          '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-                    }
-                  },
-                  readOnly: true,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.calendar_today, size: 16),
+                        label: Text(
+                          dataSelecionada == null
+                              ? 'Selecionar data'
+                              : _formatarData(dataSelecionada),
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                        onPressed: () async {
+                          final picked = await showDatePicker(
+                            context: ctx,
+                            initialDate: dataSelecionada ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime.now()
+                                .add(const Duration(days: 365 * 2)),
+                          );
+                          if (picked != null) {
+                            setStateDialog(() => dataSelecionada = picked);
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.access_time, size: 16),
+                        label: Text(
+                          horarioCtrl.text.isEmpty
+                              ? 'Horário'
+                              : horarioCtrl.text,
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                        onPressed: () async {
+                          final picked = await showTimePicker(
+                            context: ctx,
+                            initialTime: TimeOfDay.now(),
+                          );
+                          if (picked != null) {
+                            setStateDialog(() {
+                              horarioCtrl.text =
+                                  '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Text('Recorrente?',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
-                    const SizedBox(width: 8),
+                    Text(
+                      'Recorrente?',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const Spacer(),
                     Switch(
                       value: recorrente,
                       onChanged: (v) =>
@@ -559,17 +656,19 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
                   ],
                 ),
                 if (recorrente) ...[
-                  const SizedBox(height: 8),
-                  const Text('Dias da semana',
-                      style: TextStyle(fontWeight: FontWeight.w500)),
+                  const Text(
+                    'Dias da semana',
+                    style: TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w500),
+                  ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 6,
                     children: List.generate(7, (i) {
-                      final selecionado = diasSelecionados.contains(i);
+                      final sel = diasSelecionados.contains(i);
                       return FilterChip(
                         label: Text(nomesDias[i]),
-                        selected: selecionado,
+                        selected: sel,
                         onSelected: (v) {
                           setStateDialog(() {
                             if (v) {
@@ -584,21 +683,20 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
                     }),
                   ),
                   const SizedBox(height: 12),
-                  const Text('Repetir até',
-                      style: TextStyle(fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 6),
                   OutlinedButton.icon(
-                    icon: const Icon(Icons.event_busy),
-                    label: Text(recorrenciaFim == null
-                        ? 'Sem data de fim'
-                        : '${recorrenciaFim!.day.toString().padLeft(2, '0')}/'
-                            '${recorrenciaFim!.month.toString().padLeft(2, '0')}/'
-                            '${recorrenciaFim!.year}'),
+                    icon: const Icon(Icons.event_busy, size: 16),
+                    label: Text(
+                      recorrenciaFim == null
+                          ? 'Sem data de fim'
+                          : 'Até ${_formatarData(recorrenciaFim)}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
                     onPressed: () async {
                       final picked = await showDatePicker(
                         context: ctx,
                         initialDate: recorrenciaFim ??
-                            DateTime.now().add(const Duration(days: 30)),
+                            DateTime.now()
+                                .add(const Duration(days: 30)),
                         firstDate: DateTime.now(),
                         lastDate: DateTime.now()
                             .add(const Duration(days: 365 * 2)),
@@ -662,7 +760,8 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
                   if (ctx.mounted) {
                     ScaffoldMessenger.of(ctx).showSnackBar(
                       SnackBar(
-                          content: Text('Erro ao salvar atendimento: $e')),
+                          content:
+                              Text('Erro ao salvar atendimento: $e')),
                     );
                   }
                 }
@@ -674,48 +773,46 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
       ),
     );
 
-    if (resultado == 'save') {
-      await _recarregar();
-    }
+    if (resultado == 'save') await _recarregar();
   }
 
-  // ─── Helpers visuais ──────────────────────────────────────────────────────
-
-  Color _corPrioridade(String prioridade) {
-    switch (prioridade) {
-      case 'alta':
-        return Colors.red.shade100;
-      case 'media':
-        return Colors.orange.shade100;
-      case 'baixa':
-      default:
-        return Colors.green.shade100;
-    }
-  }
-
-  String _formatarData(DateTime? data) {
-    if (data == null) return '';
-    return '${data.day.toString().padLeft(2, '0')}/'
-        '${data.month.toString().padLeft(2, '0')}/'
-        '${data.year}';
-  }
+  // ─── Card de atendimento ──────────────────────────────────────────────────
 
   Widget _buildCardAtendimento(Atendimento a) {
     final concluido = a.status == 'concluido';
 
-    return Card(
-      color: concluido ? Colors.grey.shade100 : null,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: concluido ? Colors.grey.shade50 : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border(
+          left: BorderSide(
+            color: concluido ? Colors.grey.shade300 : Colors.teal,
+            width: 3,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: ListTile(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
         leading: GestureDetector(
           onTap: () => _alternarStatus(a),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
             child: Icon(
               concluido
-                  ? Icons.check_circle
+                  ? Icons.check_circle_rounded
                   : Icons.radio_button_unchecked,
               key: ValueKey(concluido),
-              color: concluido ? Colors.green : Colors.grey,
+              color: concluido ? Colors.green : Colors.grey.shade400,
               size: 28,
             ),
           ),
@@ -724,45 +821,67 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
           a.tipoAtendimentoNome ?? 'Atendimento',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            decoration:
-                concluido ? TextDecoration.lineThrough : null,
-            color: concluido ? Colors.grey : null,
+            fontSize: 14,
+            decoration: concluido ? TextDecoration.lineThrough : null,
+            color: concluido ? Colors.grey : Colors.black87,
           ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (a.descricao != null && a.descricao!.isNotEmpty)
-              Text(a.descricao!,
-                  style:
-                      TextStyle(color: concluido ? Colors.grey : null)),
+              Text(
+                a.descricao!,
+                style: TextStyle(
+                    color: concluido ? Colors.grey : Colors.black54,
+                    fontSize: 12),
+              ),
             if (a.dataPrevista != null)
-              Text('Data: ${_formatarData(a.dataPrevista)}'),
-            if (a.horarioPrevisto != null &&
-                a.horarioPrevisto!.isNotEmpty)
-              Text('Horário: ${a.horarioPrevisto}'),
+              Row(
+                children: [
+                  Icon(Icons.calendar_today,
+                      size: 11, color: Colors.grey.shade500),
+                  const SizedBox(width: 3),
+                  Text(
+                    _formatarData(a.dataPrevista),
+                    style: TextStyle(
+                        fontSize: 11, color: Colors.grey.shade600),
+                  ),
+                  if (a.horarioPrevisto != null &&
+                      a.horarioPrevisto!.isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    Icon(Icons.access_time,
+                        size: 11, color: Colors.grey.shade500),
+                    const SizedBox(width: 3),
+                    Text(
+                      a.horarioPrevisto!,
+                      style: TextStyle(
+                          fontSize: 11, color: Colors.grey.shade600),
+                    ),
+                  ],
+                ],
+              ),
             if (a.recorrente)
               Row(
                 children: [
-                  const Icon(Icons.repeat,
-                      size: 14, color: Colors.blue),
-                  const SizedBox(width: 4),
+                  Icon(Icons.repeat, size: 11, color: Colors.blue.shade300),
+                  const SizedBox(width: 3),
                   Text(
                     a.recorrenciaDiasLabel.isNotEmpty
                         ? a.recorrenciaDiasLabel
                         : 'Recorrente',
-                    style: const TextStyle(
-                        color: Colors.blue, fontSize: 12),
+                    style: TextStyle(
+                        color: Colors.blue.shade400, fontSize: 11),
                   ),
                 ],
               ),
           ],
         ),
         trailing: concluido
-            ? const Icon(Icons.check_circle,
-                color: Colors.green, size: 20)
+            ? null
             : IconButton(
-                icon: const Icon(Icons.edit_outlined, size: 20),
+                icon: Icon(Icons.edit_outlined,
+                    size: 18, color: Colors.grey.shade500),
                 onPressed: () => _abrirFormAtendimento(existente: a),
               ),
       ),
@@ -774,162 +893,347 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
   @override
   Widget build(BuildContext context) {
     final p = _paciente;
-    final pendentes =
-        _todos.where((a) => a.status == 'pendente').toList();
+    final scheme = Theme.of(context).colorScheme;
+    final corPrioridade = _corPrioridade(p.prioridade);
+    final pendentes = _todos.where((a) => a.status == 'pendente').toList();
     final concluidos =
         _todos.where((a) => a.status == 'concluido').toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(p.nome),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person_add_alt),
-            tooltip: 'Compartilhar paciente',
-            onPressed: _compartilharPaciente,
-          ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'editar') _abrirFormEdicao();
-              if (value == 'deletar') _confirmarDelecao();
-            },
-            itemBuilder: (ctx) => [
-              const PopupMenuItem(
-                value: 'editar',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit_outlined),
-                    SizedBox(width: 8),
-                    Text('Editar paciente'),
-                  ],
-                ),
+      body: Column(
+        children: [
+          // Header com gradiente e informações do paciente
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [scheme.primary, scheme.primary.withOpacity(0.80)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const PopupMenuItem(
-                value: 'deletar',
-                child: Row(
-                  children: [
-                    Icon(Icons.delete_outline, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('Remover paciente',
-                        style: TextStyle(color: Colors.red)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: _carregando
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _recarregar,
-              child: ListView(
-                padding: const EdgeInsets.all(8),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
                 children: [
-                  Card(
-                    color: _corPrioridade(p.prioridade),
-                    child: ListTile(
-                      title: Text(p.nome,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold)),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (p.leito != null && p.leito!.isNotEmpty)
-                            Text('Leito: ${p.leito}'),
-                          if (p.hospitalNome != null)
-                            Text('Hospital: ${p.hospitalNome}'),
-                          Text(
-                              'Prioridade: ${p.prioridade.toUpperCase()}'),
-                          if (p.observacoes != null &&
-                              p.observacoes!.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: Text('Obs: ${p.observacoes}'),
+                  // Barra de ações
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 8, 8, 0),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new,
+                              color: Colors.white, size: 20),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.person_add_alt,
+                              color: Colors.white),
+                          tooltip: 'Compartilhar',
+                          onPressed: _compartilharPaciente,
+                        ),
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.more_vert,
+                              color: Colors.white),
+                          onSelected: (value) {
+                            if (value == 'editar') _abrirFormEdicao();
+                            if (value == 'deletar') _confirmarDelecao();
+                          },
+                          itemBuilder: (ctx) => [
+                            const PopupMenuItem(
+                              value: 'editar',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.edit_outlined),
+                                  SizedBox(width: 8),
+                                  Text('Editar paciente'),
+                                ],
+                              ),
                             ),
-                        ],
-                      ),
+                            const PopupMenuItem(
+                              value: 'deletar',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete_outline,
+                                      color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text('Remover paciente',
+                                      style:
+                                          TextStyle(color: Colors.red)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(
-                          'Pendentes',
-                          style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Badge(
-                        label: Text('${pendentes.length}'),
-                        backgroundColor: Colors.orange,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  if (pendentes.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Center(
-                        child: Text(
-                          'Nenhum atendimento pendente.',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    )
-                  else
-                    ...pendentes.map(_buildCardAtendimento),
-                  const SizedBox(height: 16),
-                  InkWell(
-                    onTap: () => setState(
-                        () => _mostrarHistorico = !_mostrarHistorico),
-                    borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      child: Row(
-                        children: [
-                          const Text(
-                            'Histórico',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 8),
-                          Badge(
-                            label: Text('${concluidos.length}'),
-                            backgroundColor: Colors.green,
-                          ),
-                          const Spacer(),
-                          Icon(
-                            _mostrarHistorico
-                                ? Icons.expand_less
-                                : Icons.expand_more,
-                            color: Colors.grey,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  if (_mostrarHistorico)
-                    if (concluidos.isEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(
+
+                  // Informações do paciente
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 26,
+                          backgroundColor: Colors.white24,
                           child: Text(
-                            'Nenhum atendimento concluído ainda.',
-                            style: TextStyle(color: Colors.grey),
+                            p.nome.isNotEmpty ? p.nome[0].toUpperCase() : '?',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      )
-                    else
-                      ...concluidos.map(_buildCardAtendimento),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                p.nome,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: [
+                                  // Badge prioridade
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: corPrioridade.withOpacity(0.25),
+                                      borderRadius:
+                                          BorderRadius.circular(20),
+                                      border: Border.all(
+                                          color: corPrioridade
+                                              .withOpacity(0.5)),
+                                    ),
+                                    child: Text(
+                                      _labelPrioridade(p.prioridade),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  if (p.leito != null &&
+                                      p.leito!.isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white24,
+                                        borderRadius:
+                                            BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        'Leito ${p.leito}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                  if (p.hospitalNome != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white24,
+                                        borderRadius:
+                                            BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        p.hospitalNome!,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              if (p.observacoes != null &&
+                                  p.observacoes!.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    p.observacoes!,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
+          ),
+
+          // Conteúdo principal
+          Expanded(
+            child: _carregando
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: _recarregar,
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(12, 16, 12, 80),
+                      children: [
+                        // Seção: Pendentes
+                        Row(
+                          children: [
+                            const Text(
+                              'Pendentes',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: pendentes.isEmpty
+                                    ? Colors.grey.shade200
+                                    : Colors.orange.shade100,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${pendentes.length}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: pendentes.isEmpty
+                                      ? Colors.grey
+                                      : Colors.orange.shade800,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (pendentes.isEmpty)
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: Colors.grey.shade200),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.check_circle_outline,
+                                    color: Colors.grey.shade400),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Nenhum atendimento pendente.',
+                                  style: TextStyle(
+                                      color: Colors.grey.shade600),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          ...pendentes.map(_buildCardAtendimento),
+
+                        const SizedBox(height: 20),
+
+                        // Seção: Histórico (colapsável)
+                        GestureDetector(
+                          onTap: () => setState(
+                              () => _mostrarHistorico = !_mostrarHistorico),
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Histórico',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade100,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${concluidos.length}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.green.shade800,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              Icon(
+                                _mostrarHistorico
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: Colors.grey.shade500,
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        if (_mostrarHistorico)
+                          concluidos.isEmpty
+                              ? Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade50,
+                                    borderRadius:
+                                        BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: Colors.grey.shade200),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.history,
+                                          color: Colors.grey.shade400),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        'Nenhum atendimento concluído ainda.',
+                                        style: TextStyle(
+                                            color: Colors.grey.shade600),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Column(
+                                  children: concluidos
+                                      .map(_buildCardAtendimento)
+                                      .toList(),
+                                ),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _abrirFormAtendimento(),
         tooltip: 'Novo atendimento',
@@ -939,7 +1243,7 @@ class _PacienteDetalhesScreenState extends State<PacienteDetalhesScreen> {
   }
 }
 
-class _TodosAtendimentosHelper {
+class _AtendimentoHelper {
   static Atendimento comStatus(Atendimento a, String novoStatus) {
     return Atendimento(
       id: a.id,

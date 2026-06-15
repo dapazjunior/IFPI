@@ -57,8 +57,7 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
     setState(() => _carregando = true);
 
     try {
-      final conta =
-          await _contaService.obterConta(widget.usuario.contaId!);
+      final conta = await _contaService.obterConta(widget.usuario.contaId!);
       final profissionais = await _usuarioService
           .listarProfissionaisDaConta(widget.usuario.contaId!);
 
@@ -90,6 +89,25 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
   }
 
   Future<void> _logout() async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sair'),
+        content: const Text('Deseja realmente sair?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sair'),
+          ),
+        ],
+      ),
+    );
+    if (confirmar != true) return;
+
     await _authService.logout();
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
@@ -132,18 +150,29 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
     }).toList();
   }
 
-  Color _corPrioridade(String prioridade) {
+  Color _corFundoPrioridade(String prioridade) {
     switch (prioridade) {
       case 'alta':
-        return Colors.red.shade100;
+        return Colors.red.shade50;
       case 'media':
-        return Colors.orange.shade100;
+        return Colors.orange.shade50;
       default:
-        return Colors.green.shade100;
+        return Colors.green.shade50;
     }
   }
 
-  Color _corIconePrioridade(String prioridade) {
+  Color _corBordaPrioridade(String prioridade) {
+    switch (prioridade) {
+      case 'alta':
+        return Colors.red.shade400;
+      case 'media':
+        return Colors.orange.shade400;
+      default:
+        return Colors.green.shade400;
+    }
+  }
+
+  Color _corAvatarPrioridade(String prioridade) {
     switch (prioridade) {
       case 'alta':
         return Colors.red;
@@ -154,15 +183,100 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
     }
   }
 
-  IconData _iconePrioridade(String prioridade) {
+  String _labelPrioridade(String prioridade) {
     switch (prioridade) {
       case 'alta':
-        return Icons.priority_high;
+        return 'Alta';
       case 'media':
-        return Icons.remove;
+        return 'Média';
       default:
-        return Icons.arrow_downward;
+        return 'Baixa';
     }
+  }
+
+  Widget _buildHeader() {
+    final scheme = Theme.of(context).colorScheme;
+    final u = widget.usuario;
+    final conta = _conta;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [scheme.primary, scheme.primary.withOpacity(0.80)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      conta?.nomeEquipe ?? u.nome,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Gestor: ${u.nome}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    if (conta != null) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: conta.planoAtivo
+                              ? Colors.green.shade400
+                              : Colors.red.shade400,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          conta.planoAtivo
+                              ? '${_tituloPlano(conta.plano)} ativo'
+                              : 'Plano suspenso',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              CircleAvatar(
+                radius: 26,
+                backgroundColor: Colors.white24,
+                child: Text(
+                  u.nome.isNotEmpty ? u.nome[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -171,41 +285,31 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
     final usados = _profissionais.length;
     final limite = conta?.limiteProfissionais ?? 0;
 
-    Widget body;
-
-    if (_carregando) {
-      body = const Center(child: CircularProgressIndicator());
-    } else if (conta == null) {
-      body = const Center(
-        child: Text(
-          'Conta não encontrada.',
-          style: TextStyle(color: Colors.red),
-        ),
-      );
-    } else {
-      final telas = [
-        _buildResumo(conta, usados, limite),
-        _buildEquipe(_profissionais, usados, limite),
-        _buildPacientes(_pacientes, _profissionais),
-      ];
-      body = telas[_abaSelecionada];
-    }
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Gestor – ${widget.usuario.nome}'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _carregarDados,
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-          ),
-        ],
-      ),
-      body: body,
+      body: _carregando
+          ? const Center(child: CircularProgressIndicator())
+          : conta == null
+              ? const Center(
+                  child: Text(
+                    'Conta não encontrada.',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
+              : Column(
+                  children: [
+                    _buildHeader(),
+                    Expanded(
+                      child: IndexedStack(
+                        index: _abaSelecionada,
+                        children: [
+                          _buildResumo(conta, usados, limite),
+                          _buildEquipe(_profissionais, usados, limite),
+                          _buildPacientes(_pacientes, _profissionais),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _abaSelecionada,
         onDestinationSelected: (i) => setState(() => _abaSelecionada = i),
@@ -222,7 +326,7 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
           ),
           NavigationDestination(
             icon: Icon(Icons.people_alt_outlined),
-            selectedIcon: Icon(Icons.people),
+            selectedIcon: Icon(Icons.people_alt),
             label: 'Pacientes',
           ),
         ],
@@ -233,7 +337,6 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
 
   Widget? _buildFab() {
     if (_abaSelecionada == 1) {
-      // Equipe
       return FloatingActionButton(
         heroTag: 'fab_gestor_equipe',
         onPressed: () async {
@@ -249,7 +352,6 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
         child: const Icon(Icons.person_add),
       );
     } else if (_abaSelecionada == 2) {
-      // Pacientes
       return FloatingActionButton(
         heroTag: 'fab_gestor_pacientes',
         onPressed: () async {
@@ -269,82 +371,367 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
   }
 
   // ─── Aba Resumo ───────────────────────────────────────────────────────────
+
   Widget _buildResumo(Conta conta, int usados, int limite) {
     final restante = (limite - usados).clamp(0, limite);
+    final ativos = _profissionais.where((p) => p.ativo).length;
+    final emServico = _profissionais.where((p) => p.emServico).length;
 
     return RefreshIndicator(
       onRefresh: _carregarDados,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         children: [
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.business_center),
-              title: Text(conta.nomeEquipe ?? 'Minha conta'),
-              subtitle: Text('Tipo: ${conta.tipoConta.toUpperCase()}'),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.star_border),
-              title: Text(_tituloPlano(conta.plano)),
-              subtitle:
-                  Text('Profissionais: $usados de $limite usados'),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Card(
-            child: ListTile(
-              leading: Icon(
-                conta.planoAtivo ? Icons.check_circle : Icons.cancel,
-                color: conta.planoAtivo ? Colors.green : Colors.red,
-              ),
-              title: Text(
-                conta.planoAtivo ? 'Plano ativo' : 'Plano desativado',
-              ),
-              subtitle: Text(
-                  'Status de pagamento: ${conta.statusPagamento}'),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.people_alt),
-              title: Text('${_pacientes.length} paciente(s) na conta'),
-              subtitle: const Text('Veja detalhes na aba Pacientes'),
-            ),
-          ),
-          const SizedBox(height: 12),
-          restante > 0
-              ? Text(
-                  'Você ainda pode adicionar $restante profissional(is).',
-                  style: const TextStyle(color: Colors.green),
-                )
-              : const Text(
-                  'Limite atingido. Considere fazer upgrade do plano.',
-                  style: TextStyle(color: Colors.red),
+          // Cards de métricas
+          Row(
+            children: [
+              Expanded(
+                child: _metricCard(
+                  icon: Icons.people,
+                  cor: Colors.blue,
+                  valor: '$usados/$limite',
+                  label: 'Profissionais',
                 ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _metricCard(
+                  icon: Icons.person_pin_circle,
+                  cor: Colors.green,
+                  valor: '$emServico',
+                  label: 'Em serviço',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _metricCard(
+                  icon: Icons.personal_injury,
+                  cor: Colors.teal,
+                  valor: '${_pacientes.length}',
+                  label: 'Pacientes',
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _metricCard(
+                  icon: Icons.add_circle_outline,
+                  cor: restante > 0 ? Colors.orange : Colors.red,
+                  valor: '$restante',
+                  label: 'Vagas livres',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Card do plano
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.star,
+                        color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      _tituloPlano(conta.plano),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: conta.planoAtivo
+                            ? Colors.green.shade50
+                            : Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: conta.planoAtivo
+                              ? Colors.green.shade200
+                              : Colors.red.shade200,
+                        ),
+                      ),
+                      child: Text(
+                        conta.planoAtivo ? 'Ativo' : 'Suspenso',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: conta.planoAtivo
+                              ? Colors.green.shade700
+                              : Colors.red.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: limite > 0 ? usados / limite : 0,
+                    backgroundColor: Colors.grey.shade200,
+                    color: usados >= limite
+                        ? Colors.red
+                        : Theme.of(context).colorScheme.primary,
+                    minHeight: 6,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '$usados de $limite profissionais utilizados',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Pagamento: ${conta.statusPagamento}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: conta.statusPagamento == 'ativo'
+                        ? Colors.green.shade700
+                        : Colors.orange.shade700,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Acesso rápido
+          const Text(
+            'Acesso rápido',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _atalhoCard(
+                  icon: Icons.person_add,
+                  label: 'Novo\nprofissional',
+                  onTap: () async {
+                    final criado = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const GestorNovoProfissionalScreen(),
+                      ),
+                    );
+                    if (criado == true) _carregarDados();
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _atalhoCard(
+                  icon: Icons.person_add_alt_1,
+                  label: 'Novo\npaciente',
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            PacienteFormScreen(usuario: widget.usuario),
+                      ),
+                    );
+                    _carregarDados();
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _atalhoCard(
+                  icon: Icons.logout,
+                  label: 'Sair',
+                  cor: Colors.red.shade400,
+                  onTap: _logout,
+                ),
+              ),
+            ],
+          ),
+
+          if (restante == 0) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.red.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber,
+                      color: Colors.red.shade400, size: 20),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Limite de profissionais atingido. Considere fazer upgrade do plano.',
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
+  Widget _metricCard({
+    required IconData icon,
+    required Color cor,
+    required String valor,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: cor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: cor, size: 20),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                valor,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: cor,
+                ),
+              ),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _atalhoCard({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    Color? cor,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    final corFinal = cor ?? scheme.primary;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: corFinal, size: 24),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ─── Aba Equipe ───────────────────────────────────────────────────────────
-  Widget _buildEquipe(
-      List<Usuario> profissionais, int usados, int limite) {
+
+  Widget _buildEquipe(List<Usuario> profissionais, int usados, int limite) {
     return Column(
       children: [
-        Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        Container(
+          color: Colors.white,
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: Row(
             children: [
               Text(
-                'Profissionais ($usados / $limite)',
+                'Profissionais',
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '$usados / $limite',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
             ],
@@ -352,12 +739,40 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
         ),
         const Divider(height: 1),
         if (profissionais.isEmpty)
-          const Expanded(
+          Expanded(
             child: Center(
-              child: Text(
-                'Nenhum profissional cadastrado.\nUse o botão + para adicionar.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.group_add,
+                          size: 48, color: Colors.grey.shade400),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Nenhum profissional cadastrado',
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Toque no botão + para adicionar\no primeiro membro da equipe.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 13,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           )
@@ -366,39 +781,115 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
             child: RefreshIndicator(
               onRefresh: _carregarDados,
               child: ListView.builder(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
                 itemCount: profissionais.length,
                 itemBuilder: (context, index) {
                   final p = profissionais[index];
-                  return Card(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Text(
-                          p.nome.isNotEmpty
-                              ? p.nome[0].toUpperCase()
-                              : '?',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold),
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
+                      ],
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 4),
+                      leading: Stack(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: p.ativo
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey.shade400,
+                            child: Text(
+                              p.nome.isNotEmpty
+                                  ? p.nome[0].toUpperCase()
+                                  : '?',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          if (p.emServico)
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: Colors.white, width: 2),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      title: Text(p.nome),
+                      title: Text(
+                        p.nome,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(p.email),
                           Text(
-                            p.ativo ? 'Ativo' : 'Desativado',
+                            p.email,
                             style: TextStyle(
-                              color:
-                                  p.ativo ? Colors.green : Colors.red,
-                              fontSize: 12,
-                            ),
+                                fontSize: 12, color: Colors.grey.shade600),
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                p.emServico
+                                    ? Icons.circle
+                                    : Icons.circle_outlined,
+                                size: 10,
+                                color: p.emServico
+                                    ? Colors.green
+                                    : Colors.grey,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                p.emServico ? 'Em serviço' : 'Offline',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: p.emServico
+                                      ? Colors.green
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      trailing: Switch(
-                        value: p.ativo,
-                        onChanged: (_) => _alternarAtivo(p),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            p.ativo ? 'Ativo' : 'Inativo',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: p.ativo
+                                  ? Colors.green.shade700
+                                  : Colors.red.shade400,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Switch(
+                            value: p.ativo,
+                            onChanged: (_) => _alternarAtivo(p),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -411,8 +902,8 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
   }
 
   // ─── Aba Pacientes ────────────────────────────────────────────────────────
-  Widget _buildPacientes(
-      List<Paciente> pacientes, List<Usuario> profissionais) {
+
+  Widget _buildPacientes(List<Paciente> pacientes, List<Usuario> profissionais) {
     final filtrados = _aplicarFiltrosPacientes(pacientes);
     final hospitais = pacientes
         .map((p) => p.hospitalNome)
@@ -423,14 +914,14 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
 
     return Column(
       children: [
-        // Filtro por profissional
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+        Container(
+          color: Colors.white,
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
           child: DropdownButtonFormField<String?>(
             value: _filtroProfissionalId,
             decoration: const InputDecoration(
               labelText: 'Profissional responsável',
-              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.person_search),
               isDense: true,
             ),
             items: [
@@ -451,80 +942,101 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
             },
           ),
         ),
-        // Filtros de prioridade e hospital (reaproveitando lógica da lista de pacientes)
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Row(
-            children: [
-              const Text('Prioridade:',
-                  style: TextStyle(fontWeight: FontWeight.w500)),
-              const SizedBox(width: 8),
-              ChoiceChip(
-                label: const Text('Todas'),
-                selected: _filtroPrioridade == null,
-                onSelected: (_) =>
-                    setState(() => _filtroPrioridade = null),
-              ),
-              const SizedBox(width: 4),
-              ChoiceChip(
-                label: const Text('Alta'),
-                selected: _filtroPrioridade == 'alta',
-                selectedColor: Colors.red.shade200,
-                onSelected: (_) => setState(() => _filtroPrioridade =
-                    _filtroPrioridade == 'alta' ? null : 'alta'),
-              ),
-              const SizedBox(width: 4),
-              ChoiceChip(
-                label: const Text('Média'),
-                selected: _filtroPrioridade == 'media',
-                selectedColor: Colors.orange.shade200,
-                onSelected: (_) => setState(() => _filtroPrioridade =
-                    _filtroPrioridade == 'media' ? null : 'media'),
-              ),
-              const SizedBox(width: 4),
-              ChoiceChip(
-                label: const Text('Baixa'),
-                selected: _filtroPrioridade == 'baixa',
-                selectedColor: Colors.green.shade200,
-                onSelected: (_) => setState(() => _filtroPrioridade =
-                    _filtroPrioridade == 'baixa' ? null : 'baixa'),
-              ),
-              if (hospitais.isNotEmpty) ...[
-                const SizedBox(width: 16),
-                const Text('Hospital:',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Todos'),
-                  selected: _filtroHospital == null,
-                  onSelected: (_) =>
-                      setState(() => _filtroHospital = null),
+        Container(
+          color: Colors.white,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(12, 6, 12, 10),
+            child: Row(
+              children: [
+                _chipFiltro(
+                  label: 'Todas',
+                  selecionado: _filtroPrioridade == null,
+                  onTap: () => setState(() => _filtroPrioridade = null),
                 ),
-                ...hospitais.map(
-                  (h) => Padding(
-                    padding: const EdgeInsets.only(left: 4),
-                    child: ChoiceChip(
-                      label: Text(h),
-                      selected: _filtroHospital == h,
-                      onSelected: (_) => setState(() =>
-                          _filtroHospital =
+                const SizedBox(width: 6),
+                _chipFiltro(
+                  label: 'Alta',
+                  selecionado: _filtroPrioridade == 'alta',
+                  corSelecionada: Colors.red.shade100,
+                  corTexto: Colors.red.shade700,
+                  onTap: () => setState(() => _filtroPrioridade =
+                      _filtroPrioridade == 'alta' ? null : 'alta'),
+                ),
+                const SizedBox(width: 6),
+                _chipFiltro(
+                  label: 'Média',
+                  selecionado: _filtroPrioridade == 'media',
+                  corSelecionada: Colors.orange.shade100,
+                  corTexto: Colors.orange.shade700,
+                  onTap: () => setState(() => _filtroPrioridade =
+                      _filtroPrioridade == 'media' ? null : 'media'),
+                ),
+                const SizedBox(width: 6),
+                _chipFiltro(
+                  label: 'Baixa',
+                  selecionado: _filtroPrioridade == 'baixa',
+                  corSelecionada: Colors.green.shade100,
+                  corTexto: Colors.green.shade700,
+                  onTap: () => setState(() => _filtroPrioridade =
+                      _filtroPrioridade == 'baixa' ? null : 'baixa'),
+                ),
+                if (hospitais.isNotEmpty) ...[
+                  const SizedBox(width: 10),
+                  Container(
+                      height: 20, width: 1, color: Colors.grey.shade300),
+                  const SizedBox(width: 10),
+                  ...hospitais.map((h) => Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: _chipFiltro(
+                          label: h,
+                          selecionado: _filtroHospital == h,
+                          onTap: () => setState(() => _filtroHospital =
                               _filtroHospital == h ? null : h),
-                    ),
-                  ),
-                ),
+                        ),
+                      )),
+                ],
               ],
-            ],
+            ),
           ),
         ),
         const Divider(height: 1),
         if (filtrados.isEmpty)
-          const Expanded(
+          Expanded(
             child: Center(
-              child: Text(
-                'Nenhum paciente encontrado.',
-                style: TextStyle(color: Colors.grey),
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.people_outline,
+                          size: 48, color: Colors.grey.shade400),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      pacientes.isEmpty
+                          ? 'Nenhum paciente cadastrado'
+                          : 'Nenhum paciente com esse filtro',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      pacientes.isEmpty
+                          ? 'Toque no botão + para cadastrar o primeiro paciente.'
+                          : 'Tente ajustar os filtros.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.grey.shade600, fontSize: 13),
+                    ),
+                  ],
+                ),
               ),
             ),
           )
@@ -533,19 +1045,36 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
             child: RefreshIndicator(
               onRefresh: _carregarDados,
               child: ListView.builder(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
                 itemCount: filtrados.length,
                 itemBuilder: (context, index) {
                   final p = filtrados[index];
-                  return Card(
-                    color: _corPrioridade(p.prioridade),
+                  return Container(
                     margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: _corFundoPrioridade(p.prioridade),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border(
+                        left: BorderSide(
+                          color: _corBordaPrioridade(p.prioridade),
+                          width: 4,
+                        ),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                     child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 6),
                       leading: CircleAvatar(
-                        backgroundColor:
-                            _corIconePrioridade(p.prioridade),
+                        backgroundColor: _corAvatarPrioridade(p.prioridade),
                         child: Text(
-                          p.nome.substring(0, 1).toUpperCase(),
+                          p.nome.isNotEmpty ? p.nome[0].toUpperCase() : '?',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -554,20 +1083,62 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
                       ),
                       title: Text(
                         p.nome,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (p.leito != null && p.leito!.isNotEmpty)
-                            Text('Leito: ${p.leito}'),
+                            Row(
+                              children: [
+                                Icon(Icons.bed,
+                                    size: 12, color: Colors.grey.shade600),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Leito ${p.leito}',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade700),
+                                ),
+                              ],
+                            ),
                           if (p.hospitalNome != null)
-                            Text('Hospital: ${p.hospitalNome}'),
+                            Row(
+                              children: [
+                                Icon(Icons.local_hospital,
+                                    size: 12, color: Colors.grey.shade600),
+                                const SizedBox(width: 4),
+                                Text(
+                                  p.hospitalNome!,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade700),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
-                      trailing: Icon(
-                        _iconePrioridade(p.prioridade),
-                        color: _corIconePrioridade(p.prioridade),
+                      trailing: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: _corBordaPrioridade(p.prioridade)
+                              .withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: _corBordaPrioridade(p.prioridade)
+                                .withOpacity(0.4),
+                          ),
+                        ),
+                        child: Text(
+                          _labelPrioridade(p.prioridade),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: _corAvatarPrioridade(p.prioridade),
+                          ),
+                        ),
                       ),
                       onTap: () async {
                         await Navigator.push(
@@ -588,6 +1159,45 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _chipFiltro({
+    required String label,
+    required bool selecionado,
+    Color? corSelecionada,
+    Color? corTexto,
+    required VoidCallback onTap,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selecionado
+              ? (corSelecionada ?? scheme.primaryContainer)
+              : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selecionado
+                ? (corTexto ?? scheme.primary)
+                : Colors.transparent,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight:
+                selecionado ? FontWeight.w600 : FontWeight.normal,
+            color: selecionado
+                ? (corTexto ?? scheme.primary)
+                : Colors.grey.shade700,
+          ),
+        ),
+      ),
     );
   }
 }

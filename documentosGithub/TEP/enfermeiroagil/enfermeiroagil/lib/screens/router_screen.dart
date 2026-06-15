@@ -32,7 +32,6 @@ class _RouterScreenState extends State<RouterScreen> {
     try {
       final supabase = Supabase.instance.client;
 
-      // Se não há sessão ativa, vai para login imediatamente
       if (supabase.auth.currentSession == null) {
         if (!mounted) return;
         _ir(const LoginScreen());
@@ -44,25 +43,20 @@ class _RouterScreenState extends State<RouterScreen> {
 
       if (!mounted) return;
 
-      // Admin do sistema não depende de plano
       if (usuario.isAdminSistema) {
         _ir(AdminSistemaScreen(usuario: usuario));
         return;
       }
 
-      // Usuário desativado ou bloqueado manualmente
       if (!usuario.ativo || usuario.bloqueado) {
         _ir(const ContaSuspensaScreen(
-          motivo:
-              'Seu acesso foi desativado. Entre em contato com o suporte.',
+          motivo: 'Seu acesso foi desativado. Entre em contato com o suporte.',
         ));
         return;
       }
 
-      // Verifica situação do plano da conta
       if (usuario.contaId != null) {
-        final Conta? conta =
-            await contaService.obterConta(usuario.contaId!);
+        final Conta? conta = await contaService.obterConta(usuario.contaId!);
 
         if (!mounted) return;
 
@@ -75,7 +69,6 @@ class _RouterScreenState extends State<RouterScreen> {
         }
       }
 
-      // Roteamento por tipo de usuário
       if (usuario.isGestor) {
         _ir(GestorDashboardScreen(usuario: usuario));
       } else {
@@ -86,16 +79,12 @@ class _RouterScreenState extends State<RouterScreen> {
 
       final supabase = Supabase.instance.client;
 
-      // Se não há sessão, vai para login normalmente
       if (supabase.auth.currentSession == null) {
         _ir(const LoginScreen());
         return;
       }
 
-      // Há sessão mas o perfil não carregou — mostra erro sem deslogar
-      setState(() {
-        _erroCarregamento = e.toString();
-      });
+      setState(() => _erroCarregamento = e.toString());
     }
   }
 
@@ -119,20 +108,33 @@ class _RouterScreenState extends State<RouterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     if (_erroCarregamento != null) {
       return Scaffold(
-        body: Center(
+        body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(32),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.wifi_off_rounded,
+                    size: 48,
+                    color: Colors.red.shade400,
+                  ),
+                ),
+                const SizedBox(height: 24),
                 const Text(
                   'Erro ao carregar perfil',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -140,19 +142,31 @@ class _RouterScreenState extends State<RouterScreen> {
                 Text(
                   _erroCarregamento!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: _tentarNovamente,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Tentar novamente'),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: _tentarNovamente,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Tentar novamente'),
+                  ),
                 ),
                 const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: _sair,
-                  icon: const Icon(Icons.logout),
-                  label: const Text('Sair'),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: _sair,
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Sair'),
+                  ),
                 ),
               ],
             ),
@@ -161,8 +175,45 @@ class _RouterScreenState extends State<RouterScreen> {
       );
     }
 
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
+    // Tela de loading com identidade visual
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              scheme.primary,
+              scheme.primary.withOpacity(0.75),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.medical_services_rounded,
+                size: 64,
+                color: Colors.white,
+              ),
+              SizedBox(height: 24),
+              CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 3,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Carregando...',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

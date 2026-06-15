@@ -62,6 +62,8 @@ class PacienteService {
     required String prioridade,
     String? hospitalId,
     String? observacoes,
+    // Corrigido: parâmetro que estava sendo ignorado antes
+    String? tipoAtendimentoIdPrincipal,
   }) async {
     final user = _supabase.auth.currentUser;
     if (user == null) throw Exception('Usuário não autenticado');
@@ -96,10 +98,21 @@ class PacienteService {
       'adicionado_por': user.id,
     });
 
+    // Se foi informado um tipo de atendimento principal, cria o atendimento inicial
+    if (tipoAtendimentoIdPrincipal != null) {
+      await _supabase.from('atendimentos').insert({
+        'paciente_id': paciente.id,
+        'tipo_atendimento_id': tipoAtendimentoIdPrincipal,
+        'status': 'pendente',
+        'recorrente': false,
+        'criado_por': user.id,
+      });
+    }
+
     // Se for gestor, vincula automaticamente todos os profissionais da conta
     if (usuario.isGestor) {
-      final profissionais = await usuarioService
-          .listarProfissionaisDaConta(usuario.contaId!);
+      final profissionais =
+          await usuarioService.listarProfissionaisDaConta(usuario.contaId!);
 
       for (final prof in profissionais) {
         await _supabase.from('paciente_enfermeiros').upsert({

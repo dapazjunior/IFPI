@@ -13,14 +13,14 @@ class PacienteListScreen extends StatefulWidget {
   const PacienteListScreen({
     super.key,
     required this.usuario,
-    this.mostrarFab = false, // quando usado como aba, o FAB fica no dashboard
+    this.mostrarFab = false,
   });
 
   @override
-  State<PacienteListScreen> createState() => _PacienteListScreenState();
+  PacienteListScreenState createState() => PacienteListScreenState();
 }
 
-class _PacienteListScreenState extends State<PacienteListScreen> {
+class PacienteListScreenState extends State<PacienteListScreen> {
   late final PacienteService _pacienteService;
   late Future<List<Paciente>> _futurePacientes;
 
@@ -31,10 +31,10 @@ class _PacienteListScreenState extends State<PacienteListScreen> {
   void initState() {
     super.initState();
     _pacienteService = PacienteService(Supabase.instance.client);
-    _recarregar();
+    recarregar();
   }
 
-  void _recarregar() {
+  void recarregar() {
     setState(() {
       _futurePacientes = _pacienteService.listarPacientesDoUsuario();
     });
@@ -50,39 +50,47 @@ class _PacienteListScreenState extends State<PacienteListScreen> {
     }).toList();
   }
 
-  Color _corPrioridade(String prioridade) {
+  Color _corFundoPrioridade(String prioridade) {
     switch (prioridade) {
       case 'alta':
-        return Colors.red.shade100;
+        return Colors.red.shade50;
       case 'media':
-        return Colors.orange.shade100;
-      case 'baixa':
+        return Colors.orange.shade50;
       default:
-        return Colors.green.shade100;
+        return Colors.green.shade50;
     }
   }
 
-  IconData _iconePrioridade(String prioridade) {
+  Color _corBordaPrioridade(String prioridade) {
     switch (prioridade) {
       case 'alta':
-        return Icons.priority_high;
+        return Colors.red.shade400;
       case 'media':
-        return Icons.remove;
-      case 'baixa':
+        return Colors.orange.shade400;
       default:
-        return Icons.arrow_downward;
+        return Colors.green.shade400;
     }
   }
 
-  Color _corIconePrioridade(String prioridade) {
+  Color _corAvatarPrioridade(String prioridade) {
     switch (prioridade) {
       case 'alta':
         return Colors.red;
       case 'media':
         return Colors.orange;
-      case 'baixa':
       default:
         return Colors.green;
+    }
+  }
+
+  String _labelPrioridade(String prioridade) {
+    switch (prioridade) {
+      case 'alta':
+        return 'Alta';
+      case 'media':
+        return 'Média';
+      default:
+        return 'Baixa';
     }
   }
 
@@ -94,66 +102,103 @@ class _PacienteListScreenState extends State<PacienteListScreen> {
         .toList()
       ..sort();
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          const Text('Prioridade:',
-              style: TextStyle(fontWeight: FontWeight.w500)),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: const Text('Todas'),
-            selected: _filtroPrioridade == null,
-            onSelected: (_) => setState(() => _filtroPrioridade = null),
-          ),
-          const SizedBox(width: 4),
-          ChoiceChip(
-            label: const Text('Alta'),
-            selected: _filtroPrioridade == 'alta',
-            selectedColor: Colors.red.shade200,
-            onSelected: (_) => setState(() =>
-                _filtroPrioridade = _filtroPrioridade == 'alta' ? null : 'alta'),
-          ),
-          const SizedBox(width: 4),
-          ChoiceChip(
-            label: const Text('Média'),
-            selected: _filtroPrioridade == 'media',
-            selectedColor: Colors.orange.shade200,
-            onSelected: (_) => setState(() => _filtroPrioridade =
-                _filtroPrioridade == 'media' ? null : 'media'),
-          ),
-          const SizedBox(width: 4),
-          ChoiceChip(
-            label: const Text('Baixa'),
-            selected: _filtroPrioridade == 'baixa',
-            selectedColor: Colors.green.shade200,
-            onSelected: (_) => setState(() => _filtroPrioridade =
-                _filtroPrioridade == 'baixa' ? null : 'baixa'),
-          ),
-          if (hospitais.isNotEmpty) ...[
-            const SizedBox(width: 16),
-            const Text('Hospital:',
-                style: TextStyle(fontWeight: FontWeight.w500)),
-            const SizedBox(width: 8),
-            ChoiceChip(
-              label: const Text('Todos'),
-              selected: _filtroHospital == null,
-              onSelected: (_) => setState(() => _filtroHospital = null),
+    return Container(
+      color: Colors.white,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            _chipFiltro(
+              label: 'Todas',
+              selecionado: _filtroPrioridade == null,
+              onTap: () => setState(() => _filtroPrioridade = null),
             ),
-            ...hospitais.map((h) {
-              return Padding(
-                padding: const EdgeInsets.only(left: 4),
-                child: ChoiceChip(
-                  label: Text(h),
-                  selected: _filtroHospital == h,
-                  onSelected: (_) => setState(
-                      () => _filtroHospital = _filtroHospital == h ? null : h),
-                ),
-              );
-            }),
+            const SizedBox(width: 6),
+            _chipFiltro(
+              label: 'Alta',
+              selecionado: _filtroPrioridade == 'alta',
+              corSelecionada: Colors.red.shade100,
+              corTexto: Colors.red.shade700,
+              onTap: () => setState(() => _filtroPrioridade =
+                  _filtroPrioridade == 'alta' ? null : 'alta'),
+            ),
+            const SizedBox(width: 6),
+            _chipFiltro(
+              label: 'Média',
+              selecionado: _filtroPrioridade == 'media',
+              corSelecionada: Colors.orange.shade100,
+              corTexto: Colors.orange.shade700,
+              onTap: () => setState(() => _filtroPrioridade =
+                  _filtroPrioridade == 'media' ? null : 'media'),
+            ),
+            const SizedBox(width: 6),
+            _chipFiltro(
+              label: 'Baixa',
+              selecionado: _filtroPrioridade == 'baixa',
+              corSelecionada: Colors.green.shade100,
+              corTexto: Colors.green.shade700,
+              onTap: () => setState(() => _filtroPrioridade =
+                  _filtroPrioridade == 'baixa' ? null : 'baixa'),
+            ),
+            if (hospitais.isNotEmpty) ...[
+              const SizedBox(width: 12),
+              Container(
+                  height: 20,
+                  width: 1,
+                  color: Colors.grey.shade300),
+              const SizedBox(width: 12),
+              ...hospitais.map((h) => Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: _chipFiltro(
+                      label: h,
+                      selecionado: _filtroHospital == h,
+                      onTap: () => setState(() => _filtroHospital =
+                          _filtroHospital == h ? null : h),
+                    ),
+                  )),
+            ],
           ],
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _chipFiltro({
+    required String label,
+    required bool selecionado,
+    Color? corSelecionada,
+    Color? corTexto,
+    required VoidCallback onTap,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: selecionado
+              ? (corSelecionada ?? scheme.primaryContainer)
+              : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selecionado
+                ? (corTexto ?? scheme.primary)
+                : Colors.transparent,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight:
+                selecionado ? FontWeight.w600 : FontWeight.normal,
+            color: selecionado
+                ? (corTexto ?? scheme.primary)
+                : Colors.grey.shade700,
+          ),
+        ),
       ),
     );
   }
@@ -169,7 +214,28 @@ class _PacienteListScreenState extends State<PacienteListScreen> {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          return Center(child: Text('Erro: ${snapshot.error}'));
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline,
+                      size: 48, color: Colors.red.shade300),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Erro ao carregar pacientes',
+                    style: TextStyle(color: Colors.grey.shade700),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: recarregar,
+                    child: const Text('Tentar novamente'),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
 
         final todos = snapshot.data ?? [];
@@ -180,67 +246,184 @@ class _PacienteListScreenState extends State<PacienteListScreen> {
             _buildFiltros(todos),
             const Divider(height: 1),
             if (filtrados.isEmpty)
-              const Expanded(
+              Expanded(
                 child: Center(
-                  child: Text(
-                    'Nenhum paciente encontrado.\nToque em + para cadastrar.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey),
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.people_outline,
+                            size: 48,
+                            color: Colors.grey.shade400,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          todos.isEmpty
+                              ? 'Nenhum paciente cadastrado'
+                              : 'Nenhum paciente com esse filtro',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          todos.isEmpty
+                              ? 'Toque no botão + para cadastrar\nseu primeiro paciente.'
+                              : 'Tente ajustar ou limpar os filtros.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 13,
+                            height: 1.5,
+                          ),
+                        ),
+                        if (todos.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          TextButton(
+                            onPressed: () => setState(() {
+                              _filtroPrioridade = null;
+                              _filtroHospital = null;
+                            }),
+                            child: const Text('Limpar filtros'),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
               )
             else
               Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: filtrados.length,
-                  itemBuilder: (context, index) {
-                    final p = filtrados[index];
-                    return Card(
-                      color: _corPrioridade(p.prioridade),
-                      margin: const EdgeInsets.only(bottom: 10),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: _corIconePrioridade(p.prioridade),
-                          child: Text(
-                            p.nome.substring(0, 1).toUpperCase(),
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
+                child: RefreshIndicator(
+                  onRefresh: () async => recarregar(),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
+                    itemCount: filtrados.length,
+                    itemBuilder: (context, index) {
+                      final p = filtrados[index];
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          color: _corFundoPrioridade(p.prioridade),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border(
+                            left: BorderSide(
+                              color: _corBordaPrioridade(p.prioridade),
+                              width: 4,
+                            ),
                           ),
-                        ),
-                        title: Text(
-                          p.nome,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (p.leito != null && p.leito!.isNotEmpty)
-                              Text('Leito: ${p.leito}'),
-                            if (p.hospitalNome != null)
-                              Text('Hospital: ${p.hospitalNome}'),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
                           ],
                         ),
-                        trailing: Icon(
-                          _iconePrioridade(p.prioridade),
-                          color: _corIconePrioridade(p.prioridade),
-                        ),
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PacienteDetalhesScreen(
-                                paciente: p,
-                                usuario: usuario,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 6),
+                          leading: CircleAvatar(
+                            backgroundColor:
+                                _corAvatarPrioridade(p.prioridade),
+                            child: Text(
+                              p.nome.isNotEmpty
+                                  ? p.nome[0].toUpperCase()
+                                  : '?',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          );
-                          _recarregar();
-                        },
-                      ),
-                    );
-                  },
+                          ),
+                          title: Text(
+                            p.nome,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (p.leito != null && p.leito!.isNotEmpty)
+                                Row(
+                                  children: [
+                                    Icon(Icons.bed,
+                                        size: 12,
+                                        color: Colors.grey.shade600),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Leito ${p.leito}',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade700),
+                                    ),
+                                  ],
+                                ),
+                              if (p.hospitalNome != null)
+                                Row(
+                                  children: [
+                                    Icon(Icons.local_hospital,
+                                        size: 12,
+                                        color: Colors.grey.shade600),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      p.hospitalNome!,
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade700),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                          trailing: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: _corBordaPrioridade(p.prioridade)
+                                  .withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _corBordaPrioridade(p.prioridade)
+                                    .withOpacity(0.4),
+                              ),
+                            ),
+                            child: Text(
+                              _labelPrioridade(p.prioridade),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: _corAvatarPrioridade(p.prioridade),
+                              ),
+                            ),
+                          ),
+                          onTap: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PacienteDetalhesScreen(
+                                  paciente: p,
+                                  usuario: usuario,
+                                ),
+                              ),
+                            );
+                            recarregar();
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
           ],

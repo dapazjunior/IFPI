@@ -20,6 +20,7 @@ class _SignupScreenState extends State<SignupScreen> {
   String _tipoConta = 'individual';
   String _planoGestor = 'homecare';
   bool _carregando = false;
+  bool _senhaVisivel = false;
   String? _erro;
 
   final _authService = AuthService();
@@ -62,7 +63,6 @@ class _SignupScreenState extends State<SignupScreen> {
         const SnackBar(content: Text('Conta criada com sucesso!')),
       );
 
-      // Usuário já está logado após o signup, vai direto para o router
       Navigator.pushReplacementNamed(context, '/router');
     } catch (e) {
       setState(() {
@@ -74,201 +74,374 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final isGestor = _tipoConta == 'gestor';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Criar conta'),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: _nomeCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Nome completo',
-                      border: OutlineInputBorder(),
+      body: Column(
+        children: [
+          // Header compacto com gradiente
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  scheme.primary,
+                  scheme.primary.withOpacity(0.75),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new,
+                          color: Colors.white, size: 20),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                    textCapitalization: TextCapitalization.words,
-                    validator: (value) {
-                      if (value == null || value.trim().length < 3) {
-                        return 'Informe seu nome completo';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _emailCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'E-mail',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null ||
-                          !value.contains('@') ||
-                          !value.contains('.')) {
-                        return 'Informe um e-mail válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _telefoneCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Telefone',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.phone,
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _documentoCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Documento (CPF/COREN/CRM)',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _senhaCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Senha',
-                      border: OutlineInputBorder(),
-                    ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.length < 6) {
-                        return 'A senha deve ter pelo menos 6 caracteres';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Tipo de conta',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Profissional individual'),
-                          value: 'individual',
-                          groupValue: _tipoConta,
-                          onChanged: (v) {
-                            if (v == null) return;
-                            setState(() => _tipoConta = v);
-                          },
+                    const SizedBox(width: 8),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Criar conta',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: RadioListTile<String>(
-                          title: const Text('Gestor de equipe'),
-                          value: 'gestor',
-                          groupValue: _tipoConta,
-                          onChanged: (v) {
-                            if (v == null) return;
-                            setState(() => _tipoConta = v);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (isGestor) ...[
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Plano do gestor',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<String>(
-                      value: _planoGestor,
-                      decoration: const InputDecoration(
-                        labelText: 'Plano',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'homecare',
-                          child: Text('Homecare (até 5 profissionais)'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'equipe',
-                          child: Text('Equipe (até 15 profissionais)'),
+                        Text(
+                          'Preencha seus dados para começar',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
                         ),
                       ],
-                      onChanged: (v) {
-                        if (v == null) return;
-                        setState(() => _planoGestor = v);
-                      },
                     ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Formulário
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Seção: Dados pessoais
+                    _sectionLabel('Dados pessoais'),
                     const SizedBox(height: 12),
                     TextFormField(
-                      controller: _nomeEquipeCtrl,
+                      controller: _nomeCtrl,
                       decoration: const InputDecoration(
-                        labelText: 'Nome da equipe/serviço',
-                        border: OutlineInputBorder(),
+                        labelText: 'Nome completo',
+                        prefixIcon: Icon(Icons.person_outline),
                       ),
+                      textCapitalization: TextCapitalization.words,
+                      textInputAction: TextInputAction.next,
                       validator: (value) {
-                        if (isGestor &&
-                            (value == null || value.trim().isEmpty)) {
-                          return 'Informe o nome da equipe/serviço';
+                        if (value == null || value.trim().length < 3) {
+                          return 'Informe seu nome completo';
                         }
                         return null;
                       },
                     ),
-                  ],
-                  const SizedBox(height: 16),
-                  if (_erro != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        _erro!,
-                        style: const TextStyle(
-                            color: Colors.red, fontSize: 13),
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      controller: _emailCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'E-mail',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        if (value == null ||
+                            !value.contains('@') ||
+                            !value.contains('.')) {
+                          return 'Informe um e-mail válido';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      controller: _telefoneCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Telefone',
+                        prefixIcon: Icon(Icons.phone_outlined),
+                      ),
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      controller: _documentoCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Documento (CPF/COREN/CRM)',
+                        prefixIcon: Icon(Icons.badge_outlined),
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      controller: _senhaCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Senha',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _senhaVisivel
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                          onPressed: () => setState(
+                              () => _senhaVisivel = !_senhaVisivel),
+                        ),
+                      ),
+                      obscureText: !_senhaVisivel,
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        if (value == null || value.length < 6) {
+                          return 'A senha deve ter pelo menos 6 caracteres';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    // Seção: Tipo de conta
+                    _sectionLabel('Tipo de conta'),
+                    const SizedBox(height: 12),
+                    _buildTipoContaCard(
+                      value: 'individual',
+                      titulo: 'Profissional individual',
+                      subtitulo: 'Para uso pessoal, sem equipe',
+                      icone: Icons.person,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTipoContaCard(
+                      value: 'gestor',
+                      titulo: 'Gestor de equipe',
+                      subtitulo: 'Gerencie uma equipe de profissionais',
+                      icone: Icons.groups,
+                    ),
+
+                    // Campos adicionais do gestor
+                    if (isGestor) ...[
+                      const SizedBox(height: 28),
+                      _sectionLabel('Configuração da equipe'),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        value: _planoGestor,
+                        decoration: const InputDecoration(
+                          labelText: 'Plano',
+                          prefixIcon: Icon(Icons.star_outline),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'homecare',
+                            child: Text('Homecare (até 5 profissionais)'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'equipe',
+                            child: Text('Equipe (até 15 profissionais)'),
+                          ),
+                        ],
+                        onChanged: (v) {
+                          if (v == null) return;
+                          setState(() => _planoGestor = v);
+                        },
+                      ),
+                      const SizedBox(height: 14),
+                      TextFormField(
+                        controller: _nomeEquipeCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Nome da equipe / serviço',
+                          prefixIcon: Icon(Icons.business_outlined),
+                        ),
+                        textCapitalization: TextCapitalization.words,
+                        validator: (value) {
+                          if (isGestor &&
+                              (value == null || value.trim().isEmpty)) {
+                            return 'Informe o nome da equipe';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+
+                    const SizedBox(height: 28),
+
+                    // Erro
+                    if (_erro != null)
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline,
+                                color: Colors.red, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _erro!,
+                                style: const TextStyle(
+                                    color: Colors.red, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // Botão
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _carregando ? null : _submit,
+                        child: _carregando
+                            ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Criar conta',
+                                style: TextStyle(fontSize: 16),
+                              ),
                       ),
                     ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _carregando ? null : _submit,
-                      child: _carregando
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white),
-                              ),
-                            )
-                          : const Text('Criar conta'),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Já tem conta? ',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Entrar'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionLabel(String texto) {
+    return Text(
+      texto,
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: Theme.of(context).colorScheme.primary,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  Widget _buildTipoContaCard({
+    required String value,
+    required String titulo,
+    required String subtitulo,
+    required IconData icone,
+  }) {
+    final selecionado = _tipoConta == value;
+    final scheme = Theme.of(context).colorScheme;
+
+    return GestureDetector(
+      onTap: () => setState(() => _tipoConta = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: selecionado
+              ? scheme.primaryContainer.withOpacity(0.5)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selecionado ? scheme.primary : Colors.grey.shade300,
+            width: selecionado ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: selecionado
+                    ? scheme.primary
+                    : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icone,
+                color: selecionado ? Colors.white : Colors.grey.shade600,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    titulo,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: selecionado
+                          ? scheme.primary
+                          : Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitulo,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
+            Icon(
+              selecionado
+                  ? Icons.radio_button_checked
+                  : Icons.radio_button_unchecked,
+              color: selecionado ? scheme.primary : Colors.grey.shade400,
+            ),
+          ],
         ),
       ),
     );

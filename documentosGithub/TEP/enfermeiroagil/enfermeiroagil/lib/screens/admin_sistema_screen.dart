@@ -103,35 +103,114 @@ class _AdminSistemaScreenState extends State<AdminSistemaScreen> {
     }
   }
 
+  Color _corTipo(Usuario u) {
+    if (u.isAdminSistema) return Colors.purple;
+    if (u.isGestor) return Colors.blue;
+    return const Color(0xFF00796B);
+  }
+
+  Widget _buildHeader() {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [scheme.primary, scheme.primary.withOpacity(0.80)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Painel do Sistema',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.usuario.nome,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'Admin Sistema',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.refresh, color: Colors.white),
+                    onPressed: _carregarDados,
+                    tooltip: 'Atualizar',
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.logout, color: Colors.white),
+                    onPressed: _logout,
+                    tooltip: 'Sair',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Admin – ${widget.usuario.nome}'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _carregarDados,
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
+      body: Column(
+        children: [
+          _buildHeader(),
+          Expanded(
+            child: _carregando
+                ? const Center(child: CircularProgressIndicator())
+                : IndexedStack(
+                    index: _abaSelecionada,
+                    children: [
+                      _buildResumo(),
+                      _buildContas(),
+                      _buildUsuarios(),
+                    ],
+                  ),
           ),
         ],
       ),
-      body: _carregando
-          ? const Center(child: CircularProgressIndicator())
-          : IndexedStack(
-              index: _abaSelecionada,
-              children: [
-                _buildResumo(),
-                _buildContas(),
-                _buildUsuarios(),
-              ],
-            ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _abaSelecionada,
-        onDestinationSelected: (i) => setState(() => _abaSelecionada = i),
+        onDestinationSelected: (i) =>
+            setState(() => _abaSelecionada = i),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
@@ -154,6 +233,7 @@ class _AdminSistemaScreenState extends State<AdminSistemaScreen> {
   }
 
   // ─── Aba Resumo ───────────────────────────────────────────────────────────
+
   Widget _buildResumo() {
     final totalContas = _contas.length;
     final contasAtivas = _contas.where((c) => c.planoAtivo).length;
@@ -166,85 +246,145 @@ class _AdminSistemaScreenState extends State<AdminSistemaScreen> {
     return RefreshIndicator(
       onRefresh: _carregarDados,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         children: [
-          const Text(
-            'Visão geral do sistema',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
+          // Grid de métricas
           Row(
             children: [
               Expanded(
-                child: _cardResumo(
+                child: _metricCard(
                   icon: Icons.business,
-                  cor: Colors.teal,
-                  titulo: 'Contas',
+                  cor: const Color(0xFF00796B),
                   valor: '$totalContas',
-                  subtitulo: '$contasAtivas ativas',
+                  label: 'Contas',
+                  sub: '$contasAtivas ativas',
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
-                child: _cardResumo(
+                child: _metricCard(
                   icon: Icons.people,
                   cor: Colors.blue,
-                  titulo: 'Usuários',
                   valor: '$totalUsuarios',
-                  subtitulo: '$bloqueados bloqueados',
+                  label: 'Usuários',
+                  sub: '$bloqueados bloqueados',
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
-                child: _cardResumo(
+                child: _metricCard(
                   icon: Icons.manage_accounts,
                   cor: Colors.purple,
-                  titulo: 'Gestores',
                   valor: '$gestores',
-                  subtitulo: 'no sistema',
+                  label: 'Gestores',
+                  sub: 'no sistema',
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
-                child: _cardResumo(
+                child: _metricCard(
                   icon: Icons.badge,
                   cor: Colors.orange,
-                  titulo: 'Profissionais',
                   valor: '$profissionais',
-                  subtitulo: 'cadastrados',
+                  label: 'Profissionais',
+                  sub: 'cadastrados',
                 ),
               ),
             ],
           ),
+
           const SizedBox(height: 24),
-          const Text(
-            'Contas com plano desativado',
-            style: TextStyle(fontWeight: FontWeight.bold),
+
+          // Contas suspensas
+          Row(
+            children: [
+              const Text(
+                'Contas com plano desativado',
+                style:
+                    TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 8),
+              if (contasInativas.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${contasInativas.length}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.red.shade700,
+                    ),
+                  ),
+                ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           if (contasInativas.isEmpty)
-            const Text(
-              'Todas as contas estão ativas.',
-              style: TextStyle(color: Colors.green),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.check_circle,
+                      color: Colors.green.shade600, size: 20),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Todas as contas estão ativas.',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
             )
           else
             ...contasInativas.map(
-              (c) => Card(
-                color: Colors.red.shade50,
-                child: ListTile(
-                  leading:
-                      const Icon(Icons.warning, color: Colors.red),
-                  title:
-                      Text(c.nomeEquipe ?? c.tipoConta.toUpperCase()),
-                  subtitle: Text('Pagamento: ${c.statusPagamento}'),
-                  trailing: TextButton(
-                    onPressed: () => _alternarPlanoAtivo(c),
-                    child: const Text('Reativar'),
-                  ),
+              (c) => Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning_amber,
+                        color: Colors.red.shade400, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            c.nomeEquipe ?? c.tipoConta.toUpperCase(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Pagamento: ${c.statusPagamento}',
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey.shade700),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => _alternarPlanoAtivo(c),
+                      child: const Text('Reativar'),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -253,49 +393,98 @@ class _AdminSistemaScreenState extends State<AdminSistemaScreen> {
     );
   }
 
-  Widget _cardResumo({
+  Widget _metricCard({
     required IconData icon,
     required Color cor,
-    required String titulo,
     required String valor,
-    required String subtitulo,
+    required String label,
+    required String sub,
   }) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(icon, color: cor, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              valor,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: cor,
-              ),
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: cor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
             ),
-            Text(
-              titulo,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+            child: Icon(icon, color: cor, size: 20),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  valor,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: cor,
+                  ),
+                ),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  sub,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              subtitulo,
-              style: const TextStyle(fontSize: 11, color: Colors.grey),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   // ─── Aba Contas ───────────────────────────────────────────────────────────
+
   Widget _buildContas() {
     if (_contas.isEmpty) {
-      return const Center(
-        child: Text(
-          'Nenhuma conta cadastrada.',
-          style: TextStyle(color: Colors.grey),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.business_outlined,
+                    size: 48, color: Colors.grey.shade400),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Nenhuma conta cadastrada.',
+                style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -303,20 +492,42 @@ class _AdminSistemaScreenState extends State<AdminSistemaScreen> {
     return RefreshIndicator(
       onRefresh: _carregarDados,
       child: ListView.builder(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
         itemCount: _contas.length,
         itemBuilder: (context, index) {
           final c = _contas[index];
-          return Card(
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border(
+                left: BorderSide(
+                  color: c.planoAtivo
+                      ? const Color(0xFF00796B)
+                      : Colors.red.shade300,
+                  width: 4,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14, vertical: 4),
               leading: CircleAvatar(
-                backgroundColor:
-                    c.planoAtivo ? Colors.teal : Colors.red.shade300,
+                backgroundColor: c.planoAtivo
+                    ? const Color(0xFF00796B)
+                    : Colors.red.shade300,
                 child: Icon(
-                  c.tipoConta == 'gestor'
-                      ? Icons.groups
-                      : Icons.person,
+                  c.tipoConta == 'gestor' ? Icons.groups : Icons.person,
                   color: Colors.white,
+                  size: 20,
                 ),
               ),
               title: Text(
@@ -327,16 +538,31 @@ class _AdminSistemaScreenState extends State<AdminSistemaScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Plano: ${c.plano} • Limite: ${c.limiteProfissionais}',
-                  ),
-                  Text(
-                    'Pagamento: ${c.statusPagamento}',
+                    'Plano: ${c.plano} · Limite: ${c.limiteProfissionais} prof.',
                     style: TextStyle(
-                      fontSize: 12,
-                      color: c.statusPagamento == 'ativo'
-                          ? Colors.green
-                          : Colors.orange,
-                    ),
+                        fontSize: 12, color: Colors.grey.shade600),
+                  ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.circle,
+                        size: 8,
+                        color: c.statusPagamento == 'ativo'
+                            ? Colors.green
+                            : Colors.orange,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Pagamento: ${c.statusPagamento}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: c.statusPagamento == 'ativo'
+                              ? Colors.green.shade700
+                              : Colors.orange.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -352,12 +578,32 @@ class _AdminSistemaScreenState extends State<AdminSistemaScreen> {
   }
 
   // ─── Aba Usuários ─────────────────────────────────────────────────────────
+
   Widget _buildUsuarios() {
     if (_usuarios.isEmpty) {
-      return const Center(
-        child: Text(
-          'Nenhum usuário encontrado.',
-          style: TextStyle(color: Colors.grey),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.people_outline,
+                    size: 48, color: Colors.grey.shade400),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Nenhum usuário encontrado.',
+                style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -365,49 +611,101 @@ class _AdminSistemaScreenState extends State<AdminSistemaScreen> {
     return RefreshIndicator(
       onRefresh: _carregarDados,
       child: ListView.builder(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
         itemCount: _usuarios.length,
         itemBuilder: (context, index) {
           final u = _usuarios[index];
-          return Card(
+          final cor = _corTipo(u);
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14, vertical: 4),
               leading: CircleAvatar(
-                backgroundColor: u.isAdminSistema
-                    ? Colors.purple
-                    : u.isGestor
-                        ? Colors.blue
-                        : Colors.teal,
+                backgroundColor: cor,
                 child: Text(
                   u.nome.isNotEmpty ? u.nome[0].toUpperCase() : '?',
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              title: Text(u.nome),
+              title: Text(
+                u.nome,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(u.email),
                   Text(
-                    _labelTipoUsuario(u.tipoUsuario),
+                    u.email,
                     style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: u.isAdminSistema
-                          ? Colors.purple
-                          : u.isGestor
-                              ? Colors.blue
-                              : Colors.teal,
-                    ),
+                        fontSize: 12, color: Colors.grey.shade600),
                   ),
-                  if (u.bloqueado)
-                    const Text(
-                      'Bloqueado',
-                      style: TextStyle(color: Colors.red, fontSize: 12),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: cor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          _labelTipoUsuario(u.tipoUsuario),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: cor,
+                          ),
+                        ),
+                      ),
+                      if (u.bloqueado) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Bloqueado',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
               ),
               trailing: u.isAdminSistema
-                  ? const Icon(Icons.shield, color: Colors.purple)
+                  ? Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.purple.shade50,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.shield,
+                          color: Colors.purple, size: 18),
+                    )
                   : Switch(
                       value: !u.bloqueado,
                       onChanged: (_) => _alternarBloqueado(u),
