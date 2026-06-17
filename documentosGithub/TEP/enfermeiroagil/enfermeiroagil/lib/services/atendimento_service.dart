@@ -7,6 +7,24 @@ class AtendimentoService {
   AtendimentoService(this._supabase);
 
   Future<List<Atendimento>> listarProximosDoUsuario() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) throw Exception('Usuário não autenticado');
+
+    // Primeiro, obtenha os IDs dos pacientes que o usuário atual está vinculado
+    final List<dynamic> pacienteVinculos = await _supabase
+        .from('paciente_enfermeiros')
+        .select('paciente_id')
+        .eq('enfermeiro_id', user.id);
+
+    final List<String> pacientesIds =
+        pacienteVinculos.map((e) => e['paciente_id'] as String).toList();
+
+    // Se não houver pacientes vinculados, retorne uma lista vazia para evitar erro no filtro 'inFilter'
+    if (pacientesIds.isEmpty) {
+      return [];
+    }
+
+    // Em seguida, obtenha os atendimentos para esses pacientes
     final rows = await _supabase
         .from('atendimentos')
         .select('''
@@ -19,6 +37,7 @@ class AtendimentoService {
           tipos_atendimento (nome)
         ''')
         .eq('status', 'pendente')
+        .inFilter('paciente_id', pacientesIds) // CORREÇÃO AQUI: usando inFilter
         .order('data_prevista', ascending: true)
         .order('horario_previsto', ascending: true);
 

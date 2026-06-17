@@ -61,16 +61,14 @@ class _GestorDashboardScreenState extends State<GestorDashboardScreen> {
       final profissionais = await _usuarioService
           .listarProfissionaisDaConta(widget.usuario.contaId!);
 
-      List<Paciente> pacientes;
-      if (_filtroProfissionalId == null) {
-        pacientes = await _pacienteService
-            .listarPacientesDaConta(widget.usuario.contaId!);
-      } else {
-        pacientes = await _pacienteService
-            .listarPacientesDaContaPorProfissional(
-          contaId: widget.usuario.contaId!,
-          profissionalId: _filtroProfissionalId!,
-        );
+      List<Paciente> pacientes =
+          await _pacienteService.listarPacientesDaConta(widget.usuario.contaId!);
+
+      // Caso haja filtro por profissional, filtra localmente
+      if (_filtroProfissionalId != null) {
+        pacientes = pacientes
+            .where((p) => p.criadoPor == _filtroProfissionalId) // <-- LINHA CORRIGIDA AQUI
+            .toList();
       }
 
       setState(() {
