@@ -26,7 +26,7 @@ class PacienteService {
     return rows.map<Paciente>((r) => Paciente.fromMap(r)).toList();
   }
 
-  Future<List<Paciente>> listarPacientesDaContaPorProfissional({
+  Future<List<Paciente>> listarPacientesDaContanPorProfissional({
     required String contaId,
     required String profissionalId,
   }) async {
