@@ -283,24 +283,6 @@ O projeto já conta com materiais importantes de apoio, como:
 ### Protótipo de alta fidelidade
 O protótipo pode ser representado em **HTML** com navegação simulada entre telas, servindo como demonstração visual do fluxo do aplicativo.
 
-### Sugestão de seção de imagens
-Se você tiver capturas de tela, pode adicioná-las aqui:
-
-```md
-## Imagens do projeto
-
-### Tela de login
-![Login](docs/images/login.png)
-
-### Dashboard do enfermeiro
-![Dashboard Enfermeiro](docs/images/dashboard-enfermeiro.png)
-
-### Lista de pacientes
-![Pacientes](docs/images/pacientes.png)
-
-### Dashboard do gestor
-![Dashboard Gestor](docs/images/dashboard-gestor.png)
-```
 
 ---
 
