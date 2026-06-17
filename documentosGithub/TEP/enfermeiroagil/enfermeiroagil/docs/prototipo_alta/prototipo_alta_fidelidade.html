@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Enfermeiro Ágil - Protótipo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    body {
+      background: #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    /* Moldura de celular */
+    .app-shell {
+      width: 400px;
+      max-width: 100%;
+      height: 800px;
+      max-height: 100vh;
+      background: #f5f5f5;
+      border-radius: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      background: #1976d2;
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-header .back-btn {
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    .app-header-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    /* Área de conteúdo das telas */
+    .app-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+
+    /* Barra inferior (nav) */
+    .app-footer {
+      border-top: 1px solid #ddd;
+      background: #fff;
+      padding: 8px 0;
+    }
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.8rem;
+    }
+    .bottom-nav button {
+      border: none;
+      background: none;
+      font-size: 0.8rem;
+      color: #616161;
+    }
+    .bottom-nav button.active {
+      color: #1976d2;
+      font-weight: 600;
+    }
+
+    /* Telas */
+    .screen {
+      display: none;
+    }
+    .screen.active {
+      display: block;
+    }
+
+    .logo-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1976d2;
+    }
+
+    .splash-screen {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .splash-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 999px;
+      background: #1976d2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .card-form {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 80px;
+      right: 32px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #1976d2;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      border: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+
+    /* Para o protótipo: esconde FAB em telas que não precisam */
+    .fab.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Cabeçalho dinâmico -->
+    <div class="app-header">
+      <span class="back-btn d-none" id="backBtn">&larr;</span>
+      <span class="app-header-title" id="headerTitle">Enfermeiro Ágil</span>
+    </div>
+
+    <!-- Corpo (onde as telas aparecem) -->
+    <div class="app-body">
+      <!-- Splash -->
+      <div class="screen active" data-screen="splash">
+        <div class="splash-screen">
+          <div class="splash-logo">EA</div>
+          <div>
+            <div class="logo-title">Enfermeiro Ágil</div>
+            <p class="text-muted mb-4">
+              Organize pacientes e atendimentos com eficiência.
+            </p>
+          </div>
+          <button
+            class="btn btn-primary"
+            data-target="login"
+          >
+            Ir para Login
+          </button>
+        </div>
+      </div>
+
+      <!-- Login -->
+      <div class="screen" data-screen="login">
+        <div class="card-form mb-3">
+          <h5 class="mb-3">Login</h5>
+          <div class="mb-3">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-control" placeholder="seuemail@exemplo.com" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-control" placeholder="••••••••" />
+          </div>
+          <div class="text-end mb-3">
+            <small class="text-primary" style="cursor:pointer;">Esqueci minha senha</small>
+          </div>
+          <button class="btn btn-primary w-100 mb-2" data-target="home">
+            Entrar
+          </button>
+        </div>
+        <div class="text-center">
+          <small>Não tem conta?</small><br />
+          <button class="btn btn-link p-0" data-target="register">
+            Registrar-se
+          </button>
+        </div>
+      </div>
+
+      <!-- Registro -->
+      <div class="screen" data-screen="register">
+        <div class="card-form mb-3">
+          <h5 class="mb-3">Criar Conta</h5>
+          <div class="mb-3">
+            <label class="form-label">Nome completo</label>
+            <input type="text" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">E-mail</label>
+            <input type="email" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirmar senha</label>
+            <input type="password" class="form-control" />
+          </div>
+          <button class="btn btn-primary w-100 mb-2" data-target="home">
+            Registrar
+          </button>
+        </div>
+        <div class="text-center">
+          <small>Já tem conta?</small><br />
+          <button class="btn btn-link p-0" data-target="login">
+            Fazer login
+          </button>
+        </div>
+      </div>
+
+      <!-- Home -->
+      <div class="screen" data-screen="home">
+        <h5 class="mb-2">Olá, Enfermeiro(a) Maria</h5>
+        <p class="text-muted mb-4">
+          Veja seus pacientes e atendimentos de hoje.
+        </p>
+        <div class="row g-3">
+          <div class="col-12">
+            <div
+              class="card p-3"
+              style="cursor:pointer;"
+              data-target="patients"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">Pacientes</h6>
+                  <small class="text-muted">Gerenciar pacientes</small>
+                </div>
+                <span class="badge bg-primary rounded-pill">12</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div
+              class="card p-3"
+              style="cursor:pointer;"
+              data-target="appointments"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">Atendimentos</h6>
+                  <small class="text-muted">Ver e registrar atendimentos</small>
+                </div>
+                <span class="badge bg-success rounded-pill">5 hoje</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div
+              class="card p-3"
+              style="cursor:pointer;"
+              data-target="profile"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">Perfil</h6>
+                  <small class="text-muted">Dados do usuário</small>
+                </div>
+                <span class="text-muted">></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de Pacientes -->
+      <div class="screen" data-screen="patients">
+        <div class="mb-3">
+          <input
+            type="search"
+            class="form-control"
+            placeholder="Buscar paciente pelo nome"
+          />
+        </div>
+        <div class="list-group">
+          <button
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            data-target="patient-details"
+          >
+            <div>
+              <div class="fw-semibold">João Silva</div>
+              <small class="text-muted">45 anos • Leito 12 • UTI</small>
+            </div>
+            <span class="badge bg-danger">Crítico</span>
+          </button>
+          <button
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            data-target="patient-details"
+          >
+            <div>
+              <div class="fw-semibold">Maria Souza</div>
+              <small class="text-muted">63 anos • Leito 03 • Clínica</small>
+            </div>
+            <span class="badge bg-warning text-dark">Observação</span>
+          </button>
+          <button
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            data-target="patient-details"
+          >
+            <div>
+              <div class="fw-semibold">Carlos Lima</div>
+              <small class="text-muted">30 anos • Leito 20 • Enfermaria</small>
+            </div>
+            <span class="badge bg-success">Estável</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Detalhes do Paciente -->
+      <div class="screen" data-screen="patient-details">
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title mb-1">João Silva</h5>
+            <small class="text-muted d-block mb-2">
+              45 anos • Leito 12 • UTI
+            </small>
+            <span class="badge bg-danger mb-2">Crítico</span>
+            <h6 class="mt-3">Informações Clínicas</h6>
+            <p class="mb-2">
+              Diagnóstico: Insuficiência respiratória aguda.
+            </p>
+            <p class="mb-0">
+              Alergias: Nenhuma registrada.<br />
+              Observações: Monitorar saturação constantemente.
+            </p>
+          </div>
+        </div>
+
+        <h6>Atendimentos recentes</h6>
+        <div class="list-group mb-3">
+          <button
+            class="list-group-item list-group-item-action"
+            data-target="appointment-details"
+          >
+            14/04/2026 - Medicação • Administração de antibiótico.
+          </button>
+          <button
+            class="list-group-item list-group-item-action"
+            data-target="appointment-details"
+          >
+            13/04/2026 - Avaliação • Exame físico completo.
+          </button>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-outline-primary flex-fill"
+            data-target="patient-edit"
+          >
+            Editar dados
+          </button>
+          <button
+            class="btn btn-success flex-fill"
+            data-target="appointment-create"
+          >
+            Novo atendimento
+          </button>
+        </div>
+      </div>
+
+      <!-- Criar Paciente -->
+      <div class="screen" data-screen="patient-create">
+        <div class="card-form">
+          <h5 class="mb-3">Novo Paciente</h5>
+          <div class="mb-3">
+            <label class="form-label">Nome completo</label>
+            <input type="text" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Idade</label>
+            <input type="number" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Leito / Setor</label>
+            <input type="text" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Estado do paciente</label>
+            <select class="form-select">
+              <option>Estável</option>
+              <option>Em observação</option>
+              <option>Crítico</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Diagnóstico / Observações iniciais</label>
+            <textarea class="form-control" rows="3"></textarea>
+          </div>
+          <button class="btn btn-primary w-100 mb-2" data-target="patients">
+            Salvar paciente
+          </button>
+          <button class="btn btn-link w-100" data-target="patients">
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      <!-- Editar Paciente -->
+      <div class="screen" data-screen="patient-edit">
+        <div class="card-form">
+          <h5 class="mb-3">Editar Paciente</h5>
+          <div class="mb-3">
+            <label class="form-label">Nome completo</label>
+            <input type="text" class="form-control" value="João Silva" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Idade</label>
+            <input type="number" class="form-control" value="45" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Leito / Setor</label>
+            <input type="text" class="form-control" value="Leito 12 • UTI" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Estado do paciente</label>
+            <select class="form-select">
+              <option selected>Crítico</option>
+              <option>Estável</option>
+              <option>Em observação</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Diagnóstico / Observações</label>
+            <textarea class="form-control" rows="3">
+Insuficiência respiratória aguda. Monitorar saturação constantemente.</textarea>
+          </div>
+          <button
+            class="btn btn-primary w-100 mb-2"
+            data-target="patient-details"
+          >
+            Salvar alterações
+          </button>
+          <button
+            class="btn btn-link w-100"
+            data-target="patient-details"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de Atendimentos -->
+      <div class="screen" data-screen="appointments">
+        <div class="mb-3">
+          <select class="form-select">
+            <option>Hoje</option>
+            <option>Últimos 7 dias</option>
+            <option>Todos</option>
+          </select>
+        </div>
+        <div class="list-group">
+          <button
+            class="list-group-item list-group-item-action"
+            data-target="appointment-details"
+          >
+            <div class="d-flex justify-content-between">
+              <div>
+                <div class="fw-semibold">João Silva</div>
+                <small class="text-muted">14/04/2026 • 10:30</small><br />
+                <small>Medicação - Antibiótico</small>
+              </div>
+              <span class="text-muted">></span>
+            </div>
+          </button>
+          <button
+            class="list-group-item list-group-item-action"
+            data-target="appointment-details"
+          >
+            <div class="d-flex justify-content-between">
+              <div>
+                <div class="fw-semibold">Maria Souza</div>
+                <small class="text-muted">14/04/2026 • 09:00</small><br />
+                <small>Avaliação - Exame físico</small>
+              </div>
+              <span class="text-muted">></span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Detalhes do Atendimento -->
+      <div class="screen" data-screen="appointment-details">
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="mb-1">João Silva</h6>
+            <small class="text-muted d-block mb-2">
+              14/04/2026 • 10:30 • Medicação
+            </small>
+            <h6>Descrição do procedimento</h6>
+            <p>
+              Administração de antibiótico intravenoso conforme prescrição
+              médica.
+            </p>
+            <h6>Observações</h6>
+            <p>
+              Monitorar reação alérgica nas próximas horas.
+            </p>
+            <h6>Medicamentos administrados</h6>
+            <p>Ceftriaxona 1g IV.</p>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-outline-primary flex-fill"
+            data-target="appointment-edit"
+          >
+            Editar atendimento
+          </button>
+        </div>
+      </div>
+
+      <!-- Criar Atendimento -->
+      <div class="screen" data-screen="appointment-create">
+        <div class="card-form">
+          <h5 class="mb-3">Novo Atendimento</h5>
+          <div class="mb-3">
+            <label class="form-label">Paciente</label>
+            <input
+              type="text"
+              class="form-control"
+              value="João Silva"
+              disabled
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tipo de atendimento</label>
+            <select class="form-select">
+              <option>Medicação</option>
+              <option>Curativo</option>
+              <option>Avaliação</option>
+              <option>Sinais vitais</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Horário</label>
+            <input type="time" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descrição do procedimento</label>
+            <textarea class="form-control" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Observações</label>
+            <textarea class="form-control" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Medicamentos administrados</label>
+            <textarea class="form-control" rows="2"></textarea>
+          </div>
+          <button
+            class="btn btn-success w-100 mb-2"
+            data-target="patient-details"
+          >
+            Salvar atendimento
+          </button>
+          <button
+            class="btn btn-link w-100"
+            data-target="patient-details"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      <!-- Editar Atendimento -->
+      <div class="screen" data-screen="appointment-edit">
+        <div class="card-form">
+          <h5 class="mb-3">Editar Atendimento</h5>
+          <div class="mb-3">
+            <label class="form-label">Paciente</label>
+            <input
+              type="text"
+              class="form-control"
+              value="João Silva"
+              disabled
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tipo de atendimento</label>
+            <select class="form-select">
+              <option selected>Medicação</option>
+              <option>Curativo</option>
+              <option>Avaliação</option>
+              <option>Sinais vitais</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Data</label>
+            <input type="date" class="form-control" value="2026-04-14" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Horário</label>
+            <input type="time" class="form-control" value="10:30" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descrição do procedimento</label>
+            <textarea class="form-control" rows="3">
+Administração de antibiótico intravenoso conforme prescrição médica.</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Observações</label>
+            <textarea class="form-control" rows="2">
+Monitorar reação alérgica nas próximas horas.</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Medicamentos administrados</label>
+            <textarea class="form-control" rows="2">
+Ceftriaxona 1g IV.</textarea>
+          </div>
+          <button
+            class="btn btn-primary w-100 mb-2"
+            data-target="appointment-details"
+          >
+            Salvar alterações
+          </button>
+          <button
+            class="btn btn-link w-100"
+            data-target="appointment-details"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      <!-- Perfil -->
+      <div class="screen" data-screen="profile">
+        <div class="card mb-3">
+          <div class="card-body d-flex align-items-center">
+            <div
+              class="me-3 d-flex align-items-center justify-content-center rounded-circle"
+              style="width:48px;height:48px;background:#1976d2;color:#fff;font-weight:600;"
+            >
+              M
+            </div>
+            <div>
+              <div class="fw-semibold">Maria Oliveira</div>
+              <small class="text-muted">maria.oliveira@hospital.com</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6>Dados profissionais</h6>
+            <p class="mb-1"><strong>Registro (COREN):</strong> 123456</p>
+            <p class="mb-1">
+              <strong>Especialidade:</strong> Enfermagem UTI
+            </p>
+            <p class="mb-0">
+              <strong>Unidade:</strong> Hospital Central
+            </p>
+          </div>
+        </div>
+
+        <div class="list-group mb-3">
+          <button
+            class="list-group-item list-group-item-action"
+            data-target="profile-edit"
+          >
+            Editar perfil / dados do usuário
+          </button>
+          <button
+            class="list-group-item list-group-item-action"
+            data-target="settings"
+          >
+            Configurações
+          </button>
+        </div>
+
+        <button class="btn btn-outline-danger w-100" data-target="login">
+          Sair
+        </button>
+      </div>
+
+      <!-- Editar Perfil / Dados do Usuário -->
+      <div class="screen" data-screen="profile-edit">
+        <div class="card-form">
+          <h5 class="mb-3">Editar Perfil</h5>
+
+          <div class="d-flex align-items-center mb-3">
+            <div
+              class="me-3 d-flex align-items-center justify-content-center rounded-circle"
+              style="width:48px;height:48px;background:#1976d2;color:#fff;font-weight:600;"
+            >
+              M
+            </div>
+            <div>
+              <div class="fw-semibold">Maria Oliveira</div>
+              <small class="text-muted">maria.oliveira@hospital.com</small>
+            </div>
+          </div>
+
+          <h6 class="mt-2">Dados pessoais</h6>
+          <div class="mb-2">
+            <label class="form-label">Nome completo</label>
+            <input type="text" class="form-control" value="Maria Oliveira" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Data de nascimento</label>
+            <input type="date" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Telefone</label>
+            <input type="tel" class="form-control" />
+          </div>
+
+          <h6>Dados profissionais</h6>
+          <div class="mb-2">
+            <label class="form-label">Registro profissional (COREN)</label>
+            <input type="text" class="form-control" value="123456" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Especialidade</label>
+            <input
+              type="text"
+              class="form-control"
+              value="Enfermagem UTI"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Unidade / Hospital</label>
+            <input
+              type="text"
+              class="form-control"
+              value="Hospital Central"
+            />
+          </div>
+
+          <h6>Contato & Localização</h6>
+          <div class="mb-2">
+            <label class="form-label">E-mail</label>
+            <input
+              type="email"
+              class="form-control"
+              value="maria.oliveira@hospital.com"
+            />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Cidade</label>
+            <input type="text" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Estado / UF</label>
+            <input type="text" class="form-control" />
+          </div>
+
+          <button class="btn btn-primary w-100 mb-2" data-target="profile">
+            Salvar alterações
+          </button>
+          <button class="btn btn-link w-100" data-target="profile">
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      <!-- Configurações -->
+      <div class="screen" data-screen="settings">
+        <div class="list-group">
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold">Notificações</div>
+              <small class="text-muted">Alertas sobre atendimentos</small>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" checked />
+            </div>
+          </div>
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold">Tema</div>
+              <small class="text-muted">Claro / Escuro</small>
+            </div>
+            <span class="text-muted">Claro</span>
+          </div>
+          <button class="list-group-item list-group-item-action">
+            Ajuda e suporte
+          </button>
+          <button class="list-group-item list-group-item-action">
+            Sobre o aplicativo
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra inferior -->
+    <div class="app-footer">
+      <div class="bottom-nav">
+        <button class="nav-btn active" data-target="home">Home</button>
+        <button class="nav-btn" data-target="patients">Pacientes</button>
+        <button class="nav-btn" data-target="appointments">Atendimentos</button>
+        <button class="nav-btn" data-target="profile">Perfil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB para criar paciente (aparece só na lista de pacientes) -->
+  <button class="fab hidden" id="fabBtn" data-target="patient-create">+</button>
+
+  <!-- Bootstrap JS (opcional para alguns componentes) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script simples para trocar de "tela" -->
+  <script>
+    const screens = document.querySelectorAll(".screen");
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const backBtn = document.getElementById("backBtn");
+    const headerTitle = document.getElementById("headerTitle");
+    const fabBtn = document.getElementById("fabBtn");
+
+    // histórico simples de telas para o botão voltar
+    const historyStack = [];
+
+    function setScreen(target, pushHistory = true) {
+      const current = document.querySelector(".screen.active");
+      if (current && pushHistory) {
+        historyStack.push(current.dataset.screen);
+      }
+
+      screens.forEach((s) => s.classList.remove("active"));
+      const newScreen = document.querySelector(
+        `.screen[data-screen="${target}"]`
+      );
+      if (newScreen) {
+        newScreen.classList.add("active");
+      }
+
+      // Atualiza título básico (poderia ser mais sofisticado)
+      const titles = {
+        splash: "Enfermeiro Ágil",
+        login: "Login",
+        register: "Criar Conta",
+        home: "Enfermeiro Ágil",
+        patients: "Pacientes",
+        "patient-details": "Detalhes do Paciente",
+        "patient-create": "Novo Paciente",
+        "patient-edit": "Editar Paciente",
+        appointments: "Atendimentos",
+        "appointment-details": "Detalhes do Atendimento",
+        "appointment-create": "Novo Atendimento",
+        "appointment-edit": "Editar Atendimento",
+        profile: "Perfil",
+        "profile-edit": "Editar Perfil",
+        settings: "Configurações",
+      };
+      headerTitle.textContent = titles[target] || "Enfermeiro Ágil";
+
+      // Mostra/esconde botão voltar
+      if (target === "home" || target === "splash") {
+        backBtn.classList.add("d-none");
+      } else {
+        backBtn.classList.remove("d-none");
+      }
+
+      // Controle simples da FAB (aparece na lista de pacientes)
+      if (target === "patients") {
+        fabBtn.classList.remove("hidden");
+      } else {
+        fabBtn.classList.add("hidden");
+      }
+
+      // Atualiza estado visual da bottom nav
+      navButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.target === target);
+      });
+    }
+
+    // Clique em qualquer elemento com data-target
+    document.body.addEventListener("click", (e) => {
+      const target = e.target.closest("[data-target]");
+      if (!target) return;
+      const screen = target.getAttribute("data-target");
+      setScreen(screen);
+    });
+
+    // Botão voltar
+    backBtn.addEventListener("click", () => {
+      const prev = historyStack.pop();
+      if (prev) {
+        setScreen(prev, false);
+      } else {
+        setScreen("home", false);
+      }
+    });
+
+    // Começa na splash
+    setScreen("splash", false);
+  </script>
+</body>
+</html>
